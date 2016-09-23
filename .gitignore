@@ -96,5 +96,6 @@ ENV/
 *.binaryproto
 *.mat
 
-# Sublime project file
+# Sublime files
 *.sublime-project
+*.sublime-workplace

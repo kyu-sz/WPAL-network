@@ -1,0 +1,18 @@
+train_net: "models/vgg_cnn_f/train_net.prototxt"
+
+base_lr: 0.001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 350000
+display: 20
+average_loss: 100
+momentum: 0.9
+weight_decay: 0.0005
+
+# Standard caffe solver snapshotting is replaced by our own snapshot function
+snapshot: 0
+
+# We still use the snapshot prefix, though
+snapshot_prefix: "am_vgg_cnn_f"
+
+iter_size: 2

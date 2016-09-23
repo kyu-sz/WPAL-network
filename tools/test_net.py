@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 
 # --------------------------------------------------------------------
-# This file is part of RAM Network.
+# This file is part of AM Network.
 # 
-# RAM Network is free software: you can redistribute it and/or modify
+# AM Network is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# RAM Network is distributed in the hope that it will be useful,
+# AM Network is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with RAM Network.  If not, see <http://www.gnu.org/licenses/>.
+# along with AM Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
 import __init__
@@ -26,14 +26,14 @@ import pprint
 import numpy as np
 import time, os, sys
 
-from ram_net.test import test_net
+from am_net.test import test_net
 
 
 def parse_args():
     """
     Parse input arguments
     """
-    parser = argparse.ArgumentParser(description='train RAM Net')
+    parser = argparse.ArgumentParser(description='train AM Net')
     parser.add_argument('--gpu', dest='gpu_id',
                         help='GPU device ID to use (default: 0)',
                         default=0, type=int)

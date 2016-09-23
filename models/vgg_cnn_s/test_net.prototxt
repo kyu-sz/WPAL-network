@@ -1,18 +1,28 @@
-name: "VGG_CNN_F"
+name: "VGG_CNN_S"
+
 input: "data"
-input_dim: 10
-input_dim: 3
-input_dim: 224
-input_dim: 224
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 224
+  dim: 224
+}
+
+input: "im_info"
+input_shape {
+  dim: 1
+  dim: 3
+}
+
 layers {
   bottom: "data"
   top: "conv1"
   name: "conv1"
   type: CONVOLUTION
   convolution_param {
-    num_output: 64
-    kernel_size: 11
-    stride: 4
+    num_output: 96
+    kernel_size: 7
+    stride: 2
   }
 }
 layers {
@@ -41,7 +51,7 @@ layers {
   pooling_param {
     pool: MAX
     kernel_size: 3
-    stride: 2
+    stride: 3
   }
 }
 layers {
@@ -51,7 +61,6 @@ layers {
   type: CONVOLUTION
   convolution_param {
     num_output: 256
-    pad: 2
     kernel_size: 5
   }
 }
@@ -63,24 +72,12 @@ layers {
 }
 layers {
   bottom: "conv2"
-  top: "norm2"
-  name: "norm2"
-  type: LRN
-  lrn_param {
-    local_size: 5
-    alpha: 0.0005
-    beta: 0.75
-    k: 2
-  }
-}
-layers {
-  bottom: "norm2"
   top: "pool2"
   name: "pool2"
   type: POOLING
   pooling_param {
     pool: MAX
-    kernel_size: 3
+    kernel_size: 2
     stride: 2
   }
 }
@@ -90,7 +87,7 @@ layers {
   name: "conv3"
   type: CONVOLUTION
   convolution_param {
-    num_output: 256
+    num_output: 512
     pad: 1
     kernel_size: 3
   }
@@ -107,7 +104,7 @@ layers {
   name: "conv4"
   type: CONVOLUTION
   convolution_param {
-    num_output: 256
+    num_output: 512
     pad: 1
     kernel_size: 3
   }
@@ -124,7 +121,7 @@ layers {
   name: "conv5"
   type: CONVOLUTION
   convolution_param {
-    num_output: 256
+    num_output: 512
     pad: 1
     kernel_size: 3
   }
@@ -143,7 +140,7 @@ layers {
   pooling_param {
     pool: MAX
     kernel_size: 3
-    stride: 2
+    stride: 3
   }
 }
 layers {

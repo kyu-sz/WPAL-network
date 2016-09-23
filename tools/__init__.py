@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 
 # --------------------------------------------------------------------
-# This file is part of RAM Network.
+# This file is part of AM Network.
 # 
-# RAM Network is free software: you can redistribute it and/or modify
+# AM Network is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# RAM Network is distributed in the hope that it will be useful,
+# AM Network is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with RAM Network.  If not, see <http://www.gnu.org/licenses/>.
+# along with AM Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-"""Set up paths for RAM Net."""
+"""Set up paths for AM Net."""
 
 import os.path as osp
 import sys

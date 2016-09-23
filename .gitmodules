@@ -1,3 +1,4 @@
+
 [submodule "caffe"]
 	path = caffe
-	url = ./caffe
+	url = https://github.com/kyu-sz/caffe.git
