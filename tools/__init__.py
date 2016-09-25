@@ -19,6 +19,7 @@
 
 """Set up paths for AM Net."""
 
+import os
 import os.path as osp
 import sys
 
@@ -29,9 +30,15 @@ def add_path(path):
 this_dir = osp.dirname(__file__)
 
 # Add caffe to PYTHONPATH
-caffe_path = osp.join(this_dir, '..', 'caffe', 'python')
+project_path = osp.join(this_dir, '..')
+add_path(project_path)
+
+# Add caffe to PYTHONPATH
+caffe_path = osp.join(project_path, 'caffe', 'python')
 add_path(caffe_path)
 
 # Add lib to PYTHONPATH
-lib_path = osp.join(this_dir, '..', 'lib')
+lib_path = osp.join(project_path, 'lib')
 add_path(lib_path)
+
+os.chdir(project_path)

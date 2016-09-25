@@ -1,14 +1,14 @@
 name: "VGG_CNN_F"
 
 layer {
-  name: 'input-data'
-  type: 'Python'
-  top: 'data'
-  top: 'im_info'
-  top: 'attr'
+  name: "input-data"
+  type: "PYTHON"
+  top: "data"
+  top: "im_info"
+  top: "attr"
   python_param {
-    module: 'data_layer.layer'
-    layer: 'DataLayer'
+    module: "data_layer.layer"
+    layer: "DataLayer"
   }
 }
 

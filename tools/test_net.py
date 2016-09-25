@@ -26,7 +26,8 @@ import pprint
 import numpy as np
 import time, os, sys
 
-from am_net.test import test_net
+from wma_net.test import test_net
+from wma_net.config import config, conf_from_file, conf_from_list
 
 
 def parse_args():
@@ -64,15 +65,15 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    if args.cfg_file is not None:
-        cfg_from_file(args.cfg_file)
-    if args.set_cfgs is not None:
-        cfg_from_list(args.set_cfgs)
+    if args.config_file is not None:
+        config_from_file(args.config_file)
+    if args.set_configs is not None:
+        config_from_list(args.set_configs)
 
-    cfg.GPU_ID = args.gpu_id
+    config.GPU_ID = args.gpu_id
 
     print('Using config:')
-    pprint.pprint(cfg)
+    pprint.pprint(config)
 
     while not os.path.exists(args.caffemodel) and args.wait:
         print('Waiting for {} to exist...'.format(args.caffemodel))

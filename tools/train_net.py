@@ -27,7 +27,8 @@ import numpy as np
 import sys
 
 from utils.timer import Timer
-from am_net.train import train_net
+from wma_net.train import train_net
+from wma_net.config import config, conf_from_file, conf_from_list
 
 
 def parse_args():
