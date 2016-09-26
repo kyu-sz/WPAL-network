@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 
 # --------------------------------------------------------------------
-# This file is part of AM Network.
+# This file is part of WMA Network.
 # 
-# AM Network is free software: you can redistribute it and/or modify
+# WMA Network is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# AM Network is distributed in the hope that it will be useful,
+# WMA Network is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with AM Network.  If not, see <http://www.gnu.org/licenses/>.
+# along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
 import __init__
@@ -50,7 +50,10 @@ def parse_args():
                         default='./models/vgg_cnn_s/vgg_cnn_s.caffemodel', type=str)
     parser.add_argument('--dbpath', dest='db_path',
                         help='the path of the RAP database',
-						default='~/datasets/rap', type=str)
+						default='/home/ken.yu/datasets/rap', type=str)
+    parser.add_argument('--setid', dest='par_set_id',
+                        help='the index of training and testing data partition set',
+                        default='0', type=int)
     parser.add_argument('--outputdir', dest='output_dir',
                         help='the directory to save outputs',
                         default='./output', type=str)
@@ -78,6 +81,6 @@ if __name__ == '__main__':
 
     print 'Output will be saved to `{:s}`'.format(args.output_dir)
 
-    train_net(args.solver, args.db_path, args.output_dir,
+    train_net(args.solver, args.db_path, args.par_set_id, args.output_dir,
         pretrained_model=args.pretrained_model,
 		max_iters=args.max_iters)
