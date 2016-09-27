@@ -22,6 +22,7 @@ from caffe.proto import caffe_pb2
 import google.protobuf as pb2
 from utils.rap_db import RAP_DB
 from utils.timer import Timer
+import sys
 
 class SolverWrapper(object):
     """A simple wrapper around Caffe's solver.
@@ -34,6 +35,10 @@ class SolverWrapper(object):
         self.output_dir = output_dir
 
         self.solver = caffe.SGDSolver(solver_prototxt)
+
+        print 'Finished!'
+        sys.exit(1)
+
         if pretrained_model is not None:
             print ('Loading pretrained model '
                    'weights from {:s}').format(pretrained_model)

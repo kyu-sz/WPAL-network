@@ -25,31 +25,30 @@ import cv2
 from wma_net.config import config
 from utils.blob import prep_img_for_blob, img_list_to_blob
 
-def get_minibatch(rapdb, img_names, labels):
-    """Construct a minibatch with given image names and corresponding labels."""
+def get_minibatch(img_paths, labels):
+    """Construct a minibatch with given image paths and corresponding labels."""
+    num_images = len(img_paths)
 
     # Sample random scales to use for each image in this batch
     random_scale_inds = npr.randint(0, high=len(config.TRAIN.SCALES),
                                     size=num_images)
 
     # Get the input image blob, formatted for caffe
-    img_blob, attr = _get_image_blob(rapdb, random_scale_inds)
+    img_blob = _get_image_blob(img_paths, random_scale_inds)
 
-    blobs = {'data': img_blob, 'attr': attr}
+    blobs = {'data': img_blob, 'attr': labels}
 
     return blobs
 
-def _get_image_blob(rapdb, scale_inds):
-    """Builds an input blob from the images in the rapdb at the specified
+def _get_image_blob(img_paths, scale_inds):
+    """Builds an input blob from the images at the specified
     scales.
     """
-    num_images = len(rapdb)
+    num_images = len(img_paths)
     processed_ims = []
     img_scales = []
     for i in xrange(num_images):
-        img = cv2.imread(rapdb[i]['image'])
-        if rapdb[i]['flipped']:
-            img = img[:, ::-1, :]
+        img = cv2.imread(img_paths[i])
         target_size = config.TRAIN.SCALES[scale_inds[i]]
         img, img_scale = prep_img_for_blob(img, config.PIXEL_MEANS, target_size,
                                         config.TRAIN.MAX_SIZE)

@@ -34,7 +34,7 @@ class DataLayer(caffe.Layer):
 
     def _shuffle_db_inds(self):
         """Randomly permute the training roidb."""
-        self._perm = np.random.permutation(np.arange(len(self.train_ind)))
+        self._perm = np.random.permutation(np.arange(len(self._db.train_ind)))
         self._cur = 0
 
     def _get_next_minibatch_inds(self):
@@ -54,8 +54,6 @@ class DataLayer(caffe.Layer):
     def set_db(self, db):
         """Set the roidb to be used by this layer during training."""
         self._db = db
-        self._image_names = self._db.img_names[self._db.train_ind]
-        self._labels = self._db.labels[self._db.train_ind]
 
         self._shuffle_db_inds()
 
@@ -130,18 +128,18 @@ class BlobFetcher(Process):
     def _get_next_minibatch_inds(self):
         """Return the roidb indices for the next minibatch."""
         # TODO(rbg): remove duplicated code
-        if self._cur + config.TRAIN.IMS_PER_BATCH >= len(self._db.train_ind):
+        if self._cur >= len(self._db.train_ind):
             self._shuffle_db_inds()
 
-        db_inds = self._perm[self._cur:self._cur + config.TRAIN.IMS_PER_BATCH]
-        self._cur += config.TRAIN.IMS_PER_BATCH
+        db_inds = self._perm[self._cur:self._cur + config.TRAIN.BATCH_SIZE]
+        self._cur += config.TRAIN.BATCH_SIZE
         return db_inds
 
     def run(self):
         print 'BlobFetcher started'
         while True:
             db_inds = self._get_next_minibatch_inds()
-            minibatch_img_names = [self._db.img_names[i] for i in db_inds]
+            minibatch_img_paths = [self._db.get_img_path(i) for i in db_inds]
             minibatch_labels = [self._db.labels[i] for i in db_inds]
-            blobs = get_minibatch(minibatch_img_names, minibatch_labels)
+            blobs = get_minibatch(minibatch_img_paths, minibatch_labels)
             self._queue.put(blobs)
