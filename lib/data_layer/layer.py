@@ -29,38 +29,30 @@ from multiprocessing import Process, Queue
 from wma_net.config import config
 from data_layer.minibatch import get_minibatch
 
+
 class DataLayer(caffe.Layer):
     """WMA-net data layer used for training."""
 
-    def _shuffle_db_inds(self):
-        """Randomly permute the training roidb."""
-        self._perm = np.random.permutation(np.arange(len(self._db.train_ind)))
-        self._cur = 0
-
-    def _get_next_minibatch_inds(self):
-        """Return the roidb indices for the next minibatch."""
-        if self._cur + config.TRAIN.IMS_PER_BATCH >= len(self.train_ind):
-            self._shuffle_db_inds()
-
-        db_inds = self._perm[self._cur:self._cur + config.TRAIN.IMS_PER_BATCH]
-        self._cur += config.TRAIN.IMS_PER_BATCH
-        return db_inds
+    def __init__(self):
+        self._db = None
+        self._blob_queue = None
+        self._prefetch_process = None
+        self._name_to_top_map = None
 
     def _get_next_minibatch(self):
-        """Return the blobs to be used for the next minibatch.
+        """Return the blobs to be used for the next mini-batch.
         """
         return self._blob_queue.get()
 
     def set_db(self, db):
-        """Set the roidb to be used by this layer during training."""
+        """Set the database to be used by this layer during training."""
         self._db = db
-
-        self._shuffle_db_inds()
 
         """Enable prefetch."""
         self._blob_queue = Queue(10)
         self._prefetch_process = BlobFetcher(self._blob_queue, self._db)
         self._prefetch_process.start()
+
         # Terminate the child process when the parent exists
         def cleanup():
             print 'Terminating BlobFetcher'
@@ -71,13 +63,11 @@ class DataLayer(caffe.Layer):
 
     def setup(self, bottom, top):
         """Setup the DataLayer."""
-
         self._name_to_top_map = {}
 
         # data blob: holds a batch of N images, each with 3 channels
         idx = 0
-        top[idx].reshape(config.TRAIN.BATCH_SIZE, 3,
-            max(config.TRAIN.SCALES), config.TRAIN.MAX_SIZE)
+        top[idx].reshape(config.TRAIN.BATCH_SIZE, 3, max(config.TRAIN.SCALES), config.TRAIN.MAX_SIZE)
         self._name_to_top_map['data'] = idx
         idx += 1
 
@@ -93,6 +83,7 @@ class DataLayer(caffe.Layer):
         blobs = self._get_next_minibatch()
 
         for blob_name, blob in blobs.iteritems():
+            print 'Inputting', blob_name
             top_ind = self._name_to_top_map[blob_name]
             # Reshape net's input blobs
             top[top_ind].reshape(*(blob.shape))
@@ -106,6 +97,7 @@ class DataLayer(caffe.Layer):
     def reshape(self, bottom, top):
         """Reshaping happens during the call to forward."""
         pass
+
 
 class BlobFetcher(Process):
     """Experimental class for prefetching blobs in a separate process."""
@@ -121,13 +113,11 @@ class BlobFetcher(Process):
 
     def _shuffle_db_inds(self):
         """Randomly permute the training roidb."""
-        # TODO(rbg): remove duplicated code
         self._perm = np.random.permutation(np.arange(len(self._db.train_ind)))
         self._cur = 0
 
     def _get_next_minibatch_inds(self):
         """Return the roidb indices for the next minibatch."""
-        # TODO(rbg): remove duplicated code
         if self._cur >= len(self._db.train_ind):
             self._shuffle_db_inds()
 
@@ -143,3 +133,4 @@ class BlobFetcher(Process):
             minibatch_labels = [self._db.labels[i] for i in db_inds]
             blobs = get_minibatch(minibatch_img_paths, minibatch_labels)
             self._queue.put(blobs)
+            print "New blob added to the queue! Current size of queue:", self._queue.qsize()

@@ -1,14 +1,11 @@
 name: "VGG_CNN_S"
 
-layer {
-  name: "input-data"
-  type: "Python"
-  top: "data"
-  top: "attr"
-  python_param {
-    module: "data_layer.layer"
-    layer: "DataLayer"
-  }
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 224
+  dim: 224
 }
 
 layer {
@@ -252,28 +249,6 @@ layer {
 }
 
 layer {
-  bottom: "fc3_e"
-  bottom: "attr"
-  name: "cross_entropy_loss_3"
-  top: "cross_entropy_loss_3"
-  type: "SigmoidCrossEntropyLoss"
-}
-layer {
-  bottom: "fc4_e"
-  bottom: "attr"
-  name: "cross_entropy_loss_4"
-  top: "cross_entropy_loss_4"
-  type: "SigmoidCrossEntropyLoss"
-}
-layer {
-  bottom: "fc5_e"
-  bottom: "attr"
-  name: "cross_entropy_loss_5"
-  top: "cross_entropy_loss_5"
-  type: "SigmoidCrossEntropyLoss"
-}
-
-layer {
   name: "concat"
   bottom: "fc3_e"
   bottom: "fc4_e"
@@ -290,12 +265,4 @@ layer {
   inner_product_param {
     num_output: 92
   }
-}
-
-layer {
-  bottom: "fc_total"
-  bottom: "attr"
-  name: "cross_entropy_loss_total"
-  top: "cross_entropy_loss_total"
-  type: "SigmoidCrossEntropyLoss"
 }

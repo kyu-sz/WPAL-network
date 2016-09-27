@@ -25,6 +25,7 @@ import cv2
 from wma_net.config import config
 from utils.blob import prep_img_for_blob, img_list_to_blob
 
+
 def get_minibatch(img_paths, labels):
     """Construct a minibatch with given image paths and corresponding labels."""
     num_images = len(img_paths)
@@ -35,10 +36,18 @@ def get_minibatch(img_paths, labels):
 
     # Get the input image blob, formatted for caffe
     img_blob = _get_image_blob(img_paths, random_scale_inds)
+    attr_blob = _get_attr_blob(labels)
 
     blobs = {'data': img_blob, 'attr': labels}
 
     return blobs
+
+
+def _get_attr_blob(labels):
+    """Builds an input blob from the labels"""
+    blob = np.zeros((labels.shape[0], 1, 1, labels.shape[1]),
+                    dtype=np.float32)
+
 
 def _get_image_blob(img_paths, scale_inds):
     """Builds an input blob from the images at the specified

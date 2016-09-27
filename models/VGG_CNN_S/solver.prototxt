@@ -1,4 +1,4 @@
-train_net: "models/vgg_cnn_s/train_net.prototxt"
+train_net: "models/VGG_CNN_S/train_net.prototxt"
 
 base_lr: 0.001
 lr_policy: "step"

@@ -1,24 +1,21 @@
 name: "VGG_CNN_S"
 
-input: "data"
-input_shape {
-  dim: 1
-  dim: 3
-  dim: 224
-  dim: 224
-}
-
-input: "im_info"
-input_shape {
-  dim: 1
-  dim: 3
+layer {
+  name: "input-data"
+  type: "Python"
+  top: "data"
+  top: "attr"
+  python_param {
+    module: "data_layer.layer"
+    layer: "DataLayer"
+  }
 }
 
 layer {
   bottom: "data"
   top: "conv1"
   name: "conv1"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
     num_output: 96
     kernel_size: 7
@@ -28,8 +25,8 @@ layer {
 layer {
   bottom: "conv1"
   top: "conv1"
-  name: "relu1"
-  type: "RELU"
+  name: "ReLU1"
+  type: "ReLU"
 }
 layer {
   bottom: "conv1"
@@ -47,7 +44,7 @@ layer {
   bottom: "norm1"
   top: "pool1"
   name: "pool1"
-  type: "POOLING"
+  type: "Pooling"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -58,7 +55,7 @@ layer {
   bottom: "pool1"
   top: "conv2"
   name: "conv2"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
     num_output: 256
     kernel_size: 5
@@ -67,14 +64,14 @@ layer {
 layer {
   bottom: "conv2"
   top: "conv2"
-  name: "relu2"
-  type: "RELU"
+  name: "ReLU2"
+  type: "ReLU"
 }
 layer {
   bottom: "conv2"
   top: "pool2"
   name: "pool2"
-  type: "POOLING"
+  type: "Pooling"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -85,7 +82,7 @@ layer {
   bottom: "pool2"
   top: "conv3"
   name: "conv3"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
     num_output: 512
     pad: 1
@@ -95,14 +92,14 @@ layer {
 layer {
   bottom: "conv3"
   top: "conv3"
-  name: "relu3"
-  type: "RELU"
+  name: "ReLU3"
+  type: "ReLU"
 }
 layer {
   bottom: "conv3"
   top: "conv4"
   name: "conv4"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
     num_output: 512
     pad: 1
@@ -112,14 +109,14 @@ layer {
 layer {
   bottom: "conv4"
   top: "conv4"
-  name: "relu4"
-  type: "RELU"
+  name: "ReLU4"
+  type: "ReLU"
 }
 layer {
   bottom: "conv4"
   top: "conv5"
   name: "conv5"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
     num_output: 512
     pad: 1
@@ -129,14 +126,14 @@ layer {
 layer {
   bottom: "conv5"
   top: "conv5"
-  name: "relu5"
-  type: "RELU"
+  name: "ReLU5"
+  type: "ReLU"
 }
 layer {
   bottom: "conv5"
   top: "pool5"
   name: "pool5"
-  type: "POOLING"
+  type: "Pooling"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -148,9 +145,9 @@ layer {
   bottom: "conv3"
   top: "conv3_e"
   name: "conv3_e"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
-    num_output: 1024
+    num_output: 1
     pad: 2
     kernel_size: 5
   }
@@ -158,14 +155,14 @@ layer {
 layer {
   bottom: "conv3_e"
   top: "conv3_e"
-  name: "relu3_e"
-  type: "RELU"
+  name: "ReLU3_e"
+  type: "ReLU"
 }
 layer {
   bottom: "conv3_e"
   top: "pool3_e"
   name: "pool3_e"
-  type: "POOLING"
+  type: "Pooling"
   pooling_param {
     pool: MAX
     global_pooling: 1
@@ -175,9 +172,9 @@ layer {
   bottom: "conv4"
   top: "conv4_e"
   name: "conv4_e"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
-    num_output: 1024
+    num_output: 1
     pad: 2
     kernel_size: 5
   }
@@ -185,14 +182,14 @@ layer {
 layer {
   bottom: "conv4_e"
   top: "conv4_e"
-  name: "relu4_e"
-  type: "RELU"
+  name: "ReLU4_e"
+  type: "ReLU"
 }
 layer {
   bottom: "conv4_e"
   top: "pool4_e"
   name: "pool4_e"
-  type: "POOLING"
+  type: "Pooling"
   pooling_param {
     pool: MAX
     global_pooling: 1
@@ -202,9 +199,9 @@ layer {
   bottom: "conv5"
   top: "conv5_e"
   name: "conv5_e"
-  type: "CONVOLUTION"
+  type: "Convolution"
   convolution_param {
-    num_output: 1024
+    num_output: 1
     pad: 2
     kernel_size: 5
   }
@@ -212,14 +209,14 @@ layer {
 layer {
   bottom: "conv5_e"
   top: "conv5_e"
-  name: "relu5_e"
-  type: "RELU"
+  name: "ReLU5_e"
+  type: "ReLU"
 }
 layer {
   bottom: "conv5_e"
   top: "pool5_e"
   name: "pool5_e"
-  type: "POOLING"
+  type: "Pooling"
   pooling_param {
     pool: MAX
     global_pooling: 1
@@ -230,7 +227,7 @@ layer {
   bottom: "pool3_e"
   top: "fc3_e"
   name: "fc3_e"
-  type: "INNER_PRODUCT"
+  type: "InnerProduct"
   inner_product_param {
     num_output: 92
   }
@@ -239,7 +236,7 @@ layer {
   bottom: "pool4_e"
   top: "fc4_e"
   name: "fc4_e"
-  type: "INNER_PRODUCT"
+  type: "InnerProduct"
   inner_product_param {
     num_output: 92
   }
@@ -248,10 +245,32 @@ layer {
   bottom: "pool5_e"
   top: "fc5_e"
   name: "fc5_e"
-  type: "INNER_PRODUCT"
+  type: "InnerProduct"
   inner_product_param {
     num_output: 92
   }
+}
+
+layer {
+  bottom: "fc3_e"
+  bottom: "attr"
+  name: "cross_entropy_loss_3"
+  top: "cross_entropy_loss_3"
+  type: "SigmoidCrossEntropyLoss"
+}
+layer {
+  bottom: "fc4_e"
+  bottom: "attr"
+  name: "cross_entropy_loss_4"
+  top: "cross_entropy_loss_4"
+  type: "SigmoidCrossEntropyLoss"
+}
+layer {
+  bottom: "fc5_e"
+  bottom: "attr"
+  name: "cross_entropy_loss_5"
+  top: "cross_entropy_loss_5"
+  type: "SigmoidCrossEntropyLoss"
 }
 
 layer {
@@ -260,15 +279,23 @@ layer {
   bottom: "fc4_e"
   bottom: "fc5_e"
   top: "concat"
-  type: "CONCAT"
+  type: "Concat"
 }
 
 layer {
   bottom: "concat"
   top: "fc_total"
   name: "fc_total"
-  type: "INNER_PRODUCT"
+  type: "InnerProduct"
   inner_product_param {
     num_output: 92
   }
+}
+
+layer {
+  bottom: "fc_total"
+  bottom: "attr"
+  name: "cross_entropy_loss_total"
+  top: "cross_entropy_loss_total"
+  type: "SigmoidCrossEntropyLoss"
 }

@@ -98,3 +98,6 @@ ENV/
 # Sublime files
 *.sublime-project
 *.sublime-workplace
+
+# PyCharm files
+.idea

@@ -1,9 +1,8 @@
-import cv2
 import scipy.io as sio
 import os.path as osp
 
 
-class RAP_DB:
+class RAPDatabase:
 	def __init__(self, db_path, par_set_id):
 		self._db_path = db_path
 
@@ -27,11 +26,11 @@ class RAP_DB:
 		return osp.join(self._db_path, 'RAP_dataset', self._img_names[img_id][0][0])
 
 if __name__ == '__main__':
-	db = RAP_DB('/home/ken.yu/datasets/rap', 0)
+	db = RAPDatabase('/home/ken.yu/datasets/rap', 0)
 	print db._partition.shape
 	print db._partition[0][0][0][0][1].shape
 	print db._partition[1][0][0][0][1].shape
-	print db.labels.shape
+	print "Labels:", db.labels.shape
 	print db.train_ind.shape
 	print 'Max training index: ', max(db.train_ind)
 	print db.get_img_path(0)

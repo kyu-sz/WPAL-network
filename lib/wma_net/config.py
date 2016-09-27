@@ -168,7 +168,7 @@ def _merge_a_into_b(a, b):
             b[k] = v
 
 
-def conf_from_file(filename):
+def config_from_file(filename):
     """Load a config file and merge it into the default options."""
     import yaml
     with open(filename, 'r') as f:
@@ -177,7 +177,7 @@ def conf_from_file(filename):
     _merge_a_into_b(yaml_config, __C)
 
 
-def conf_from_list(config_list):
+def config_from_list(config_list):
     """Set config keys via list (e.g., from command line)."""
     from ast import literal_eval
     assert len(config_list) % 2 == 0

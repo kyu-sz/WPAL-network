@@ -28,7 +28,7 @@ import sys
 
 from utils.timer import Timer
 from wma_net.train import train_net
-from wma_net.config import config, conf_from_file, conf_from_list
+from wma_net.config import config, config_from_file, config_from_list
 
 
 def parse_args():
@@ -41,26 +41,35 @@ def parse_args():
                         default=-1, type=int)
     parser.add_argument('--solver', dest='solver',
                         help='solver prototxt',
-                        default='./models/vgg_cnn_s/solver.prototxt', type=str)
+                        default='./models/VGG_CNN_S/solver.prototxt', type=str)
     parser.add_argument('--iters', dest='max_iters',
                         help='number of training iterations',
                         default=40000, type=int)
     parser.add_argument('--weights', dest='pretrained_model',
                         help='initialize with pretrained model weights',
-                        default='./models/vgg_cnn_s/vgg_cnn_s.caffemodel', type=str)
+                        default='./data/pretrained_models/VGG_CNN_S.caffemodel', type=str)
     parser.add_argument('--dbpath', dest='db_path',
                         help='the path of the RAP database',
-						default='/home/ken.yu/datasets/rap', type=str)
+                        default='./data/RAP', type=str)
     parser.add_argument('--setid', dest='par_set_id',
                         help='the index of training and testing data partition set',
                         default='0', type=int)
     parser.add_argument('--outputdir', dest='output_dir',
                         help='the directory to save outputs',
                         default='./output', type=str)
+    parser.add_argument('--rand', dest='randomize',
+                        help='randomize (do not use a fixed seed)',
+                        action='store_true')
+    parser.add_argument('--set', dest='set_cfgs',
+                        help='set config keys', default=None,
+                        nargs=argparse.REMAINDER)
+    parser.add_argument('--cfg', dest='cfg_file',
+                        help='optional config file',
+                        default=None, type=str)
 
-    #if len(sys.argv) == 1:
-    #    parser.print_help()
-    #    sys.exit()
+    # if len(sys.argv) == 1:
+    #     parser.print_help()
+    #     sys.exit()
 
     args = parser.parse_args()
     return args
@@ -72,7 +81,14 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    # set up caffe
+    if args.cfg_file is not None:
+        config_from_file(args.cfg_file)
+    if args.set_cfgs is not None:
+        config_from_list(args.set_cfgs)
+
+    config.GPU_ID = args.gpu_id
+
+    # set up Caffe
     if args.gpu_id == -1:
         caffe.set_mode_cpu()
     else:
@@ -82,5 +98,5 @@ if __name__ == '__main__':
     print 'Output will be saved to `{:s}`'.format(args.output_dir)
 
     train_net(args.solver, args.db_path, args.par_set_id, args.output_dir,
-        pretrained_model=args.pretrained_model,
-		max_iters=args.max_iters)
+              pretrained_model=args.pretrained_model,
+              max_iters=args.max_iters)

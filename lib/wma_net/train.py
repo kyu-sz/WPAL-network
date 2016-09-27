@@ -31,13 +31,10 @@ class SolverWrapper(object):
 
     def __init__(self, solver_prototxt, db_path, par_set_id, output_dir,
                  pretrained_model=None):
-        """Initialize the SolverWrapper."""
+        """ Initialize the SolverWrapper. """
         self.output_dir = output_dir
 
         self.solver = caffe.SGDSolver(solver_prototxt)
-
-        print 'Finished!'
-        sys.exit(1)
 
         if pretrained_model is not None:
             print ('Loading pretrained model '
@@ -70,6 +67,7 @@ class SolverWrapper(object):
         return filename
 
     def train_model(self, max_iters):
+
         """Network training loop."""
         last_snapshot_iter = -1
         timer = Timer()
