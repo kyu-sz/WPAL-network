@@ -28,32 +28,44 @@ import time, os, sys
 
 from wma_net.test import test_net
 from wma_net.config import config, conf_from_file, conf_from_list
+from utils.rap_db import RAPDataset
 
 
 def parse_args():
     """
     Parse input arguments
     """
-    parser = argparse.ArgumentParser(description='train AM Net')
+    parser = argparse.ArgumentParser(description='train WMA Network')
     parser.add_argument('--gpu', dest='gpu_id',
                         help='GPU device ID to use (default: 0)',
                         default=0, type=int)
     parser.add_argument('--def', dest='prototxt',
                         help='prototxt file defining the network',
-                        default=None, type=str)
+                        default='./models/VGG_CNN_S/test_net.prototxt', type=str)
     parser.add_argument('--net', dest='caffemodel',
                         help='model to test',
-                        default=None, type=str)
+                        default='./data/models/VGG_CNN_S.caffemodel', type=str)
+    parser.add_argument('--cfg', dest='cfg_file',
+                        help='optional config file', default=None, type=str)
     parser.add_argument('--wait', dest='wait',
                         help='wait until net file exists',
                         default=True, type=bool)
-    parser.add_argument('--imdb', dest='imdb_name',
-                        help='dataset to test on',
-                        default='rap_test', type=str)
+    parser.add_argument('--set', dest='set_cfgs',
+                        help='set config keys', default=None,
+                        nargs=argparse.REMAINDER)
+    parser.add_argument('--dbpath', dest='db_path',
+                        help='the path of the RAP database',
+                        default='./data/RAP', type=str)
+    parser.add_argument('--setid', dest='par_set_id',
+                        help='the index of training and testing data partition set',
+                        default='0', type=int)
+    parser.add_argument('--outputdir', dest='output_dir',
+                        help='the directory to save outputs',
+                        default='./output', type=str)
 
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit()
+    # if len(sys.argv) == 1:
+    #     parser.print_help()
+    #     sys.exit()
 
     args = parser.parse_args()
     return args
@@ -84,6 +96,7 @@ if __name__ == '__main__':
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
-    imdb = get_imdb(args.imdb_name)
+    """Load RAP dataset"""
+    db = RAPDataset(args.db_path, args.par_set_id)
 
-    test_net(net, imdb)
+    test_net(net, db, args.output_dir)

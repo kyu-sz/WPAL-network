@@ -27,6 +27,7 @@ import numpy as np
 import sys
 
 from utils.timer import Timer
+from utils.rap_db import RAPDataset
 from wma_net.train import train_net
 from wma_net.config import config, config_from_file, config_from_list
 
@@ -35,7 +36,7 @@ def parse_args():
     """
     Parse input arguments
     """
-    parser = argparse.ArgumentParser(description='train AM Net')
+    parser = argparse.ArgumentParser(description='train WMA Network')
     parser.add_argument('--gpu', dest='gpu_id',
                         help='GPU device ID to use (default: -1 meaning using CPU only)',
                         default=-1, type=int)
@@ -97,6 +98,9 @@ if __name__ == '__main__':
 
     print 'Output will be saved to `{:s}`'.format(args.output_dir)
 
-    train_net(args.solver, args.db_path, args.par_set_id, args.output_dir,
+    """Load RAP dataset"""
+    db = RAPDataset(args.db_path, args.par_set_id)
+
+    train_net(args.solver, db, args.output_dir,
               pretrained_model=args.pretrained_model,
               max_iters=args.max_iters)

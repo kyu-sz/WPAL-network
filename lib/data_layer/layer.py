@@ -24,6 +24,8 @@ DataLayer implements a Caffe Python layer.
 import caffe
 import numpy as np
 import yaml
+import sys
+import time
 from multiprocessing import Process, Queue
 
 from wma_net.config import config
@@ -32,12 +34,6 @@ from data_layer.minibatch import get_minibatch
 
 class DataLayer(caffe.Layer):
     """WMA-net data layer used for training."""
-
-    def __init__(self):
-        self._db = None
-        self._blob_queue = None
-        self._prefetch_process = None
-        self._name_to_top_map = None
 
     def _get_next_minibatch(self):
         """Return the blobs to be used for the next mini-batch.
@@ -107,30 +103,30 @@ class BlobFetcher(Process):
         self._db = db
         self._perm = None
         self._cur = 0
-        self._shuffle_db_inds()
+        self._shuffle_train_inds()
         # fix the random seed for reproducibility
         np.random.seed(config.RNG_SEED)
 
-    def _shuffle_db_inds(self):
+    def _shuffle_train_inds(self):
         """Randomly permute the training roidb."""
-        self._perm = np.random.permutation(np.arange(len(self._db.train_ind)))
+        self._perm = np.random.permutation(self._db.train_ind)
         self._cur = 0
 
     def _get_next_minibatch_inds(self):
         """Return the roidb indices for the next minibatch."""
         if self._cur >= len(self._db.train_ind):
-            self._shuffle_db_inds()
+            self._shuffle_train_inds()
 
-        db_inds = self._perm[self._cur:self._cur + config.TRAIN.BATCH_SIZE]
+        train_inds = self._perm[self._cur:self._cur + config.TRAIN.BATCH_SIZE]
         self._cur += config.TRAIN.BATCH_SIZE
-        return db_inds
+        return train_inds
 
     def run(self):
         print 'BlobFetcher started'
         while True:
-            db_inds = self._get_next_minibatch_inds()
-            minibatch_img_paths = [self._db.get_img_path(i) for i in db_inds]
-            minibatch_labels = [self._db.labels[i] for i in db_inds]
+            train_inds = self._get_next_minibatch_inds()
+            minibatch_img_paths = [self._db.get_img_path(i) for i in train_inds]
+            minibatch_labels = [self._db.labels[i] for i in train_inds]
             blobs = get_minibatch(minibatch_img_paths, minibatch_labels)
             self._queue.put(blobs)
             print "New blob added to the queue! Current size of queue:", self._queue.qsize()

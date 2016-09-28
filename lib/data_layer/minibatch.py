@@ -35,26 +35,29 @@ def get_minibatch(img_paths, labels):
                                     size=num_images)
 
     # Get the input image blob, formatted for caffe
-    img_blob = _get_image_blob(img_paths, random_scale_inds)
+    img_blob, img_scales = _get_image_blob(img_paths, random_scale_inds)
     attr_blob = _get_attr_blob(labels)
 
-    blobs = {'data': img_blob, 'attr': labels}
+    blobs = {'data': img_blob, 'attr': attr_blob}
 
     return blobs
 
 
 def _get_attr_blob(labels):
     """Builds an input blob from the labels"""
-    blob = np.zeros((labels.shape[0], 1, 1, labels.shape[1]),
+    blob = np.zeros((labels.__len__(), 1, 1, labels[0].__len__()),
                     dtype=np.float32)
+    for i in xrange(labels.__len__()):
+        blob[i, :, :, :] = labels[i]
 
+    return blob
 
 def _get_image_blob(img_paths, scale_inds):
     """Builds an input blob from the images at the specified
     scales.
     """
     num_images = len(img_paths)
-    processed_ims = []
+    processed_imgs = []
     img_scales = []
     for i in xrange(num_images):
         img = cv2.imread(img_paths[i])
@@ -62,9 +65,9 @@ def _get_image_blob(img_paths, scale_inds):
         img, img_scale = prep_img_for_blob(img, config.PIXEL_MEANS, target_size,
                                         config.TRAIN.MAX_SIZE)
         img_scales.append(img_scale)
-        processed_ims.append(img)
+        processed_imgs.append(img)
 
     # Create a blob to hold the input images
-    blob = img_list_to_blob(processed_ims)
+    blob = img_list_to_blob(processed_imgs)
 
     return blob, img_scales

@@ -63,6 +63,9 @@ __C.TRAIN.BATCH_SIZE = 128
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True
 
+# Iterations between tests
+__C.TRAIN.TEST_ITERS = 100000
+
 # Iterations between snapshots
 __C.TRAIN.SNAPSHOT_ITERS = 10000
 

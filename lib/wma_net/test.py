@@ -23,48 +23,48 @@
 import __init__
 
 import argparse
-from utils.timer import Timer
 import numpy as np
 import cv2
 import caffe
 import cPickle
-from utils.blob import im_list_to_blob
 import os
+from utils.timer import Timer
+from utils.blob import img_list_to_blob
 
 
-def _get_image_blob(im):
+def _get_image_blob(img):
     """Converts an image into a network input.
     Arguments:
-        im (ndarray): a color image in BGR order
+        img (ndarray): a color image in BGR order
     Returns:
         blob (ndarray): a data blob holding an image pyramid
         im_scale_factors (list): list of image scales (relative to im) used
             in the image pyramid
     """
-    im_orig = im.astype(np.float32, copy=True)
-    im_orig -= config.PIXEL_MEANS
+    img_orig = img.astype(np.float32, copy=True)
+    img_orig -= config.PIXEL_MEANS
 
-    im_shape = im_orig.shape
-    im_size_min = np.min(im_shape[0:2])
-    im_size_max = np.max(im_shape[0:2])
+    img_shape = img_orig.shape
+    img_size_min = np.min(img_shape[0:2])
+    img_size_max = np.max(img_shape[0:2])
 
-    processed_ims = []
-    im_scale_factors = []
+    processed_images = []
+    img_scale_factors = []
 
     for target_size in config.TEST.SCALES:
-        im_scale = float(target_size) / float(im_size_min)
+        img_scale = float(target_size) / float(img_size_min)
         # Prevent the biggest axis from being more than MAX_SIZE
-        if np.round(im_scale * im_size_max) > config.TEST.MAX_SIZE:
-            im_scale = float(config.TEST.MAX_SIZE) / float(im_size_max)
-        im = cv2.resize(im_orig, None, None, fx=im_scale, fy=im_scale,
-                        interpolation=cv2.INTER_LINEAR)
-        im_scale_factors.append(im_scale)
-        processed_ims.append(im)
+        if np.round(img_scale * img_size_max) > config.TEST.MAX_SIZE:
+            img_scale = float(config.TEST.MAX_SIZE) / float(img_size_max)
+        img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
+                         interpolation=cv2.INTER_LINEAR)
+        img_scale_factors.append(img_scale)
+        processed_images.append(img)
 
     # Create a blob to hold the input images
-    blob = im_list_to_blob(processed_ims)
+    blob = im_list_to_blob(processed_images)
 
-    return blob, np.array(im_scale_factors)
+    return blob, np.array(img_scale_factors)
 
 
 def _get_blobs(im, rois):
@@ -75,39 +75,34 @@ def _get_blobs(im, rois):
 
 
 def recognize_attr(net, im):
-	raise NotImplementedError("Attribute recognition not implemented error")
+    raise NotImplementedError("Attribute recognition not implemented error")
 
 
-def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
-    """Test a Fast R-CNN network on an image database."""
-    num_images = len(imdb.image_index)
-    # all detections are collected into:
-    #    all_boxes[cls][image] = N x 5 array of detections in
-    #    (x1, y1, x2, y2, score)
-    all_boxes = [[[] for _ in xrange(num_images)]
-                 for _ in xrange(imdb.num_classes)]
+def test_net(net, db, output_dir, vis=False):
+    """Test a WMA Network on an image database."""
 
-    output_dir = get_output_dir(imdb, net)
+    num_images = len(db.test_ind)
+
+    all_attrs = [[] for _ in xrange(db.num_attrs)]
 
     # timers
     _t = {'recognize_attr' : Timer()}
 
-    if not config.TEST.HAS_RPN:
-        roidb = imdb.roidb
-
-    for i in xrange(num_images):
-
-        im = cv2.imread(imdb.image_path_at(i))
+    cnt = 0
+    for i in db.test_ind:
+        im = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        scores, boxes = recognize_attr(net, im)
+        attr = recognize_attr(net, im)
         _t['recognize_attr'].toc()
+        all_attrs[cnt] = attr
+        ++cnt
 
         print 'recognize_attr: {:d}/{:d} {:.3f}s' \
-              .format(i + 1, num_images, _t['recognize_attr'].average_time)
+              .format(cnt, num_images, _t['recognize_attr'].average_time)
 
     attr_file = os.path.join(output_dir, 'attributes.pkl')
-    with open(det_file, 'wb') as f:
-        cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+    with open(attr_file, 'wb') as f:
+        cPickle.dump(attr, f, cPickle.HIGHEST_PROTOCOL)
 
     print 'Evaluating attributes'
-    imdb.evaluate_detections(all_boxes, output_dir)
+    db.evaluate_detections(attr, db.test_ind, output_dir)

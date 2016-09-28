@@ -20,16 +20,17 @@
 import caffe
 from caffe.proto import caffe_pb2
 import google.protobuf as pb2
-from utils.rap_db import RAP_DB
 from utils.timer import Timer
+from test import test_net
 import sys
+
 
 class SolverWrapper(object):
     """A simple wrapper around Caffe's solver.
     This wrapper gives us control over the snapshotting process.
     """
 
-    def __init__(self, solver_prototxt, db_path, par_set_id, output_dir,
+    def __init__(self, solver_prototxt, db, output_dir,
                  pretrained_model=None):
         """ Initialize the SolverWrapper. """
         self.output_dir = output_dir
@@ -45,9 +46,7 @@ class SolverWrapper(object):
         with open(solver_prototxt, 'rt') as f:
             pb2.text_format.Merge(f.read(), self.solver_param)
 
-        """Load RAP dataset"""
-        self._db = RAP_DB(db_path, par_set_id)
-
+        self._db = db
         self.solver.net.layers[0].set_db(self._db)
 
     def snapshot(self):
@@ -67,7 +66,6 @@ class SolverWrapper(object):
         return filename
 
     def train_model(self, max_iters):
-
         """Network training loop."""
         last_snapshot_iter = -1
         timer = Timer()
@@ -84,16 +82,19 @@ class SolverWrapper(object):
                 last_snapshot_iter = self.solver.iter
                 model_paths.append(self.snapshot())
 
+            if self.solver.iter % config.TRAIN.TEST_ITERS == 0:
+                test_net(self.solver.net, self._db, self._output_dir)
+
         if last_snapshot_iter != self.solver.iter:
             model_paths.append(self.snapshot())
         return model_paths
 
 
-def train_net(solver_prototxt, db_path, par_set_id, output_dir,
+def train_net(solver_prototxt, db, output_dir,
               pretrained_model=None, max_iters=40000):
     """Train a AM network."""
     
-    sw = SolverWrapper(solver_prototxt, db_path, par_set_id, output_dir,
+    sw = SolverWrapper(solver_prototxt, db, output_dir,
                        pretrained_model=pretrained_model)
 
     print 'Solving...'

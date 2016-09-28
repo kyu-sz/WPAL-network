@@ -23,9 +23,9 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
 
 3. Download the RAP dataset
 
-To get the Richly Annotated Pedestrian (RAP) dataset, please visit rap.idealtest.org to learn about how to download a copy of it.
+    To get the Richly Annotated Pedestrian (RAP) dataset, please visit rap.idealtest.org to learn about how to download a copy of it.
 
-It should have two zip files.
+    It should have two zip files.
 
 	```
 	$RAP/RAP_annotation.zip
@@ -67,6 +67,7 @@ Then run experiment script:
 Some codes are derived from Mr. Ross Girshick's [py-faster-rcnn](https://github.com/rbgirshick/py-faster-rcnn).
 
 We use VGG_CNN_S as pretrained model. Information can be found on [Mr. K. Simonyan's Gist](https://gist.github.com/ksimonyan/fd8800eeb36e276cd6f9#file-readme-md). It is from the BMVC-2014 paper "Return of the Devil in the Details: Delving Deep into Convolutional Nets":
+	
 	```
 	Return of the Devil in the Details: Delving Deep into Convolutional Nets
 	K. Chatfield, K. Simonyan, A. Vedaldi, A. Zisserman
