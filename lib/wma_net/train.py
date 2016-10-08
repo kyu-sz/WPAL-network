@@ -19,11 +19,11 @@
 
 import caffe
 import google.protobuf as pb2
-from utils.timer import Timer
-from test import test_net
-import sys
 from caffe.proto import caffe_pb2
+from utils.timer import Timer
+
 from config import config
+from test import test_net
 
 
 class SolverWrapper(object):
@@ -35,7 +35,6 @@ class SolverWrapper(object):
                  pretrained_model=None):
         """Initialize the SolverWrapper."""
         self.output_dir = output_dir
-
         self.solver = caffe.SGDSolver(solver_prototxt)
 
         if pretrained_model is not None:
@@ -92,7 +91,7 @@ class SolverWrapper(object):
 
 def train_net(solver_prototxt, db, output_dir,
               pretrained_model=None, max_iters=40000):
-    """Train a AM network."""
+    """Train a WMA network."""
     sw = SolverWrapper(solver_prototxt, db, output_dir,
                        pretrained_model=pretrained_model)
 

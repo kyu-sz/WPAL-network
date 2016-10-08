@@ -21,15 +21,12 @@
 DataLayer implements a Caffe Python layer.
 """
 
-import caffe
-import numpy as np
-import yaml
-import sys
-import time
 from multiprocessing import Process, Queue
 
-from wma_net.config import config
+import caffe
+import numpy as np
 from data_layer.minibatch import get_minibatch
+from wma_net.config import config
 
 
 class DataLayer(caffe.Layer):
@@ -79,13 +76,11 @@ class DataLayer(caffe.Layer):
         blobs = self._get_next_minibatch()
 
         for blob_name, blob in blobs.iteritems():
-            print 'Inputting', blob_name
             top_ind = self._name_to_top_map[blob_name]
             # Reshape net's input blobs
             top[top_ind].reshape(*(blob.shape))
             # Copy data into net's input blobs
             top[top_ind].data[...] = blob.astype(np.float32, copy=False)
-            print blob_name, "input to Caffe!"
 
     def backward(self, top, propagate_down, bottom):
         """This layer does not propagate gradients."""
@@ -130,4 +125,3 @@ class BlobFetcher(Process):
             minibatch_labels = [self._db.labels[i] for i in train_inds]
             blobs = get_minibatch(minibatch_img_paths, minibatch_labels)
             self._queue.put(blobs)
-            print "New blob added to the queue! Current size of queue:", self._queue.qsize()

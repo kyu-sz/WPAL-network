@@ -58,7 +58,7 @@ __C.TRAIN.SCALES = (600,)
 __C.TRAIN.MAX_SIZE = 1000
 
 # Minibatch size (number of samples per round)
-__C.TRAIN.BATCH_SIZE = 1
+__C.TRAIN.BATCH_SIZE = 32
 
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True

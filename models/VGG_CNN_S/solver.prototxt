@@ -4,7 +4,7 @@ base_lr: 0.001
 lr_policy: "step"
 gamma: 0.1
 stepsize: 350000
-display: 20
+display: 5
 average_loss: 100
 momentum: 0.9
 weight_decay: 0.0005
@@ -13,6 +13,6 @@ weight_decay: 0.0005
 snapshot: 0
 
 # We still use the snapshot prefix, though
-snapshot_prefix: "am_vgg_cnn_s"
+snapshot_prefix: "wma_vgg_cnn_s"
 
 iter_size: 2
