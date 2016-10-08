@@ -10,7 +10,7 @@ layer {
     layer: "DataLayer"
   }
 }
-
+########################## VGG CNN S ##########################
 layer {
   bottom: "data"
   top: "conv1"
@@ -56,6 +56,12 @@ layer {
   top: "conv2"
   name: "conv2"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+  }
   convolution_param {
     num_output: 256
     kernel_size: 5
@@ -83,6 +89,12 @@ layer {
   top: "conv3"
   name: "conv3"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+  }
   convolution_param {
     num_output: 512
     pad: 1
@@ -100,6 +112,12 @@ layer {
   top: "conv4"
   name: "conv4"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+  }
   convolution_param {
     num_output: 512
     pad: 1
@@ -117,6 +135,12 @@ layer {
   top: "conv5"
   name: "conv5"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+  }
   convolution_param {
     num_output: 512
     pad: 1
@@ -134,13 +158,19 @@ layer {
   top: "pool5"
   name: "pool5"
   type: "Pooling"
+  param {
+    lr_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+  }
   pooling_param {
     pool: MAX
     kernel_size: 3
     stride: 3
   }
 }
-
+########################## Extra Conv Layers ##########################
 layer {
   bottom: "conv3"
   top: "conv3_e"
@@ -160,7 +190,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 256
+    num_output: 512
     pad: 2
     kernel_size: 5
   }
@@ -170,16 +200,6 @@ layer {
   top: "conv3_e"
   name: "ReLU3_e"
   type: "ReLU"
-}
-layer {
-  bottom: "conv3_e"
-  top: "pool3_e"
-  name: "pool3_e"
-  type: "Pooling"
-  pooling_param {
-    pool: MAX
-    global_pooling: 1
-  }
 }
 layer {
   bottom: "conv4"
@@ -200,7 +220,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 256
+    num_output: 512
     pad: 2
     kernel_size: 5
   }
@@ -210,16 +230,6 @@ layer {
   top: "conv4_e"
   name: "ReLU4_e"
   type: "ReLU"
-}
-layer {
-  bottom: "conv4_e"
-  top: "pool4_e"
-  name: "pool4_e"
-  type: "Pooling"
-  pooling_param {
-    pool: MAX
-    global_pooling: 1
-  }
 }
 layer {
   bottom: "pool5"
@@ -240,7 +250,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 256
+    num_output: 512
     pad: 2
     kernel_size: 5
   }
@@ -250,6 +260,27 @@ layer {
   top: "conv5_e"
   name: "ReLU5_e"
   type: "ReLU"
+}
+########################## Global Pooling Layers ##########################
+layer {
+  bottom: "conv3_e"
+  top: "pool3_e"
+  name: "pool3_e"
+  type: "Pooling"
+  pooling_param {
+    pool: MAX
+    global_pooling: 1
+  }
+}
+layer {
+  bottom: "conv4_e"
+  top: "pool4_e"
+  name: "pool4_e"
+  type: "Pooling"
+  pooling_param {
+    pool: MAX
+    global_pooling: 1
+  }
 }
 layer {
   bottom: "conv5_e"
@@ -261,7 +292,7 @@ layer {
     global_pooling: 1
   }
 }
-
+########################## Prediction Layers ##########################
 layer {
   bottom: "pool3_e"
   top: "fc3_e"
@@ -328,7 +359,7 @@ layer {
     num_output: 92
   }
 }
-
+########################## Loss Layers ##########################
 layer {
   bottom: "fc3_e"
   bottom: "attr"
@@ -351,7 +382,7 @@ layer {
   top: "cross_entropy_loss_5"
   type: "SigmoidCrossEntropyLoss"
 }
-
+########################## Synthesized Prediction Layers ##########################
 layer {
   name: "concat"
   bottom: "fc3_e"
@@ -360,7 +391,6 @@ layer {
   top: "concat"
   type: "Concat"
 }
-
 layer {
   bottom: "concat"
   top: "fc_total"
@@ -370,7 +400,7 @@ layer {
     num_output: 92
   }
 }
-
+########################## Synthesized Loss Layers ##########################
 layer {
   bottom: "fc_total"
   bottom: "attr"
@@ -378,18 +408,3 @@ layer {
   top: "cross_entropy_loss_total"
   type: "SigmoidCrossEntropyLoss"
 }
-
-#layer {
-#  bottom: "fc_total"
-#  name: "res_prob"
-#  top: "res_prob"
-#  type: "Concat"
-#}
-
-
-#layer {
-#  bottom: "attr"
-#  name: "attr_prob"
-#  top: "attr_prob"
-#  type: "Concat"
-#}

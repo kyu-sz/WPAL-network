@@ -28,8 +28,8 @@ Most tools in $ROOT/tools take a --config option to specify an override file.
 
 import os
 import os.path as osp
+
 import numpy as np
-# `pip install easydict` if you don't have it
 from easydict import EasyDict as edict
 
 __C = edict()
@@ -77,6 +77,9 @@ __C.TRAIN.SNAPSHOT_INFIX = ''
 # tall and thin or both short and wide) in order to avoid wasting computation
 # on zero-padding.
 __C.TRAIN.ASPECT_GROUPING = True
+
+# Whether to do flipping during training
+__C.DO_FLIP = True
 
 #
 # Testing options

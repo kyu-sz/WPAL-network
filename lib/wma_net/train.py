@@ -17,6 +17,8 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
+import os
+
 import caffe
 import google.protobuf as pb2
 from caffe.proto import caffe_pb2
@@ -31,7 +33,7 @@ class SolverWrapper(object):
     This wrapper gives us control over the snapshotting process.
     """
 
-    def __init__(self, solver_prototxt, db, output_dir,
+    def __init__(self, solver_prototxt, db, output_dir, do_flip,
                  pretrained_model=None):
         """Initialize the SolverWrapper."""
         self.output_dir = output_dir
@@ -47,10 +49,10 @@ class SolverWrapper(object):
             pb2.text_format.Merge(f.read(), self.solver_param)
 
         self._db = db
-        self.solver.net.layers[0].set_db(self._db)
+        self.solver.net.layers[0].set_db(self._db, do_flip)
 
     def snapshot(self):
-        """ Take a snapshot of the network. """
+        """Take a snapshot of the network."""
         net = self.solver.net
 
         infix = ('_' + config.TRAIN.SNAPSHOT_INFIX
@@ -93,7 +95,7 @@ class SolverWrapper(object):
 def train_net(solver_prototxt, db, output_dir,
               pretrained_model=None, max_iters=40000):
     """Train a WMA network."""
-    sw = SolverWrapper(solver_prototxt, db, output_dir,
+    sw = SolverWrapper(solver_prototxt, db, output_dir, config.TRAIN.DO_FLIP,
                        pretrained_model=pretrained_model)
 
     print 'Solving...'

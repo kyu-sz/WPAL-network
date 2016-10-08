@@ -37,13 +37,13 @@ class DataLayer(caffe.Layer):
         """
         return self._blob_queue.get()
 
-    def set_db(self, db):
+    def set_db(self, db, do_flip):
         """Set the database to be used by this layer during training."""
         self._db = db
 
         """Enable prefetch."""
         self._blob_queue = Queue(10)
-        self._prefetch_process = BlobFetcher(self._blob_queue, self._db)
+        self._prefetch_process = BlobFetcher(self._blob_queue, self._db, do_flip)
         self._prefetch_process.start()
 
         # Terminate the child process when the parent exists
@@ -93,19 +93,24 @@ class DataLayer(caffe.Layer):
 
 class BlobFetcher(Process):
     """Experimental class for prefetching blobs in a separate process."""
-    def __init__(self, queue, db):
+
+    def __init__(self, queue, db, do_flip=True):
         super(BlobFetcher, self).__init__()
         self._queue = queue
         self._db = db
         self._perm = None
         self._cur = 0
         self._shuffle_train_inds()
+
+        self._flip = np.zeros(self._db.train_ind.shape)
+        self._train_ind = self._db.train_ind
+
         # fix the random seed for reproducibility
         np.random.seed(config.RNG_SEED)
 
     def _shuffle_train_inds(self):
         """Randomly permute the training roidb."""
-        self._perm = np.random.permutation(self._db.train_ind)
+        self._perm = np.random.permutation(xrange(len(self._train_ind * (1 if self._flip else 2))))
         self._cur = 0
 
     def _get_next_minibatch_inds(self):
@@ -113,15 +118,24 @@ class BlobFetcher(Process):
         if self._cur >= len(self._db.train_ind):
             self._shuffle_train_inds()
 
-        train_inds = self._perm[self._cur:self._cur + config.TRAIN.BATCH_SIZE]
+        minibatch_inds = self._perm[self._cur:self._cur + config.TRAIN.BATCH_SIZE]
         self._cur += config.TRAIN.BATCH_SIZE
-        return train_inds
+        return minibatch_inds
 
     def run(self):
         print 'BlobFetcher started'
         while True:
-            train_inds = self._get_next_minibatch_inds()
-            minibatch_img_paths = [self._db.get_img_path(i) for i in train_inds]
-            minibatch_labels = [self._db.labels[i] for i in train_inds]
-            blobs = get_minibatch(minibatch_img_paths, minibatch_labels)
+            minibatch_inds = self._get_next_minibatch_inds()
+            minibatch_img_paths = \
+                [self._db.get_img_path(
+                    i if i < len(self._db.train_ind) else i - len(self._db.train_ind))
+                 for i in minibatch_inds]
+            minibatch_labels = \
+                [self._db.labels[
+                     i if i < len(self._db.train_ind) else i - len(self._db.train_ind)]
+                 for i in minibatch_inds]
+            minibatch_flip = \
+                [0 if i < len(self._db.train_ind) else 1
+                 for i in minibatch_inds]
+            blobs = get_minibatch(minibatch_img_paths, minibatch_labels, minibatch_flip)
             self._queue.put(blobs)

@@ -1,6 +1,25 @@
+#!/usr/bin/env python
+
+# --------------------------------------------------------------------
+# This file is part of WMA Network.
+#
+# WMA Network is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# WMA Network is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
+# --------------------------------------------------------------------
+
 import os.path as osp
 
-import numpy
+import numpy as np
 import scipy.io as sio
 
 
@@ -23,7 +42,7 @@ class RAPDataset:
 		Some labels are set to 2 in the RAP dataset, usually meaning the label is unknown or unsure.
 		We change it to 0.5 as a more reasonable value expression.
 		"""
-		self.labels = numpy.array([[0.5 if x == 2 else x for x in line] for line in self.labels])
+		self.labels = np.array([[0.5 if x == 2 else x for x in line] for line in self.labels])
 
 		self.set_partition_set_id(par_set_id)
 
