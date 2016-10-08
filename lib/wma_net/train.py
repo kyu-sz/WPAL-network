@@ -70,6 +70,7 @@ class SolverWrapper(object):
         timer = Timer()
         model_paths = []
         while self.solver.iter < max_iters:
+	    print "Python: iter", self.solver.iter
             # Make one SGD update
             timer.tic()
             self.solver.step(1)

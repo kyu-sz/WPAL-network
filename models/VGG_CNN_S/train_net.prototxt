@@ -148,7 +148,9 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 1
-    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
   }
   convolution_param {
     weight_filler {
@@ -158,7 +160,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 512
+    num_output: 256
     pad: 2
     kernel_size: 5
   }
@@ -186,7 +188,9 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 1
-    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
   }
   convolution_param {
     weight_filler {
@@ -196,7 +200,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 512
+    num_output: 256
     pad: 2
     kernel_size: 5
   }
@@ -224,7 +228,9 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 1
-    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
   }
   convolution_param {
     weight_filler {
@@ -234,7 +240,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 512
+    num_output: 256
     pad: 2
     kernel_size: 5
   }
@@ -261,6 +267,12 @@ layer {
   top: "fc3_e"
   name: "fc3_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
   inner_product_param {
     weight_filler {
         type: "xavier"
@@ -277,6 +289,12 @@ layer {
   top: "fc4_e"
   name: "fc4_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
   inner_product_param {
     weight_filler {
         type: "xavier"
@@ -293,6 +311,12 @@ layer {
   top: "fc5_e"
   name: "fc5_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
   inner_product_param {
     weight_filler {
         type: "xavier"
@@ -311,6 +335,7 @@ layer {
   name: "cross_entropy_loss_3"
   top: "cross_entropy_loss_3"
   type: "SigmoidCrossEntropyLoss"
+  #type: "Concat"
 }
 layer {
   bottom: "fc4_e"
@@ -353,3 +378,18 @@ layer {
   top: "cross_entropy_loss_total"
   type: "SigmoidCrossEntropyLoss"
 }
+
+#layer {
+#  bottom: "fc_total"
+#  name: "res_prob"
+#  top: "res_prob"
+#  type: "Concat"
+#}
+
+
+#layer {
+#  bottom: "attr"
+#  name: "attr_prob"
+#  top: "attr_prob"
+#  type: "Concat"
+#}
