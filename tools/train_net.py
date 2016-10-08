@@ -17,19 +17,16 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import __init__
+import _init_path
 
-import cv2
-import caffe
 import argparse
-import pprint
-import numpy as np
-import sys
 
 from utils.timer import Timer
-from utils.rap_db import RAPDataset
 from wma_net.train import train_net
+import caffe
+from utils.rap_db import RAPDataset
 from wma_net.config import config, config_from_file, config_from_list
+from wma_net.train import train_net
 
 
 def parse_args():

@@ -57,8 +57,8 @@ __C.TRAIN.SCALES = (600,)
 # Max pixel size of the longest side of a scaled input image
 __C.TRAIN.MAX_SIZE = 1000
 
-# Minibatch size (number of regions of interest [ROIs])
-__C.TRAIN.BATCH_SIZE = 128
+# Minibatch size (number of samples per round)
+__C.TRAIN.BATCH_SIZE = 1
 
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True

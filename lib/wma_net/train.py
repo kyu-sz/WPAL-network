@@ -18,11 +18,12 @@
 # --------------------------------------------------------------------
 
 import caffe
-from caffe.proto import caffe_pb2
 import google.protobuf as pb2
 from utils.timer import Timer
 from test import test_net
 import sys
+from caffe.proto import caffe_pb2
+from config import config
 
 
 class SolverWrapper(object):
@@ -32,7 +33,7 @@ class SolverWrapper(object):
 
     def __init__(self, solver_prototxt, db, output_dir,
                  pretrained_model=None):
-        """ Initialize the SolverWrapper. """
+        """Initialize the SolverWrapper."""
         self.output_dir = output_dir
 
         self.solver = caffe.SGDSolver(solver_prototxt)
@@ -50,8 +51,7 @@ class SolverWrapper(object):
         self.solver.net.layers[0].set_db(self._db)
 
     def snapshot(self):
-        """Take a snapshot of the network.
-        """
+        """ Take a snapshot of the network. """
         net = self.solver.net
 
         infix = ('_' + config.TRAIN.SNAPSHOT_INFIX
@@ -93,7 +93,6 @@ class SolverWrapper(object):
 def train_net(solver_prototxt, db, output_dir,
               pretrained_model=None, max_iters=40000):
     """Train a AM network."""
-    
     sw = SolverWrapper(solver_prototxt, db, output_dir,
                        pretrained_model=pretrained_model)
 

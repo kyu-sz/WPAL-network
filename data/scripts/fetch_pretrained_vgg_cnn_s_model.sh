@@ -1,9 +1,8 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../pretrained_models/" && pwd )"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"/pretrained_models
+mkdir -p $DIR
 cd $DIR
-
-echo $DIR
 
 FILE=VGG_CNN_S.caffemodel
 URL=http://www.robots.ox.ac.uk/%7Evgg/software/deep_eval/releases/bvlc/$FILE
