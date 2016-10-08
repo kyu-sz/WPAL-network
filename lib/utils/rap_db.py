@@ -1,5 +1,7 @@
-import scipy.io as sio
 import os.path as osp
+
+import numpy
+import scipy.io as sio
 
 
 class RAPDataset:
@@ -16,6 +18,12 @@ class RAPDataset:
 		self.position = rap[0][0][4]
 		self._img_names = rap[0][0][5]
 		self.attr_exp = rap[0][0][6]
+
+		"""In our model, labels should be all between 0 and 1.
+		Some labels are set to 2 in the RAP dataset, usually meaning the label is unknown or unsure.
+		We change it to 0.5 as a more reasonable value expression.
+		"""
+		self.labels = numpy.array([[0.5 if x == 2 else x for x in line] for line in self.labels])
 
 		self.set_partition_set_id(par_set_id)
 
