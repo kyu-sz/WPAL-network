@@ -16,6 +16,14 @@ layer {
   top: "conv1"
   name: "conv1"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+    decay_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+    decay_mult: 0.2
+  }
   convolution_param {
     num_output: 96
     kernel_size: 7
@@ -58,9 +66,11 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 0.1
+    decay_mult: 0.1
   }
   param {
     lr_mult: 0.2
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 256
@@ -91,9 +101,11 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 0.1
+    decay_mult: 0.1
   }
   param {
     lr_mult: 0.2
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 512
@@ -114,9 +126,11 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 0.1
+    decay_mult: 0.1
   }
   param {
     lr_mult: 0.2
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 512
@@ -158,12 +172,6 @@ layer {
   top: "pool5"
   name: "pool5"
   type: "Pooling"
-  param {
-    lr_mult: 0.1
-  }
-  param {
-    lr_mult: 0.2
-  }
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -178,9 +186,11 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     lr_mult: 2
+    decay_mult: 2
   }
   convolution_param {
     weight_filler {
@@ -208,9 +218,11 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     lr_mult: 2
+    decay_mult: 2
   }
   convolution_param {
     weight_filler {
@@ -238,9 +250,11 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     lr_mult: 2
+    decay_mult: 2
   }
   convolution_param {
     weight_filler {
@@ -299,10 +313,12 @@ layer {
   name: "fc3_e"
   type: "InnerProduct"
   param {
-    lr_mult: 1
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 2
+    lr_mult: 1
+    decay_mult: 1
   }
   inner_product_param {
     weight_filler {
@@ -321,10 +337,12 @@ layer {
   name: "fc4_e"
   type: "InnerProduct"
   param {
-    lr_mult: 1
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 2
+    lr_mult: 1
+    decay_mult: 1
   }
   inner_product_param {
     weight_filler {
@@ -343,10 +361,12 @@ layer {
   name: "fc5_e"
   type: "InnerProduct"
   param {
-    lr_mult: 1
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 2
+    lr_mult: 1
+    decay_mult: 1
   }
   inner_product_param {
     weight_filler {
@@ -396,6 +416,14 @@ layer {
   top: "fc_total"
   name: "fc_total"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  } 
   inner_product_param {
     num_output: 92
   }

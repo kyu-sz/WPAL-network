@@ -1,10 +1,12 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"/pretrained_models
+MODEL_NAME=VGG_CNN_S
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"/snapshots/${MODEL_NAME}
 mkdir -p $DIR
 cd $DIR
 
-FILE=VGG_CNN_S.caffemodel
+FILE=pretrained.caffemodel
 URL=http://www.robots.ox.ac.uk/%7Evgg/software/deep_eval/releases/bvlc/$FILE
 CHECKSUM=c33d6eb14b3a828224970a894267c516
 
@@ -24,7 +26,7 @@ if [ -f $FILE ]; then
   fi
 fi
 
-echo "Downloading ImageNet-pretrained VGG_CNN_S model..."
+echo "Downloading pretrained " ${MODEL_NAME} " model..."
 
 wget $URL -O $FILE
 

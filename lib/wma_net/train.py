@@ -34,32 +34,36 @@ class SolverWrapper(object):
     """
 
     def __init__(self, solver_prototxt, db, output_dir, do_flip,
-                 pretrained_model=None):
+                 snapshot_path=None):
         """Initialize the SolverWrapper."""
-        self.output_dir = output_dir
-        self.solver = caffe.SGDSolver(solver_prototxt)
+        self._output_dir = output_dir
+        self._solver = caffe.SGDSolver(solver_prototxt)
 
-        if pretrained_model is not None:
-            print ('Loading pretrained model '
-                   'weights from {:s}').format(pretrained_model)
-            self.solver.net.copy_from(pretrained_model)
-
-        self.solver_param = caffe_pb2.SolverParameter()
+        self._solver_param = caffe_pb2.SolverParameter()
         with open(solver_prototxt, 'rt') as f:
-            pb2.text_format.Merge(f.read(), self.solver_param)
-
-        self._db = db
-        self.solver.net.layers[0].set_db(self._db, do_flip)
-
-    def snapshot(self):
-        """Take a snapshot of the network."""
-        net = self.solver.net
+            pb2.text_format.Merge(f.read(), self._solver_param)
 
         infix = ('_' + config.TRAIN.SNAPSHOT_INFIX
                  if config.TRAIN.SNAPSHOT_INFIX != '' else '')
-        filename = (self.solver_param.snapshot_prefix + infix +
-                    '_iter_{:d}'.format(self.solver.iter) + '.caffemodel')
-        filename = os.path.join(self.output_dir, filename)
+        self._snapshot_prefix = self._solver_param.snapshot_prefix + infix + '_iter_'
+
+        if snapshot_path is not None:
+            print ('Loading snapshot weights from {:s}').format(snapshot_path)
+            self._solver.net.copy_from(snapshot_path)
+
+            snapshot_path = snapshot_path.split('/')[-1]
+            if snapshot_path.startswith(self._snapshot_prefix):
+                print 'Warning! Existing snapshots may be overriden by new snapshots!'
+ 
+        self._db = db
+        self._solver.net.layers[0].set_db(self._db, do_flip)
+
+    def snapshot(self):
+        """Take a snapshot of the network."""
+        net = self._solver.net
+
+        filename = self._snapshot_prefix + ('{:d}'.format(self._solver.iter) + '.caffemodel')
+        filename = os.path.join(self._output_dir, filename)
 
         net.save(str(filename))
         print 'Wrote snapshot to: {:s}'.format(filename)
@@ -71,32 +75,32 @@ class SolverWrapper(object):
         last_snapshot_iter = -1
         timer = Timer()
         model_paths = []
-        while self.solver.iter < max_iters:
-	    print "Python: iter", self.solver.iter
+        while self._solver.iter < max_iters:
             # Make one SGD update
             timer.tic()
-            self.solver.step(1)
+            self._solver.step(1)
             timer.toc()
-            if self.solver.iter % (10 * self.solver_param.display) == 0:
+            if self._solver.iter % (10 * self._solver_param.display) == 0:
                 print 'speed: {:.3f}s / iter'.format(timer.average_time)
-
-            if self.solver.iter % config.TRAIN.SNAPSHOT_ITERS == 0:
-                last_snapshot_iter = self.solver.iter
+            if self._solver.iter % 10 == 0:
+	        print "Python: iter", self._solver.iter
+            if self._solver.iter % config.TRAIN.SNAPSHOT_ITERS == 0:
+                last_snapshot_iter = self._solver.iter
                 model_paths.append(self.snapshot())
 
-            if self.solver.iter % config.TRAIN.TEST_ITERS == 0:
-                test_net(self.solver.net, self._db, self._output_dir)
+            if self._solver.iter % config.TRAIN.TEST_ITERS == 0:
+                test_net(self._solver.net, self._db, self._output_dir)
 
-        if last_snapshot_iter != self.solver.iter:
+        if last_snapshot_iter != self._solver.iter:
             model_paths.append(self.snapshot())
         return model_paths
 
 
 def train_net(solver_prototxt, db, output_dir,
-              pretrained_model=None, max_iters=40000):
+              snapshot_path=None, max_iters=40000):
     """Train a WMA network."""
     sw = SolverWrapper(solver_prototxt, db, output_dir, config.TRAIN.DO_FLIP,
-                       pretrained_model=pretrained_model)
+                       snapshot_path=snapshot_path)
 
     print 'Solving...'
     model_paths = sw.train_model(max_iters)

@@ -20,7 +20,7 @@
 import _init_path
 
 import argparse
-
+import os
 from utils.timer import Timer
 from wma_net.train import train_net
 import caffe
@@ -43,9 +43,9 @@ def parse_args():
     parser.add_argument('--iters', dest='max_iters',
                         help='number of training iterations',
                         default=40000, type=int)
-    parser.add_argument('--weights', dest='pretrained_model',
-                        help='initialize with pretrained model weights',
-                        default='./data/pretrained_models/VGG_CNN_S.caffemodel', type=str)
+    parser.add_argument('--weights', dest='snapshot_path',
+                        help='initialize with weights of a pretrained model or snapshot',
+                        default=None, type=str)
     parser.add_argument('--dbpath', dest='db_path',
                         help='the path of the RAP database',
                         default='./data/RAP', type=str)
@@ -98,6 +98,11 @@ if __name__ == '__main__':
     """Load RAP dataset"""
     db = RAPDataset(args.db_path, args.par_set_id)
 
+    try:
+        os.makedirs(args.output_dir)
+    except:
+        pass
+
     train_net(args.solver, db, args.output_dir,
-              pretrained_model=args.pretrained_model,
+              snapshot_path=args.snapshot_path,
               max_iters=args.max_iters)

@@ -37,12 +37,8 @@ __C = edict()
 #   from wma_net.config import config
 config = __C
 
-#
-# Database options
-#
-
+# Number of attributes in a database.
 __C.NUM_ATTR = 92
-
 
 #
 # Training options
@@ -52,22 +48,22 @@ __C.TRAIN = edict()
 
 # Scales to use during training (can list multiple scales)
 # Each scale is the pixel size of an image's shortest side
-__C.TRAIN.SCALES = (600,)
+__C.TRAIN.SCALES = (64, 128, 256)
 
 # Max pixel size of the longest side of a scaled input image
-__C.TRAIN.MAX_SIZE = 1000
+__C.TRAIN.MAX_SIZE = 512
 
 # Minibatch size (number of samples per round)
-__C.TRAIN.BATCH_SIZE = 16
+__C.TRAIN.BATCH_SIZE = 64
 
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True
 
 # Iterations between tests
-__C.TRAIN.TEST_ITERS = 100000
+__C.TRAIN.TEST_ITERS = 1000000
 
 # Iterations between snapshots
-__C.TRAIN.SNAPSHOT_ITERS = 10000
+__C.TRAIN.SNAPSHOT_ITERS = 1000
 
 # solver.prototxt specifies the snapshot path prefix, this adds an optional
 # infix to yield the path: <prefix>[_<infix>]_iters_XYZ.caffemodel
@@ -79,7 +75,7 @@ __C.TRAIN.SNAPSHOT_INFIX = ''
 __C.TRAIN.ASPECT_GROUPING = True
 
 # Whether to do flipping during training
-__C.DO_FLIP = True
+__C.TRAIN.DO_FLIP = True
 
 #
 # Testing options

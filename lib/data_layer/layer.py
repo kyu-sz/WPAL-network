@@ -100,17 +100,17 @@ class BlobFetcher(Process):
         self._db = db
         self._perm = None
         self._cur = 0
-        self._shuffle_train_inds()
-
-        self._flip = np.zeros(self._db.train_ind.shape)
+        self._do_flip = do_flip
         self._train_ind = self._db.train_ind
+
+        self._shuffle_train_inds()
 
         # fix the random seed for reproducibility
         np.random.seed(config.RNG_SEED)
 
     def _shuffle_train_inds(self):
         """Randomly permute the training roidb."""
-        self._perm = np.random.permutation(xrange(len(self._train_ind * (1 if self._flip else 2))))
+        self._perm = np.random.permutation(xrange(len(self._train_ind * (1 if self._do_flip else 2))))
         self._cur = 0
 
     def _get_next_minibatch_inds(self):
