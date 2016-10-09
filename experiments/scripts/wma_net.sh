@@ -1,9 +1,9 @@
 #!/bin/bash
 # Usage:
-# ./experiments/scripts/wma_net.sh GPU NET SNAPSHOT [options args to {train,test}_net.py]
+# ./experiments/scripts/wma_net.sh GPU NET SNAPSHOT DB_SET [options args to {train,test}_net.py]
 #
 # Example:
-# ./experiments/scripts/wma_net.sh 0 VGG_CNN_S pretrained \
+# ./experiments/scripts/wma_net.sh 0 VGG_CNN_S pretrained 0 \
 #   --set EXP_DIR foobar RNG_SEED 42 TRAIN.SCALES "[400, 500, 600, 700]"
 
 set -x
@@ -15,6 +15,7 @@ GPU_ID=$1
 NET=$2
 NET_lc=${NET,,}
 SNAPSHOT=$3
+DB_SET=$4
 
 array=( $@ )
 len=${#array[@]}
@@ -27,10 +28,18 @@ LOG="experiments/logs/wna_net_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-
 exec &> >(tee -a "$LOG")
 echo Logging output to "$LOG"
 
+if [ ${SNAPSHOT} -eq "pretrained" ]
+then
+    WEIGHTS=data/snapshots/${NET}/${DB_SET}/${SNAPSHOT}.caffemodel
+else
+    WEIGHTS=data/pretrained/${NET}.caffemodel
+fi
+
 time ./tools/train_net.py --gpu ${GPU_ID} \
   --solver models/${NET}/solver.prototxt \
-  --weights data/snapshots/${NET}/${SNAPSHOT}.caffemodel \
-  --outputdir data/snapshots/${NET}/
+  --weights WEIGHTS \
+  --outputdir data/snapshots/${NET}/${DB_SET} \
+  --setid ${DB_SET} \
   --iters ${ITERS} \
   ${EXTRA_ARGS}
 

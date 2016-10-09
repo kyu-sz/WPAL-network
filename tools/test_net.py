@@ -17,8 +17,6 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import pprint
@@ -26,10 +24,8 @@ import time
 
 import caffe
 from utils.rap_db import RAPDataset
-from wma_net.config import config
+from wma_net.config import config, config_from_file, config_from_list
 from wma_net.test import test_net
-from wma_net.config import config, conf_from_file, conf_from_list
-from utils.rap_db import RAPDataset
 
 
 def parse_args():

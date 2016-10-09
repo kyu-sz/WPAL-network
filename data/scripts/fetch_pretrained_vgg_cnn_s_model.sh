@@ -2,11 +2,11 @@
 
 MODEL_NAME=VGG_CNN_S
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"/snapshots/${MODEL_NAME}
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"/pretrained/
 mkdir -p $DIR
 cd $DIR
 
-FILE=pretrained.caffemodel
+FILE=${MODEL_NAME}.caffemodel
 URL=http://www.robots.ox.ac.uk/%7Evgg/software/deep_eval/releases/bvlc/$FILE
 CHECKSUM=c33d6eb14b3a828224970a894267c516
 

@@ -19,17 +19,12 @@
 
 """Test a AM network on an imdb (image database)."""
 
-
-import __init__
-
-import argparse
-import numpy as np
-import cv2
-import caffe
 import cPickle
 import os
+
+import cv2
+import numpy as np
 from utils.timer import Timer
-from utils.blob import img_list_to_blob
 
 
 def _get_image_blob(img):
@@ -67,14 +62,29 @@ def _get_image_blob(img):
     return blob, np.array(img_scale_factors)
 
 
-def _get_blobs(im, rois):
+def _get_blobs(im):
     """Convert an image and RoIs within that image into network inputs."""
     blobs = {'data' : None}
     blobs['data'], im_scale_factors = _get_image_blob(im)
     return blobs, im_scale_factors
 
 
-def recognize_attr(net, im):
+def recognize_attr(net, img):
+    """Recognize attributes in a pedestrian image.
+
+    Arguments:
+    	net (caffe.Net): WMA network to use.
+    	img (ndarray): color image to test (in BGR order)
+
+    Returns:
+    	attributes (ndarray): K x 1 array of predicted attributes. (K is
+    	    specified by database or the net)
+    """
+    blobs, im_scale_factors = _get_blobs(img)
+
+    # reshape network inputs
+    net.blobs['data'].reshape(*(blobs['data'].shape))
+
     raise NotImplementedError("Attribute recognition not implemented error")
 
 

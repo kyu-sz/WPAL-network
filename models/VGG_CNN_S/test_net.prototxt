@@ -1,13 +1,15 @@
 name: "VGG_CNN_S"
 
 input: "data"
+
 input_shape {
   dim: 1
   dim: 3
   dim: 224
   dim: 224
-}
+}name: "VGG_CNN_S"
 
+########################## VGG CNN S ##########################
 layer {
   bottom: "data"
   top: "conv1"
@@ -137,14 +139,14 @@ layer {
     stride: 3
   }
 }
-
+########################## Extra Conv Layers ##########################
 layer {
   bottom: "conv3"
   top: "conv3_e"
   name: "conv3_e"
   type: "Convolution"
   convolution_param {
-    num_output: 1024
+    num_output: 512
     pad: 2
     kernel_size: 5
   }
@@ -156,22 +158,12 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "conv3_e"
-  top: "pool3_e"
-  name: "pool3_e"
-  type: "Pooling"
-  pooling_param {
-    pool: MAX
-    global_pooling: 1
-  }
-}
-layer {
   bottom: "conv4"
   top: "conv4_e"
   name: "conv4_e"
   type: "Convolution"
   convolution_param {
-    num_output: 1024
+    num_output: 512
     pad: 2
     kernel_size: 5
   }
@@ -181,6 +173,34 @@ layer {
   top: "conv4_e"
   name: "ReLU4_e"
   type: "ReLU"
+}
+layer {
+  bottom: "pool5"
+  top: "conv5_e"
+  name: "conv5_e"
+  type: "Convolution"
+  convolution_param {
+    num_output: 512
+    pad: 2
+    kernel_size: 5
+  }
+}
+layer {
+  bottom: "conv5_e"
+  top: "conv5_e"
+  name: "ReLU5_e"
+  type: "ReLU"
+}
+########################## Global Pooling Layers ##########################
+layer {
+  bottom: "conv3_e"
+  top: "pool3_e"
+  name: "pool3_e"
+  type: "Pooling"
+  pooling_param {
+    pool: MAX
+    global_pooling: 1
+  }
 }
 layer {
   bottom: "conv4_e"
@@ -193,23 +213,6 @@ layer {
   }
 }
 layer {
-  bottom: "conv5"
-  top: "conv5_e"
-  name: "conv5_e"
-  type: "Convolution"
-  convolution_param {
-    num_output: 1024
-    pad: 2
-    kernel_size: 5
-  }
-}
-layer {
-  bottom: "conv5_e"
-  top: "conv5_e"
-  name: "ReLU5_e"
-  type: "ReLU"
-}
-layer {
   bottom: "conv5_e"
   top: "pool5_e"
   name: "pool5_e"
@@ -219,7 +222,7 @@ layer {
     global_pooling: 1
   }
 }
-
+########################## Prediction Layers ##########################
 layer {
   bottom: "pool3_e"
   top: "fc3_e"
@@ -247,7 +250,7 @@ layer {
     num_output: 92
   }
 }
-
+########################## Synthesized Prediction Layers ##########################
 layer {
   name: "concat"
   bottom: "fc3_e"
@@ -256,7 +259,6 @@ layer {
   top: "concat"
   type: "Concat"
 }
-
 layer {
   bottom: "concat"
   top: "fc_total"
