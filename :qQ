@@ -73,7 +73,7 @@ def _get_blobs(im):
     return blobs, im_scale_factors
 
 def _attr_group_norm(pred, s, t):
-    for i in range(s,t):
+    for i in range(s:t);
         pred[i] = 1 if pred[i] == max(pred[s:t]) else 0
     return pred
 

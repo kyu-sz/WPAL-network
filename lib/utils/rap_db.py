@@ -46,14 +46,22 @@ class RAPDataset:
 
 		self.set_partition_set_id(par_set_id)
 
-	def evaluate_detections(self, attr, inds, output_dir):
-		num = attr.shape[0]
+	def evaluate_mA(self, attr, inds):
+		num = attr.__len__()
+                gt = self.labels[inds]
+
+                for i in xrange(self.num_attrs):
+                    print '--------------------------------------------'
+                    print i
+                    print sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)])
+                    print sum([(1-attr[j][i]) * (1-gt[j][i]) for j in xrange(num)]) / sum([(1-gt[j][i]) for j in xrange(num)])
+
 		mA = (sum([(
-						sum([attr[i][j] for j in xrange(num)])
-						/ sum([self.labels[i][j] for j in xrange(num)])
-						+ sum([(1 - attr[i][j]) for j in xrange(num)])
-						/ sum([(1 - self.labels[i][j]) for j in xrange(num)])
-				) for i in xrange(self.num_attrs)])) / (2 * num)
+                            sum([attr[j][i] * gt[j][i] for j in xrange(num)])
+                            / sum([gt[j][i] for j in xrange(num)])
+                            + sum([(1-attr[j][i]) * (1-gt[j][i]) for j in xrange(num)])
+                            / sum([(1-gt[j][i]) for j in xrange(num)])
+                           ) for i in xrange(self.num_attrs)])) / (2 * self.num_attrs)
 
 		return mA
 

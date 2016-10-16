@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import _init_paths
+import _init_path
 
 from utils.rap_db import RAPDataset
 import argparse
@@ -41,4 +41,4 @@ if __name__ == '__main__':
     f = open(args.pkl, 'rb')
     attr = cPickle.load(f)
 
-    print attr.shape
+    print db.evaluate_mA(attr, db.test_ind)
