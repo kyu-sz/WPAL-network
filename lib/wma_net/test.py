@@ -141,7 +141,7 @@ def test_net(net, db, output_dir, vis=False):
 
     attr_file = os.path.join(output_dir, 'attributes.pkl')
     with open(attr_file, 'wb') as f:
-        cPickle.dump(attr, f, cPickle.HIGHEST_PROTOCOL)
+        cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
     print 'Evaluating attributes'
-    db.evaluate_detections(attr, db.test_ind, output_dir)
+    db.evaluate_detections(all_attrs, db.test_ind, output_dir)
