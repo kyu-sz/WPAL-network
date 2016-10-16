@@ -1,4 +1,4 @@
-name: "VGG_CNN_S"
+name: "VGG_CNN_S_MLL"
 
 layer {
   name: "input-data"
@@ -522,30 +522,7 @@ layer {
     num_output: 92
   }
 }
-########################## Loss Layers ##########################
-layer {
-  bottom: "fc3_e2"
-  bottom: "attr"
-  name: "cross_entropy_loss_3"
-  top: "cross_entropy_loss_3"
-  type: "SigmoidCrossEntropyLoss"
-  #type: "Concat"
-}
-layer {
-  bottom: "fc4_e2"
-  bottom: "attr"
-  name: "cross_entropy_loss_4"
-  top: "cross_entropy_loss_4"
-  type: "SigmoidCrossEntropyLoss"
-}
-layer {
-  bottom: "fc5_e2"
-  bottom: "attr"
-  name: "cross_entropy_loss_5"
-  top: "cross_entropy_loss_5"
-  type: "SigmoidCrossEntropyLoss"
-}
-########################## Synthesized Prediction Layers ##########################
+########################## Synthesis Layers ##########################
 layer {
   name: "concat"
   bottom: "fc3_e2"
@@ -578,11 +555,32 @@ layer {
     num_output: 92
   }
 }
-########################## Synthesized Loss Layers ##########################
+########################## Loss Layers ##########################
+layer {
+  bottom: "fc3_e2"
+  bottom: "attr"
+  name: "loss_3"
+  top: "loss_3"
+  type: "SigmoidCrossEntropyLoss"
+}
+layer {
+  bottom: "fc4_e2"
+  bottom: "attr"
+  name: "loss_4"
+  top: "loss_4"
+  type: "SigmoidCrossEntropyLoss"
+}
+layer {
+  bottom: "fc5_e2"
+  bottom: "attr"
+  name: "loss_5"
+  top: "loss_5"
+  type: "SigmoidCrossEntropyLoss"
+}
 layer {
   bottom: "fc_total"
   bottom: "attr"
-  name: "cross_entropy_loss_total"
-  top: "cross_entropy_loss_total"
+  name: "loss_total"
+  top: "loss_total"
   type: "SigmoidCrossEntropyLoss"
 }

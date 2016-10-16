@@ -24,7 +24,10 @@ import os
 
 import cv2
 import numpy as np
+from utils.blob import img_list_to_blob
 from utils.timer import Timer
+
+from config import config
 
 
 def _get_image_blob(img):
@@ -57,7 +60,7 @@ def _get_image_blob(img):
         processed_images.append(img)
 
     # Create a blob to hold the input images
-    blob = im_list_to_blob(processed_images)
+    blob = img_list_to_blob(processed_images)
 
     return blob, np.array(img_scale_factors)
 
@@ -85,7 +88,15 @@ def recognize_attr(net, img):
     # reshape network inputs
     net.blobs['data'].reshape(*(blobs['data'].shape))
 
-    raise NotImplementedError("Attribute recognition not implemented error")
+    forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
+    blobs_out = net.forward(**forward_kwargs)
+
+    pred_3 = blobs_out['pred_3']
+    pred_4 = blobs_out['pred_4']
+    pred_5 = blobs_out['pred_5']
+    pred_total = blobs_out['pred_total']
+
+    return pred_total
 
 
 def test_net(net, db, output_dir, vis=False):
@@ -100,12 +111,12 @@ def test_net(net, db, output_dir, vis=False):
 
     cnt = 0
     for i in db.test_ind:
-        im = cv2.imread(db.get_img_path(i))
+        img = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        attr = recognize_attr(net, im)
+        attr = recognize_attr(net, img)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
-        ++cnt
+        cnt += 1
 
         print 'recognize_attr: {:d}/{:d} {:.3f}s' \
               .format(cnt, num_images, _t['recognize_attr'].average_time)

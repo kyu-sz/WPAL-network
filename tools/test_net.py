@@ -17,8 +17,6 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import pprint
@@ -36,20 +34,20 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description='train WMA Network')
     parser.add_argument('--gpu', dest='gpu_id',
-                        help='GPU device ID to use (default: 0)',
-                        default=0, type=int)
+                        help='GPU device ID to use (default: -1)',
+                        default=-1, type=int)
     parser.add_argument('--def', dest='prototxt',
                         help='prototxt file defining the network',
                         default='./models/VGG_CNN_S/test_net.prototxt', type=str)
     parser.add_argument('--net', dest='caffemodel',
                         help='model to test',
                         default='./data/models/VGG_CNN_S.caffemodel', type=str)
-    parser.add_argument('--cfg', dest='cfg_file',
+    parser.add_argument('--cfg', dest='config_file',
                         help='optional config file', default=None, type=str)
     parser.add_argument('--wait', dest='wait',
                         help='wait until net file exists',
                         default=True, type=bool)
-    parser.add_argument('--set', dest='set_cfgs',
+    parser.add_argument('--set', dest='set_configs',
                         help='set config keys', default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--dbpath', dest='db_path',
@@ -90,8 +88,13 @@ if __name__ == '__main__':
         print('Waiting for {} to exist...'.format(args.caffemodel))
         time.sleep(10)
 
-    caffe.set_mode_gpu()
-    caffe.set_device(args.gpu_id)
+    # set up Caffe
+    if args.gpu_id == -1:
+	    caffe.set_mode_cpu()
+    else:
+	    caffe.set_mode_gpu()
+	    caffe.set_device(args.gpu_id)
+
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 

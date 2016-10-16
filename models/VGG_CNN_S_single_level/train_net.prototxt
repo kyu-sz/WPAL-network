@@ -386,11 +386,11 @@ layer {
     }
   }
 }
-########################## Synthesized Loss Layers ##########################
+########################## Loss Layer ##########################
 layer {
   bottom: "fc7"
   bottom: "attr"
-  name: "sce_loss"
-  top: "sce_loss"
+  name: "loss"
+  top: "loss"
   type: "SigmoidCrossEntropyLoss"
 }
