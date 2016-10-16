@@ -49,6 +49,7 @@ def _get_image_blob(img):
     processed_images = []
     img_scale_factors = []
 
+    
     for target_size in config.TEST.SCALES:
         img_scale = float(target_size) / float(img_size_min)
         # Prevent the biggest axis from being more than MAX_SIZE
@@ -89,6 +90,9 @@ def recognize_attr(net, img):
     net.blobs['data'].reshape(*(blobs['data'].shape))
 
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
+    #if debug:
+    #    print blobs['data'].shape
+    #    print forward_kwargs
     blobs_out = net.forward(**forward_kwargs)
 
     pred_3 = blobs_out['pred_3']
@@ -96,7 +100,14 @@ def recognize_attr(net, img):
     pred_5 = blobs_out['pred_5']
     pred_total = blobs_out['pred_total']
 
-    return pred_total
+    pred = np.average(pred_total, axis=0)
+    #print pred
+    #print pred.shape
+
+    for _ in pred:
+        _ = 0 if _ < 0.5 else 1
+
+    return pred
 
 
 def test_net(net, db, output_dir, vis=False):
@@ -104,11 +115,14 @@ def test_net(net, db, output_dir, vis=False):
 
     num_images = len(db.test_ind)
 
-    all_attrs = [[] for _ in xrange(db.num_attrs)]
+    all_attrs = [[] for _ in xrange(num_images)]
 
     # timers
     _t = {'recognize_attr' : Timer()}
 
+    #global debug
+    #debug  = False
+    
     cnt = 0
     for i in db.test_ind:
         img = cv2.imread(db.get_img_path(i))
@@ -118,8 +132,12 @@ def test_net(net, db, output_dir, vis=False):
         all_attrs[cnt] = attr
         cnt += 1
 
-        print 'recognize_attr: {:d}/{:d} {:.3f}s' \
-              .format(cnt, num_images, _t['recognize_attr'].average_time)
+        #if cnt > 6000:
+            #debug = True
+
+        if cnt % 100 == 0:
+            print 'recognize_attr: {:d}/{:d} {:.3f}s' \
+                  .format(cnt, num_images, _t['recognize_attr'].average_time)
 
     attr_file = os.path.join(output_dir, 'attributes.pkl')
     with open(attr_file, 'wb') as f:

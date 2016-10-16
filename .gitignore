@@ -104,3 +104,6 @@ ENV/
 
 # Log files
 logs/
+
+# Stored results
+*.pkl
