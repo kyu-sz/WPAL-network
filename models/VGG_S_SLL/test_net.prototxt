@@ -1,4 +1,4 @@
-name: "VGG_CNN_S_MLL"
+name: "VGG_S_SLL"
 
 input: "data"
 
@@ -7,7 +7,7 @@ input_shape {
   dim: 3
   dim: 224
   dim: 224
-}
+}name: "VGG_CNN_S"
 ########################## VGG CNN S ##########################
 layer {
   bottom: "data"
@@ -20,7 +20,7 @@ layer {
   }
   param {
     lr_mult: 0.2
-    decay_mult: 0
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 96
@@ -68,7 +68,7 @@ layer {
   }
   param {
     lr_mult: 0.2
-    decay_mult: 0
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 256
@@ -103,7 +103,7 @@ layer {
   }
   param {
     lr_mult: 0.2
-    decay_mult: 0
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 512
@@ -128,7 +128,7 @@ layer {
   }
   param {
     lr_mult: 0.2
-    decay_mult: 0
+    decay_mult: 0.2
   }
   convolution_param {
     num_output: 512
@@ -149,11 +149,9 @@ layer {
   type: "Convolution"
   param {
     lr_mult: 0.1
-    decay_mult: 0.1
   }
   param {
     lr_mult: 0.2
-    decay_mult: 0
   }
   convolution_param {
     num_output: 512
@@ -222,7 +220,7 @@ layer {
   }
   param {
     lr_mult: 2
-    decay_mult: 2
+    decay_mult: 0
   }
   convolution_param {
     weight_filler {
@@ -287,12 +285,6 @@ layer {
   }
 }
 layer {
-  bottom: "pool3_e"
-  top: "pool3_e"
-  name: "relu3_e"
-  type: "ReLU"
-}
-layer {
   bottom: "conv4_e"
   top: "pool4_e"
   name: "pool4_e"
@@ -301,12 +293,6 @@ layer {
     pool: MAX
     global_pooling: 1
   }
-}
-layer {
-  bottom: "pool4_e"
-  top: "pool4_e"
-  name: "relu4_e"
-  type: "ReLU"
 }
 layer {
   bottom: "conv5_e"
@@ -318,221 +304,25 @@ layer {
     global_pooling: 1
   }
 }
-layer {
-  bottom: "pool5_e"
-  top: "pool5_e"
-  name: "relu5_e"
-  type: "ReLU"
-}
-########################## Prediction Layers ##########################
-layer {
-  bottom: "pool3_e"
-  top: "fc3_e1"
-  name: "fc3_e1"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 4096
-  }
-}
-layer {
-  bottom: "fc3_e1"
-  top: "fc3_e1"
-  name: "relu3_e1"
-  type: "ReLU"
-}
-layer {
-  bottom: "fc3_e1"
-  top: "fc3_e1"
-  name: "drop3_e1"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  bottom: "fc3_e1"
-  top: "fc3_e2"
-  name: "fc3_e2"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 92
-  }
-}
-layer {
-  bottom: "pool4_e"
-  top: "fc4_e1"
-  name: "fc4_e1"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 4096
-  }
-}
-layer {
-  bottom: "fc4_e1"
-  top: "fc4_e1"
-  name: "relu4_e1"
-  type: "ReLU"
-}
-layer {
-  bottom: "fc4_e1"
-  top: "fc4_e1"
-  name: "drop4_e1"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  bottom: "fc4_e1"
-  top: "fc4_e2"
-  name: "fc4_e2"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 92
-  }
-}
-layer {
-  bottom: "pool5_e"
-  top: "fc5_e1"
-  name: "fc5_e1"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 4096
-  }
-}
-layer {
-  bottom: "fc5_e1"
-  top: "fc5_e1"
-  name: "relu5_e1"
-  type: "ReLU"
-}
-layer {
-  bottom: "fc5_e1"
-  top: "fc5_e1"
-  name: "drop5_e1"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  bottom: "fc5_e1"
-  top: "fc5_e2"
-  name: "fc5_e2"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 92
-  }
-}
-########################## Synthesis Layers ##########################
+########################## Synthesized Prediction Layers ##########################
 layer {
   name: "concat"
-  bottom: "fc3_e2"
-  bottom: "fc4_e2"
-  bottom: "fc5_e2"
+  bottom: "pool3_e"
+  bottom: "pool4_e"
+  bottom: "pool5_e"
   top: "concat"
   type: "Concat"
 }
 layer {
+  name: "relu_concat"
   bottom: "concat"
-  top: "fc_total"
-  name: "fc_total"
+  top: "concat"
+  type: "ReLU"
+}
+layer {
+  bottom: "concat"
+  top: "fc6"
+  name: "fc6_e"
   type: "InnerProduct"
   param {
     lr_mult: 0.5
@@ -544,37 +334,60 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "xavier"
+        type: "gaussian"
+	std: 0.005
     }
     bias_filler {
         type: "constant"
         value: 0.1
     }
-    num_output: 92
+    num_output: 4096
   }
 }
-########################## Loss Layers ##########################
 layer {
-  bottom: "fc3_e2"
-  name: "pred_3"
-  top: "pred_3"
-  type: "Sigmoid"
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
 }
 layer {
-  bottom: "fc4_e2"
-  name: "pred_4"
-  top: "pred_4"
-  type: "Sigmoid"
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
 }
 layer {
-  bottom: "fc5_e2"
-  name: "pred_5"
-  top: "pred_5"
-  type: "Sigmoid"
+  name: "fc7_e"
+  type: "InnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 92
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
 }
+########################## Prediction Layer ##########################
 layer {
-  bottom: "fc_total"
-  name: "pred_total"
-  top: "pred_total"
+  bottom: "fc7"
+  name: "pred"
+  top: "pred"
   type: "Sigmoid"
 }

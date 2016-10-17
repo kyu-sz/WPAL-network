@@ -1,5 +1,5 @@
-train_net: "models/VGG_CNN_S_multi_level_loss/train_net.prototxt"
-#test_net: "models/VGG_CNN_S_multi_level_loss/test_net.prototxt"
+train_net: "models/VGG_S_MLL/train_net.prototxt"
+#test_net: "models/VGG_S_MLL/test_net.prototxt"
 
 base_lr: 0.0002
 lr_policy: "step"
@@ -14,6 +14,4 @@ weight_decay: 0.0001
 snapshot: 0
 
 # We still use the snapshot prefix, though
-snapshot_prefix: "wma_s_mll"
-
-iter_size: 2
+snapshot_prefix: "vgg_s_mll"

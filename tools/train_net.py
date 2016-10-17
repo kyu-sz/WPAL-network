@@ -17,15 +17,12 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
-import sys
 import argparse
 import os
-from utils.timer import Timer
-from wma_net.train import train_net
+import sys
+
 import caffe
-from utils.rap_db import RAPDataset
+from utils.rap_db import RAP
 from wma_net.config import config, config_from_file, config_from_list
 from wma_net.train import train_net
 
@@ -97,8 +94,8 @@ if __name__ == '__main__':
 
     print 'Output will be saved to `{:s}`'.format(args.output_dir)
 
-    """Load RAP dataset"""
-    db = RAPDataset(args.db_path, args.par_set_id)
+    """Load RAP database"""
+    db = RAP(args.db_path, args.par_set_id)
 
     try:
         os.makedirs(args.output_dir)

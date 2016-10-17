@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import _init_path
-
-from utils.rap_db import RAPDataset
 import argparse
 import cPickle
+
+from utils.rap_db import RAPDataset
 
 
 def parse_args():
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    """Load RAP dataset"""
+    """Load RAP database"""
     db = RAPDataset(args.db_path, args.par_set_id)
 
     f = open(args.pkl, 'rb')

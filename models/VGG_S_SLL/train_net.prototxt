@@ -1,20 +1,29 @@
-name: "VGG_CNN_S"
+name: "VGG_S_SLL"
 
-input: "data"
-
-input_shape {
-  dim: 1
-  dim: 3
-  dim: 224
-  dim: 224
-}name: "VGG_CNN_S"
-
+layer {
+  name: "input-data"
+  type: "Python"
+  top: "data"
+  top: "attr"
+  python_param {
+    module: "data_layer.layer"
+    layer: "DataLayer"
+  }
+}
 ########################## VGG CNN S ##########################
 layer {
   bottom: "data"
   top: "conv1"
   name: "conv1"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+    decay_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+    decay_mult: 0.2
+  }
   convolution_param {
     num_output: 96
     kernel_size: 7
@@ -55,6 +64,14 @@ layer {
   top: "conv2"
   name: "conv2"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+    decay_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+    decay_mult: 0.2
+  }
   convolution_param {
     num_output: 256
     kernel_size: 5
@@ -82,6 +99,14 @@ layer {
   top: "conv3"
   name: "conv3"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+    decay_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+    decay_mult: 0.2
+  }
   convolution_param {
     num_output: 512
     pad: 1
@@ -99,6 +124,14 @@ layer {
   top: "conv4"
   name: "conv4"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+    decay_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+    decay_mult: 0.2
+  }
   convolution_param {
     num_output: 512
     pad: 1
@@ -116,6 +149,12 @@ layer {
   top: "conv5"
   name: "conv5"
   type: "Convolution"
+  param {
+    lr_mult: 0.1
+  }
+  param {
+    lr_mult: 0.2
+  }
   convolution_param {
     num_output: 512
     pad: 1
@@ -145,7 +184,22 @@ layer {
   top: "conv3_e"
   name: "conv3_e"
   type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
   convolution_param {
+    weight_filler {
+        type: "xavier"
+    }
+    bias_filler {
+        type: "constant"
+        value: 0
+    }
     num_output: 512
     pad: 2
     kernel_size: 5
@@ -162,7 +216,22 @@ layer {
   top: "conv4_e"
   name: "conv4_e"
   type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
   convolution_param {
+    weight_filler {
+        type: "xavier"
+    }
+    bias_filler {
+        type: "constant"
+        value: 0
+    }
     num_output: 512
     pad: 2
     kernel_size: 5
@@ -179,7 +248,22 @@ layer {
   top: "conv5_e"
   name: "conv5_e"
   type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
   convolution_param {
+    weight_filler {
+        type: "xavier"
+    }
+    bias_filler {
+        type: "constant"
+        value: 0
+    }
     num_output: 512
     pad: 2
     kernel_size: 5
@@ -222,49 +306,91 @@ layer {
     global_pooling: 1
   }
 }
-########################## Prediction Layers ##########################
-layer {
-  bottom: "pool3_e"
-  top: "fc3_e"
-  name: "fc3_e"
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 92
-  }
-}
-layer {
-  bottom: "pool4_e"
-  top: "fc4_e"
-  name: "fc4_e"
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 92
-  }
-}
-layer {
-  bottom: "pool5_e"
-  top: "fc5_e"
-  name: "fc5_e"
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 92
-  }
-}
 ########################## Synthesized Prediction Layers ##########################
 layer {
   name: "concat"
-  bottom: "fc3_e"
-  bottom: "fc4_e"
-  bottom: "fc5_e"
+  bottom: "pool3_e"
+  bottom: "pool4_e"
+  bottom: "pool5_e"
   top: "concat"
   type: "Concat"
 }
 layer {
+  name: "relu_concat"
   bottom: "concat"
-  top: "fc_total"
-  name: "fc_total"
+  top: "concat"
+  type: "ReLU"
+}
+layer {
+  bottom: "concat"
+  top: "fc6"
+  name: "fc6_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  inner_product_param {
+    weight_filler {
+        type: "gaussian"
+	std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "fc7_e"
+  type: "InnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
     num_output: 92
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
   }
+}
+########################## Loss Layer ##########################
+layer {
+  bottom: "fc7"
+  bottom: "attr"
+  name: "loss"
+  top: "loss"
+  type: "SigmoidCrossEntropyLoss"
 }

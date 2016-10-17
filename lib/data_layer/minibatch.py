@@ -22,11 +22,11 @@
 import cv2
 import numpy as np
 import numpy.random as npr
-from utils.blob import prep_img_for_blob, img_list_to_blob
+from utils.blob import img_list_to_blob, prep_img_for_blob
 from wma_net.config import config
 
 
-def get_minibatch(img_paths, labels, flip):
+def get_minibatch(img_paths, labels, flip, flip_attr_pairs):
     """Construct a minibatch with given image paths and corresponding labels."""
     num_images = len(img_paths)
 
@@ -36,33 +36,34 @@ def get_minibatch(img_paths, labels, flip):
 
     # Get the input image blob, formatted for caffe
     img_blob, img_scales = _get_image_blob(img_paths, random_scale_inds, flip)
-    attr_blob = _get_attr_blob(labels, flip)
+    attr_blob = _get_attr_blob(labels, flip, flip_attr_pairs)
 
     blobs = {'data': img_blob, 'attr': attr_blob}
 
     return blobs
 
 
-def _flip_labels(labels, flip):
+def _flip_labels(labels, flip, flip_attr_pairs):
     """Horizontally flip the labels according to flipping flags.
     labels: 1-dimensional numpy array.
     flip:   corresponding flipping flag array.
+    flip_attr_pairs: A list of attribute pairs to be flipped.
     """
-    """TODO: Make these indexes adaptable to databases other than RAP."""
-    face_left_ind = [54]
-    face_right_ind = [55]
-    temp = labels[face_right_ind]
-    labels[face_right_ind] = labels[face_left_ind]
-    labels[face_left_ind] = temp
+    for pair in flip_attr_pairs:
+        face_left_ind = [pair[0]]
+        face_right_ind = [pair[1]]
+        temp = labels[face_right_ind]
+        labels[face_right_ind] = labels[face_left_ind]
+        labels[face_left_ind] = temp
     return labels
 
 
-def _get_attr_blob(labels, flip):
+def _get_attr_blob(labels, flip, flip_attr_pairs):
     """Builds an input blob from the labels"""
     blob = np.zeros((labels.__len__(), 1, 1, labels[0].__len__()),
                     dtype=np.float32)
     for i in xrange(labels.__len__()):
-        blob[i, :, :, :] = _flip_labels(labels[i], flip[i])
+        blob[i, :, :, :] = _flip_labels(labels[i], flip[i], flip_attr_pairs)
 
     return blob
 

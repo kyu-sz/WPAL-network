@@ -2,7 +2,7 @@
 
 By Ken Yu, under guidance of Dr. Zhang Zhang and Prof. Kaiqi Huang.
 
-Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neural Network (CNN) structure designed for recognizing attributes from objects. Currently it is developed to recognize attributes from pedestrians only, using the Richly Annotated Pedestrian (RAP) dataset. It is not impossible to adapt this network to recognize attributes of other objects.
+Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neural Network (CNN) structure designed for recognizing attributes from objects. Currently it is developed to recognize attributes from pedestrians only, using the Richly Annotated Pedestrian (RAP) database or PETA database.
 
 ## Installation
 
@@ -21,15 +21,15 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
     WITH_PYTHON_LAYER=1 make all pycaffe -j 8
     ```
 
-3. Download the RAP dataset
+3. Download the RAP database
 
-    To get the Richly Annotated Pedestrian (RAP) dataset, please visit rap.idealtest.org to learn about how to download a copy of it.
+    To get the Richly Annotated Pedestrian (RAP) database, please visit rap.idealtest.org to learn about how to download a copy of it.
 
     It should have two zip files.
 
     ```
     $RAP/RAP_annotation.zip
-    $RAP/RAP_dataset.zip
+    $RAP/RAP_database.zip
     ```
 
 4. Unzip them both to the directory.
@@ -37,10 +37,10 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
     ```Shell
     cd $RAP
     unzip RAP_annotation.zip
-    unzip RAP_dataset.zip
+    unzip RAP_database.zip
     ```
 
-5. Create symlinks for the RAP dataset
+5. Create symlinks for the RAP database
 
     ```Shell
     cd $WMA_NET_ROOT/data

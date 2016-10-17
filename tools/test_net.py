@@ -17,15 +17,13 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import pprint
 import time
 
 import caffe
-from utils.rap_db import RAPDataset
+from utils.rap_db import RAP
 from wma_net.config import config, config_from_file, config_from_list
 from wma_net.test import test_net
 
@@ -100,7 +98,7 @@ if __name__ == '__main__':
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
-    """Load RAP dataset"""
-    db = RAPDataset(args.db_path, args.par_set_id)
+    """Load RAP database"""
+    db = RAP(args.db_path, args.par_set_id)
 
     test_net(net, db, args.output_dir)

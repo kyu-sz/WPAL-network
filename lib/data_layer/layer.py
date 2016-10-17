@@ -137,5 +137,5 @@ class BlobFetcher(Process):
             minibatch_flip = \
                 [0 if i < len(self._db.train_ind) else 1
                  for i in minibatch_inds]
-            blobs = get_minibatch(minibatch_img_paths, minibatch_labels, minibatch_flip)
+            blobs = get_minibatch(minibatch_img_paths, minibatch_labels, minibatch_flip, self._db.flip_attr_pairs)
             self._queue.put(blobs)

@@ -23,32 +23,32 @@ import numpy as np
 import scipy.io as sio
 
 
-class RAP:
+class PETA:
+	"""This tool requires the PETA to be processed into similar form as RAP."""
+
 	def __init__(self, db_path, par_set_id):
 		self._db_path = db_path
 
-		rap = sio.loadmat(osp.join(self._db_path,'RAP_annotation','RAP_annotation.mat'))['RAP_annotation']
+		try:
+			self.labels = sio.loadmat(osp.join(self._db_path, 'attributeLabels.mat'))['DataLabel']
+		except NotImplementedError:
+			import h5py
+			print h5py.File(osp.join(self._db_path, 'attributeLabels.mat')).keys()
+			self.labels = np.array(h5py.File(osp.join(self._db_path, 'attributeLabels.mat'))['DataLabel']).transpose()
 
-		self._partition = rap[0][0][0]
-		self.labels = rap[0][0][1]
-		self.attr_ch = rap[0][0][2]
-		self.attr_eng = rap[0][0][3]
-		self.num_attrs = self.attr_eng.shape[0]
-		self.position = rap[0][0][4]
-		self._img_names = rap[0][0][5]
-		self.attr_exp = rap[0][0][6]
+		try:
+			self.name = sio.loadmat(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
+		except NotImplementedError:
+			import h5py
+			print h5py.File(osp.join(self._db_path, 'attributesName.mat')).keys()
+			self.name = h5py.File(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
 
-		self.flip_attr_pairs = [(54, 55)]
-
-		"""In our model, labels should be all between 0 and 1.
-		Some labels are set to 2 in the RAP database, usually meaning the label is unknown or unsure.
-		We change it to 0.5 as a more reasonable value expression.
-		"""
-		self.labels = np.array([[0.5 if x == 2 else x for x in line] for line in self.labels])
-
+		self.num_attrs = self.name.shape[0]
 		self.test_ind = None
 		self.train_ind = None
 		self.set_partition_set_id(par_set_id)
+
+		self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
 
 	def evaluate_mA(self, attr, inds):
 		num = attr.__len__()
@@ -71,20 +71,22 @@ class RAP:
 		return mA
 
 	def set_partition_set_id(self, par_set_id):
-		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
-		self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
+		num_samples = self.labels.shape[0]
+		block_size = num_samples / 5
+		test_start = block_size * par_set_id
+		test_end = block_size + test_start
+		self.test_ind = range(test_start, test_end)
+		self.train_ind = range(0, test_start) + range(test_end, num_samples)
 
 	def get_img_path(self, img_id):
-		return osp.join(self._db_path, 'RAP_database', self._img_names[img_id][0][0])
+		return osp.join(self._db_path, 'Data', str(img_id + 1) + '.png')
 
 
 if __name__ == '__main__':
-	db = RAP('/home/ken.yu/databases/rap', 0)
-	print db._partition.shape
-	print db._partition[0][0][0][0][1].shape
-	print db._partition[1][0][0][0][1].shape
+	db = PETA('/home/ken.yu/databases/ProcessedPeta', 1)
 	print "Labels:", db.labels.shape
-	print db.train_ind.shape
+	print db.train_ind.__len__()
+	print db.test_ind.__len__()
 	print 'Max training index: ', max(db.train_ind)
 	print db.get_img_path(0)
 	print db.num_attrs

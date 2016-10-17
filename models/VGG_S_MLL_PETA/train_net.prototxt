@@ -1,4 +1,4 @@
-name: "VGG_CNN_S_MLL"
+name: "VGG_S_MLL_PETA"
 
 layer {
   name: "input-data"
@@ -389,7 +389,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 92
+    num_output: 35
   }
 }
 layer {
@@ -454,7 +454,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 92
+    num_output: 35
   }
 }
 layer {
@@ -519,7 +519,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 92
+    num_output: 35
   }
 }
 ########################## Synthesis Layers ##########################
@@ -552,7 +552,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 92
+    num_output: 35
   }
 }
 ########################## Loss Layers ##########################
