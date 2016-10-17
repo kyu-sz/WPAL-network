@@ -19,6 +19,7 @@
 
 import _init_path
 
+import sys
 import argparse
 import os
 from utils.timer import Timer
@@ -42,7 +43,7 @@ def parse_args():
                         default='./models/VGG_CNN_S/solver.prototxt', type=str)
     parser.add_argument('--iters', dest='max_iters',
                         help='number of training iterations',
-                        default=40000, type=int)
+                        default=100000, type=int)
     parser.add_argument('--weights', dest='snapshot_path',
                         help='initialize with weights of a pretrained model or snapshot',
                         default=None, type=str)
@@ -74,6 +75,7 @@ def parse_args():
 
 
 if __name__ == '__main__':
+    print 'Parsing system arguments:', sys.argv
     args = parse_args()
 
     print('Called with args:')

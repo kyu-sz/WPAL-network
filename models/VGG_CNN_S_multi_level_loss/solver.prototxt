@@ -1,4 +1,5 @@
-train_net: "models/VGG_CNN_S/train_net.prototxt"
+train_net: "models/VGG_CNN_S_multi_level_loss/train_net.prototxt"
+#test_net: "models/VGG_CNN_S_multi_level_loss/test_net.prototxt"
 
 base_lr: 0.0002
 lr_policy: "step"
@@ -7,12 +8,12 @@ stepsize: 350000
 display: 100
 average_loss: 100
 momentum: 0.9
-weight_decay: 0.00005
+weight_decay: 0.0001
 
 # Standard caffe solver snapshotting is replaced by our own snapshot function
 snapshot: 0
 
 # We still use the snapshot prefix, though
-snapshot_prefix: "wma_s"
+snapshot_prefix: "wma_s_mll"
 
 iter_size: 2

@@ -19,7 +19,7 @@ DB_SET=$4
 
 array=( $@ )
 len=${#array[@]}
-EXTRA_ARGS=${array[@]:3:$len}
+EXTRA_ARGS=${array[@]:4:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
 ITERS=40000
@@ -28,18 +28,18 @@ LOG="experiments/logs/wna_net_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-
 exec &> >(tee -a "$LOG")
 echo Logging output to "$LOG"
 
-if [ ${SNAPSHOT} -eq "pretrained" ]
+if [ ${SNAPSHOT} = "pretrained" ]
 then
-    WEIGHTS=data/snapshots/${NET}/${DB_SET}/${SNAPSHOT}.caffemodel
+    WEIGHTS=data/pretrained/${NET}.caffemodel 
 else
-    WEIGHTS=data/pretrained/${NET}.caffemodel
+    WEIGHTS=data/snapshots/${NET}/${DB_SET}/${SNAPSHOT}.caffemodel
 fi
 
 time ./tools/train_net.py --gpu ${GPU_ID} \
   --solver models/${NET}/solver.prototxt \
-  --weights WEIGHTS \
-  --outputdir data/snapshots/${NET}/${DB_SET} \
+  --weights ${WEIGHTS} \
   --setid ${DB_SET} \
+  --outputdir data/snapshots/${NET}/${DB_SET} \
   --iters ${ITERS} \
   ${EXTRA_ARGS}
 
@@ -48,6 +48,7 @@ NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print
 set -x
 
 time ./tools/test_net.py --gpu ${GPU_ID} \
-  --def models/${NET}/test.prototxt \
+  --def models/${NET}/test_net.prototxt \
+  --setid ${DB_SET} \
   --net ${NET_FINAL} \
   ${EXTRA_ARGS}

@@ -65,6 +65,7 @@ class SolverWrapper(object):
         filename = self._snapshot_prefix + ('{:d}'.format(self._solver.iter) + '.caffemodel')
         filename = os.path.join(self._output_dir, filename)
 
+	print 'Attempting to save snapshot to \"{:s}\"'.format(filename)
         net.save(str(filename))
         print 'Wrote snapshot to: {:s}'.format(filename)
 
