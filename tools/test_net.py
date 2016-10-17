@@ -17,6 +17,8 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
+import _init_path
+
 import argparse
 import os
 import pprint
@@ -50,9 +52,9 @@ def parse_args():
     parser.add_argument('--set', dest='set_configs',
                         help='set config keys', default=None,
                         nargs=argparse.REMAINDER)
-    parser.add_argument('--dbpath', dest='db_path',
-                        help='the path of the RAP database',
-                        default='./data/RAP', type=str)
+    parser.add_argument('--db', dest='db',
+                        help='the name of the database',
+                        default='RAP', type=str)
     parser.add_argument('--setid', dest='par_set_id',
                         help='the index of training and testing data partition set',
                         default='0', type=int)
@@ -98,7 +100,13 @@ if __name__ == '__main__':
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
-    """Load RAP database"""
-    db = RAP(args.db_path, args.par_set_id)
+    if args.db == 'RAP':
+        """Load RAP database"""
+        from utils.rap_db import RAP
+        db = RAP(os.path.join('data', args.db), args.par_set_id)
+    else:
+        """Load PETA dayanse"""
+        from utils.peta_db import PETA
+        db = PETA(os.path.join('data', args.db), args.par_set_id)
 
     test_net(net, db, args.output_dir)

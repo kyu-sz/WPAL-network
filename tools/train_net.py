@@ -17,12 +17,13 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
+import _init_path
+
 import argparse
 import os
 import sys
 
 import caffe
-from utils.rap_db import RAP
 from wma_net.config import config, config_from_file, config_from_list
 from wma_net.train import train_net
 
@@ -44,9 +45,9 @@ def parse_args():
     parser.add_argument('--weights', dest='snapshot_path',
                         help='initialize with weights of a pretrained model or snapshot',
                         default=None, type=str)
-    parser.add_argument('--dbpath', dest='db_path',
-                        help='the path of the RAP database',
-                        default='./data/RAP', type=str)
+    parser.add_argument('--db', dest='db',
+                        help='name of the databse',
+                        default='RAP', type=str)
     parser.add_argument('--setid', dest='par_set_id',
                         help='the index of training and testing data partition set',
                         default='0', type=int)
@@ -92,11 +93,18 @@ if __name__ == '__main__':
         caffe.set_mode_gpu()
         caffe.set_device(args.gpu_id)
 
+    if args.db == 'RAP':
+        """Load RAP database"""
+	from utils.rap_db import RAP
+        db = RAP(os.path.join('data', args.db), args.par_set_id)
+    else:
+        """Load PETA dayanse"""
+	from utils.peta_db import PETA
+        db = PETA(os.path.join('data', args.db), args.par_set_id)
+
+    config.NUM_ATTR = db.num_attrs
+
     print 'Output will be saved to `{:s}`'.format(args.output_dir)
-
-    """Load RAP database"""
-    db = RAP(args.db_path, args.par_set_id)
-
     try:
         os.makedirs(args.output_dir)
     except:

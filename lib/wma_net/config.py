@@ -37,9 +37,6 @@ __C = edict()
 #   from wma_net.config import config
 config = __C
 
-# Number of attributes in a database.
-__C.NUM_ATTR = 92
-
 #
 # Training options
 #

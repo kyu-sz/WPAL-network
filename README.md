@@ -29,7 +29,7 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
 
     ```
     $RAP/RAP_annotation.zip
-    $RAP/RAP_database.zip
+    $RAP/RAP_dataset.zip
     ```
 
 4. Unzip them both to the directory.
@@ -37,7 +37,7 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
     ```Shell
     cd $RAP
     unzip RAP_annotation.zip
-    unzip RAP_database.zip
+    unzip RAP_dataset.zip
     ```
 
 5. Create symlinks for the RAP database
