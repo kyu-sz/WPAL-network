@@ -72,17 +72,19 @@ def _get_blobs(im):
     blobs['data'], im_scale_factors = _get_image_blob(im)
     return blobs, im_scale_factors
 
-def _attr_group_norm(pred, s, t):
-    for i in range(s,t):
-        pred[i] = 1 if pred[i] == max(pred[s:t]) else 0
+def _attr_group_norm(pred, group):
+    for i in group:
+        pred[i] = 1 if pred[i] == max(pred[group]) else 0
     return pred
 
-def recognize_attr(net, img):
+def recognize_attr(net, img, attr_group):
     """Recognize attributes in a pedestrian image.
 
     Arguments:
     	net (caffe.Net): WMA network to use.
     	img (ndarray): color image to test (in BGR order)
+        attr_group(list of ranges): a list of ranges, each contains indexes
+                                    of attributes that mutually exclude each other.
 
     Returns:
     	attributes (ndarray): K x 1 array of predicted attributes. (K is
@@ -103,20 +105,9 @@ def recognize_attr(net, img):
 
     pred = np.average(pred_total, axis=0)
     
-    pred = _attr_group_norm(pred, 0, 1)
-    pred = _attr_group_norm(pred, 1, 4)
-    pred = _attr_group_norm(pred, 4, 7)
-    pred = _attr_group_norm(pred, 7, 9)
-    pred = _attr_group_norm(pred, 9, 11)
-    pred = _attr_group_norm(pred, 11, 15)
-    pred = _attr_group_norm(pred, 15, 24)
-    pred = _attr_group_norm(pred, 24, 30)
-    pred = _attr_group_norm(pred, 30, 36)
-    pred = _attr_group_norm(pred, 51, 55)
-    pred = _attr_group_norm(pred, 63, 75)
-    pred = _attr_group_norm(pred, 75, 83)
-    pred = _attr_group_norm(pred, 84, 92)
-   
+    for group in attr_group:
+        pred = _attr_group_norm(pred, group)
+    
     for i in xrange(pred.shape[0]):
         pred[i] = 0 if pred[i] < 0.5 else 1
 
@@ -140,7 +131,7 @@ def test_net(net, db, output_dir, vis=False):
     for i in db.test_ind:
         img = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        attr = recognize_attr(net, img)
+        attr = recognize_attr(net, img, db.attr_group)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
@@ -156,5 +147,5 @@ def test_net(net, db, output_dir, vis=False):
     with open(attr_file, 'wb') as f:
         cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
-    print 'Evaluating attributes'
-    db.evaluate_mA(all_attrs, db.test_ind, output_dir)
+    print 'Mean accuracy:', db.evaluate_mA(all_attrs, db.test_ind)
+

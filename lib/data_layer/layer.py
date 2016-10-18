@@ -109,8 +109,8 @@ class BlobFetcher(Process):
         np.random.seed(config.RNG_SEED)
 
     def _shuffle_train_inds(self):
-        """Randomly permute the training roidb."""
-        self._perm = np.random.permutation(xrange(len(self._train_ind * (1 if self._do_flip else 2))))
+        """Randomly permute the training database."""
+        self._perm = np.random.permutation(xrange(len(self._train_ind * (2 if self._do_flip else 1))))
         self._cur = 0
 
     def _get_next_minibatch_inds(self):
@@ -127,12 +127,12 @@ class BlobFetcher(Process):
         while True:
             minibatch_inds = self._get_next_minibatch_inds()
             minibatch_img_paths = \
-                [self._db.get_img_path(
-                    i if i < len(self._db.train_ind) else i - len(self._db.train_ind))
+                [self._db.get_img_path(self._db.train_ind[
+                    i if i < len(self._db.train_ind) else i - len(self._db.train_ind)])
                  for i in minibatch_inds]
             minibatch_labels = \
-                [self._db.labels[
-                     i if i < len(self._db.train_ind) else i - len(self._db.train_ind)]
+                [self._db.labels[self._db.train_ind[
+                     i if i < len(self._db.train_ind) else i - len(self._db.train_ind)]]
                  for i in minibatch_inds]
             minibatch_flip = \
                 [0 if i < len(self._db.train_ind) else 1

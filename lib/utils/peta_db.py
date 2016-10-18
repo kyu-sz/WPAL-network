@@ -47,10 +47,13 @@ class PETA:
 		self.test_ind = None
 		self.train_ind = None
 		self.set_partition_set_id(par_set_id)
+     
+                self.attr_group = [range(0,4)]
 
 		self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
 
 	def evaluate_mA(self, attr, inds):
+                print inds
 		num = attr.__len__()
 		gt = self.labels[inds]
 

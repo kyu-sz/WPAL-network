@@ -38,6 +38,9 @@ class RAP:
 		self._img_names = rap[0][0][5]
 		self.attr_exp = rap[0][0][6]
 
+		self.attr_group = [range(1,4), range(4,7), range(7,9), range(9,11), range(11,15), range(15,24),
+                                   range(24,30), range(30,36), range(51,55), range(63,75), range(75,83), range(84,92)]
+
 		self.flip_attr_pairs = [(54, 55)]
 
 		"""In our model, labels should be all between 0 and 1.
@@ -75,7 +78,7 @@ class RAP:
 		self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
 
 	def get_img_path(self, img_id):
-		return osp.join(self._db_path, 'RAP_database', self._img_names[img_id][0][0])
+		return osp.join(self._db_path, 'RAP_dataset', self._img_names[img_id][0][0])
 
 
 if __name__ == '__main__':
