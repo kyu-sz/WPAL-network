@@ -1,14 +1,12 @@
-name: "VGG_S_MLL"
+name: "VGG_S_MLL_RAP"
 
-layer {
-  name: "input-data"
-  type: "Python"
-  top: "data"
-  top: "attr"
-  python_param {
-    module: "data_layer.layer"
-    layer: "DataLayer"
-  }
+input: "data"
+
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 224
+  dim: 224
 }
 ########################## VGG CNN S ##########################
 layer {
@@ -332,24 +330,8 @@ layer {
   top: "fc3_e1"
   name: "fc3_e1"
   type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 512
+    num_output: 92
   }
 }
 layer {
@@ -360,35 +342,10 @@ layer {
 }
 layer {
   bottom: "fc3_e1"
-  top: "fc3_e1"
-  name: "drop3_e1"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  bottom: "fc3_e1"
   top: "fc3_e2"
   name: "fc3_e2"
   type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "constant"
-        std: 0.001
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
     num_output: 92
   }
 }
@@ -397,24 +354,8 @@ layer {
   top: "fc4_e1"
   name: "fc4_e1"
   type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 512
+    num_output: 92
   }
 }
 layer {
@@ -425,35 +366,10 @@ layer {
 }
 layer {
   bottom: "fc4_e1"
-  top: "fc4_e1"
-  name: "drop4_e1"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  bottom: "fc4_e1"
   top: "fc4_e2"
   name: "fc4_e2"
   type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "constant"
-        std: 0.001
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
     num_output: 92
   }
 }
@@ -462,24 +378,8 @@ layer {
   top: "fc5_e1"
   name: "fc5_e1"
   type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "gaussian"
-        std: 0.005
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
-    num_output: 512
+    num_output: 92
   }
 }
 layer {
@@ -490,35 +390,10 @@ layer {
 }
 layer {
   bottom: "fc5_e1"
-  top: "fc5_e1"
-  name: "drop5_e1"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  bottom: "fc5_e1"
   top: "fc5_e2"
   name: "fc5_e2"
   type: "InnerProduct"
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "constant"
-        std: 0.001
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
     num_output: 92
   }
 }
@@ -536,53 +411,32 @@ layer {
   top: "fc_syn"
   name: "fc_syn"
   type: "InnerProduct"
-  propagate_down: 0
-  param {
-    lr_mult: 0.5
-    decay_mult: 0.5
-  }
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
   inner_product_param {
-    weight_filler {
-        type: "constant"
-        std: 0.001
-    }
-    bias_filler {
-        type: "constant"
-        value: 0.1
-    }
     num_output: 92
   }
 }
 ########################## Loss Layers ##########################
 layer {
   bottom: "fc3_e2"
-  bottom: "attr"
-  name: "loss_3"
-  top: "loss_3"
-  type: "SigmoidCrossEntropyLoss"
+  name: "pred_3"
+  top: "pred_3"
+  type: "Sigmoid"
 }
 layer {
   bottom: "fc4_e2"
-  bottom: "attr"
-  name: "loss_4"
-  top: "loss_4"
-  type: "SigmoidCrossEntropyLoss"
+  name: "pred_4"
+  top: "pred_4"
+  type: "Sigmoid"
 }
 layer {
   bottom: "fc5_e2"
-  bottom: "attr"
-  name: "loss_5"
-  top: "loss_5"
-  type: "SigmoidCrossEntropyLoss"
+  name: "pred_5"
+  top: "pred_5"
+  type: "Sigmoid"
 }
 layer {
   bottom: "fc_syn"
-  bottom: "attr"
-  name: "loss_syn"
-  top: "loss_syn"
-  type: "SigmoidCrossEntropyLoss"
+  name: "pred_syn"
+  top: "pred_syn"
+  type: "Sigmoid"
 }

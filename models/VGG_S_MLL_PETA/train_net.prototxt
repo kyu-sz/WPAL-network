@@ -383,7 +383,7 @@ layer {
   inner_product_param {
     weight_filler {
         type: "constant"
-        std: 0.001
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -448,7 +448,7 @@ layer {
   inner_product_param {
     weight_filler {
         type: "constant"
-        std: 0.001
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -513,7 +513,7 @@ layer {
   inner_product_param {
     weight_filler {
         type: "constant"
-        std: 0.001
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -548,7 +548,7 @@ layer {
   inner_product_param {
     weight_filler {
         type: "constant"
-        std: 0.001
+        value: 0.001
     }
     bias_filler {
         type: "constant"

@@ -1,4 +1,4 @@
-def evaluate_mA(attr, gt):
+def mA(attr, gt):
 	num = attr.__len__()
 	num_attrs = attr[0].__len__()
 

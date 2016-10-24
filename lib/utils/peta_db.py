@@ -21,6 +21,7 @@ import os.path as osp
 
 import numpy as np
 import scipy.io as sio
+import evaluate
 
 
 class PETA:
@@ -51,7 +52,7 @@ class PETA:
 		self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
 
 	def evaluate_mA(self, attr, inds):
-		return eval.evaluate_mA(attr, self.labels[inds])
+		return evaluate.mA(attr, self.labels[inds])
 
 	def set_partition_set_id(self, par_set_id):
 		num_samples = self.labels.shape[0]

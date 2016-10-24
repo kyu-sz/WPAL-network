@@ -1,12 +1,14 @@
-name: "VGG_S_MLL"
+name: "VGG_S_MLL_RAP"
 
-input: "data"
-
-input_shape {
-  dim: 1
-  dim: 3
-  dim: 224
-  dim: 224
+layer {
+  name: "input-data"
+  type: "Python"
+  top: "data"
+  top: "attr"
+  python_param {
+    module: "data_layer.layer"
+    layer: "DataLayer"
+  }
 }
 ########################## VGG CNN S ##########################
 layer {
@@ -380,8 +382,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "gaussian"
-        std: 0.005
+        type: "constant"
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -445,8 +447,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "gaussian"
-        std: 0.005
+        type: "constant"
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -510,8 +512,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "gaussian"
-        std: 0.005
+        type: "constant"
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -534,6 +536,7 @@ layer {
   top: "fc_syn"
   name: "fc_syn"
   type: "InnerProduct"
+  propagate_down: 0
   param {
     lr_mult: 0.5
     decay_mult: 0.5
@@ -544,7 +547,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "xavier"
+        type: "constant"
+        value: 0.001
     }
     bias_filler {
         type: "constant"
@@ -556,25 +560,29 @@ layer {
 ########################## Loss Layers ##########################
 layer {
   bottom: "fc3_e2"
-  name: "pred_3"
-  top: "pred_3"
-  type: "Sigmoid"
+  bottom: "attr"
+  name: "loss_3"
+  top: "loss_3"
+  type: "SigmoidCrossEntropyLoss"
 }
 layer {
   bottom: "fc4_e2"
-  name: "pred_4"
-  top: "pred_4"
-  type: "Sigmoid"
+  bottom: "attr"
+  name: "loss_4"
+  top: "loss_4"
+  type: "SigmoidCrossEntropyLoss"
 }
 layer {
   bottom: "fc5_e2"
-  name: "pred_5"
-  top: "pred_5"
-  type: "Sigmoid"
+  bottom: "attr"
+  name: "loss_5"
+  top: "loss_5"
+  type: "SigmoidCrossEntropyLoss"
 }
 layer {
   bottom: "fc_syn"
-  name: "pred_syn"
-  top: "pred_syn"
-  type: "Sigmoid"
+  bottom: "attr"
+  name: "loss_syn"
+  top: "loss_syn"
+  type: "SigmoidCrossEntropyLoss"
 }

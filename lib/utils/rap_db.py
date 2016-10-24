@@ -21,6 +21,7 @@ import os.path as osp
 
 import numpy as np
 import scipy.io as sio
+import evaluate
 
 class RAP:
 	def __init__(self, db_path, par_set_id):
@@ -53,7 +54,7 @@ class RAP:
 		self.set_partition_set_id(par_set_id)
 
 	def evaluate_mA(self, attr, inds):
-		return eval.evaluate_mA(attr, self.labels[inds])
+		return evaluate.mA(attr, self.labels[inds])
 
 	def set_partition_set_id(self, par_set_id):
 		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
