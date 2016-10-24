@@ -101,7 +101,7 @@ def recognize_attr(net, img, attr_group):
     pred_3 = blobs_out['pred_3']
     pred_4 = blobs_out['pred_4']
     pred_5 = blobs_out['pred_5']
-    pred_total = blobs_out['pred_total']
+    pred_total = blobs_out['pred_syn']
 
     pred = np.average(pred_total, axis=0)
     

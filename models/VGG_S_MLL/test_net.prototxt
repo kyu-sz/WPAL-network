@@ -347,7 +347,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 4096
+    num_output: 512
   }
 }
 layer {
@@ -412,7 +412,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 4096
+    num_output: 512
   }
 }
 layer {
@@ -477,7 +477,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 4096
+    num_output: 512
   }
 }
 layer {
@@ -523,16 +523,16 @@ layer {
 ########################## Synthesis Layers ##########################
 layer {
   name: "concat"
-  bottom: "fc3_e2"
-  bottom: "fc4_e2"
-  bottom: "fc5_e2"
+  bottom: "fc3_e1"
+  bottom: "fc4_e1"
+  bottom: "fc5_e1"
   top: "concat"
   type: "Concat"
 }
 layer {
   bottom: "concat"
-  top: "fc_total"
-  name: "fc_total"
+  top: "fc_syn"
+  name: "fc_syn"
   type: "InnerProduct"
   param {
     lr_mult: 0.5
@@ -573,8 +573,8 @@ layer {
   type: "Sigmoid"
 }
 layer {
-  bottom: "fc_total"
-  name: "pred_total"
-  top: "pred_total"
+  bottom: "fc_syn"
+  name: "pred_syn"
+  top: "pred_syn"
   type: "Sigmoid"
 }

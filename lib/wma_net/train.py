@@ -90,7 +90,7 @@ class SolverWrapper(object):
                 model_paths.append(self.snapshot())
 
             if self._solver.iter % config.TRAIN.TEST_ITERS == 0:
-                test_net(self._solver.net, self._db, self._output_dir)
+                test_net(self._solver.test_net, self._db, self._output_dir)
 
         if last_snapshot_iter != self._solver.iter:
             model_paths.append(self.snapshot())

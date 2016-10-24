@@ -57,7 +57,7 @@ __C.TRAIN.BATCH_SIZE = 64
 __C.TRAIN.USE_FLIPPED = True
 
 # Iterations between tests
-__C.TRAIN.TEST_ITERS = 10000
+__C.TRAIN.TEST_ITERS = 1000000
 
 # Iterations between snapshots
 __C.TRAIN.SNAPSHOT_ITERS = 1000

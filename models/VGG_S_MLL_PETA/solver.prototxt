@@ -1,5 +1,7 @@
 train_net: "models/VGG_S_MLL_PETA/train_net.prototxt"
-#test_net: "models/VGG_S_MLL_PETA/test_net.prototxt"
+test_net: "models/VGG_S_MLL_PETA/test_net.prototxt"
+test_iter: 10
+test_interval: 10000
 
 base_lr: 0.0002
 lr_policy: "step"

@@ -349,7 +349,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 4096
+    num_output: 512
   }
 }
 layer {
@@ -382,8 +382,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "gaussian"
-        std: 0.005
+        type: "constant"
+        std: 0.001
     }
     bias_filler {
         type: "constant"
@@ -414,7 +414,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 4096
+    num_output: 512
   }
 }
 layer {
@@ -447,8 +447,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "gaussian"
-        std: 0.005
+        type: "constant"
+        std: 0.001
     }
     bias_filler {
         type: "constant"
@@ -479,7 +479,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 4096
+    num_output: 512
   }
 }
 layer {
@@ -512,8 +512,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "gaussian"
-        std: 0.005
+        type: "constant"
+        std: 0.001
     }
     bias_filler {
         type: "constant"
@@ -525,17 +525,18 @@ layer {
 ########################## Synthesis Layers ##########################
 layer {
   name: "concat"
-  bottom: "fc3_e2"
-  bottom: "fc4_e2"
-  bottom: "fc5_e2"
+  bottom: "fc3_e1"
+  bottom: "fc4_e1"
+  bottom: "fc5_e1"
   top: "concat"
   type: "Concat"
 }
 layer {
   bottom: "concat"
-  top: "fc_total"
-  name: "fc_total"
+  top: "fc_syn"
+  name: "fc_syn"
   type: "InnerProduct"
+  propagate_down: 0
   param {
     lr_mult: 0.5
     decay_mult: 0.5
@@ -546,7 +547,8 @@ layer {
   }
   inner_product_param {
     weight_filler {
-        type: "xavier"
+        type: "constant"
+        std: 0.001
     }
     bias_filler {
         type: "constant"
@@ -578,9 +580,9 @@ layer {
   type: "SigmoidCrossEntropyLoss"
 }
 layer {
-  bottom: "fc_total"
+  bottom: "fc_syn"
   bottom: "attr"
-  name: "loss_total"
-  top: "loss_total"
+  name: "loss_syn"
+  top: "loss_syn"
   type: "SigmoidCrossEntropyLoss"
 }
