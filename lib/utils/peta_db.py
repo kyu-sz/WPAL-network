@@ -47,31 +47,11 @@ class PETA:
 		self.test_ind = None
 		self.train_ind = None
 		self.set_partition_set_id(par_set_id)
-     
-                self.attr_group = [range(0,4)]
-
+		self.attr_group = [range(0, 4)]
 		self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
 
 	def evaluate_mA(self, attr, inds):
-                print inds
-		num = attr.__len__()
-		gt = self.labels[inds]
-
-		for i in xrange(self.num_attrs):
-			print '--------------------------------------------'
-			print i
-			print sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)])
-			print sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum(
-				[(1 - gt[j][i]) for j in xrange(num)])
-
-		mA = (sum([(
-			           sum([attr[j][i] * gt[j][i] for j in xrange(num)])
-			           / sum([gt[j][i] for j in xrange(num)])
-			           + sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)])
-			           / sum([(1 - gt[j][i]) for j in xrange(num)])
-		           ) for i in xrange(self.num_attrs)])) / (2 * self.num_attrs)
-
-		return mA
+		return eval.evaluate_mA(attr, self.labels[inds])
 
 	def set_partition_set_id(self, par_set_id):
 		num_samples = self.labels.shape[0]

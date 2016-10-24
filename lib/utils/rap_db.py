@@ -22,12 +22,11 @@ import os.path as osp
 import numpy as np
 import scipy.io as sio
 
-
 class RAP:
 	def __init__(self, db_path, par_set_id):
 		self._db_path = db_path
 
-		rap = sio.loadmat(osp.join(self._db_path,'RAP_annotation','RAP_annotation.mat'))['RAP_annotation']
+		rap = sio.loadmat(osp.join(self._db_path, 'RAP_annotation', 'RAP_annotation.mat'))['RAP_annotation']
 
 		self._partition = rap[0][0][0]
 		self.labels = rap[0][0][1]
@@ -38,8 +37,8 @@ class RAP:
 		self._img_names = rap[0][0][5]
 		self.attr_exp = rap[0][0][6]
 
-		self.attr_group = [range(1,4), range(4,7), range(7,9), range(9,11), range(11,15), range(15,24),
-                                   range(24,30), range(30,36), range(51,55), range(63,75), range(75,83), range(84,92)]
+		self.attr_group = [range(1, 4), range(4, 7), range(7, 9), range(9, 11), range(11, 15), range(15, 24),
+		                   range(24,30), range(30,36), range(51,55), range(63,75), range(75,83), range(84,92)]
 
 		self.flip_attr_pairs = [(54, 55)]
 
@@ -54,24 +53,7 @@ class RAP:
 		self.set_partition_set_id(par_set_id)
 
 	def evaluate_mA(self, attr, inds):
-		num = attr.__len__()
-		gt = self.labels[inds]
-
-		for i in xrange(self.num_attrs):
-			print '--------------------------------------------'
-			print i
-			print sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)])
-			print sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum(
-				[(1 - gt[j][i]) for j in xrange(num)])
-
-		mA = (sum([(
-			           sum([attr[j][i] * gt[j][i] for j in xrange(num)])
-			           / sum([gt[j][i] for j in xrange(num)])
-			           + sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)])
-			           / sum([(1 - gt[j][i]) for j in xrange(num)])
-		           ) for i in xrange(self.num_attrs)])) / (2 * self.num_attrs)
-
-		return mA
+		return eval.evaluate_mA(attr, self.labels[inds])
 
 	def set_partition_set_id(self, par_set_id):
 		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
