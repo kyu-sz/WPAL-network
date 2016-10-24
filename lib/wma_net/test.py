@@ -98,12 +98,7 @@ def recognize_attr(net, img, attr_group):
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
     blobs_out = net.forward(**forward_kwargs)
 
-    pred_3 = blobs_out['pred_3']
-    pred_4 = blobs_out['pred_4']
-    pred_5 = blobs_out['pred_5']
-    pred_total = blobs_out['pred_syn']
-
-    pred = np.average(pred_total, axis=0)
+    pred = np.average(blobs_out['pred'], axis=0)
     
     for group in attr_group:
         pred = _attr_group_norm(pred, group)

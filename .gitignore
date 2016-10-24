@@ -107,3 +107,6 @@ logs/
 
 # Stored results
 *.pkl
+
+# Swap files
+*.swp
