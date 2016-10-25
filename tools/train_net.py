@@ -17,8 +17,6 @@
 # along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import sys
@@ -38,7 +36,7 @@ def parse_args():
                         default=-1, type=int)
     parser.add_argument('--solver', dest='solver',
                         help='solver prototxt',
-                        default='./models/VGG_CNN_S/solver.prototxt', type=str)
+                        default=None, type=str)
     parser.add_argument('--iters', dest='max_iters',
                         help='number of training iterations',
                         default=100000, type=int)
@@ -110,6 +108,6 @@ if __name__ == '__main__':
     except:
         pass
 
-    train_net(args.solver, db, args.output_dir,
+    train_net(args.solver, db, os.path.join(args.output_dir, args.db),
               snapshot_path=args.snapshot_path,
               max_iters=args.max_iters)

@@ -21,6 +21,7 @@ import os.path as osp
 
 import numpy as np
 import scipy.io as sio
+
 import evaluate
 
 
@@ -44,6 +45,13 @@ class PETA:
 			print h5py.File(osp.join(self._db_path, 'attributesName.mat')).keys()
 			self.name = h5py.File(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
 
+		try:
+			self._partition = sio.loadmat(osp.join(self._db_path, 'partition.mat'))['partition']
+		except NotImplementedError:
+			import h5py
+			print h5py.File(osp.join(self._db_path, 'partition.mat')).keys()
+			self.name = h5py.File(osp.join(self._db_path, 'partition.mat'))['partition']
+
 		self.num_attrs = self.name.shape[0]
 		self.test_ind = None
 		self.train_ind = None
@@ -55,12 +63,8 @@ class PETA:
 		return evaluate.mA(attr, self.labels[inds])
 
 	def set_partition_set_id(self, par_set_id):
-		num_samples = self.labels.shape[0]
-		block_size = num_samples / 5
-		test_start = block_size * par_set_id
-		test_end = block_size + test_start
-		self.test_ind = range(test_start, test_end)
-		self.train_ind = range(0, test_start) + range(test_end, num_samples)
+		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
+		self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
 
 	def get_img_path(self, img_id):
 		return osp.join(self._db_path, 'Data', str(img_id + 1) + '.png')
@@ -74,3 +78,5 @@ if __name__ == '__main__':
 	print 'Max training index: ', max(db.train_ind)
 	print db.get_img_path(0)
 	print db.num_attrs
+	print db.train_ind.__len__(), db.train_ind
+	print db.test_ind.__len__(), db.test_ind
