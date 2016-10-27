@@ -1,13 +1,13 @@
 net: "models/VGG_S_MLL_RAP/train_net.prototxt"
 
-base_lr: 0.0003
+base_lr: 0.0002
 lr_policy: "step"
 gamma: 0.5
 stepsize: 25000
 display: 100
 average_loss: 100
 momentum: 0.9
-weight_decay: 0.00015
+weight_decay: 0.0001
 
 # Standard caffe solver snapshotting is replaced by our own snapshot function
 snapshot: 0
