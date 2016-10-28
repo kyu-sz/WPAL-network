@@ -68,6 +68,10 @@ class DataLayer(caffe.Layer):
         self._name_to_top_map['attr'] = idx
         idx += 1
 
+        top[idx].reshape(config.TRAIN.BATCH_SIZE, config.NUM_ATTR)
+        self._name_to_top_map['weight'] = idx
+        idx += 1       
+
         print 'DataLayer: name_to_top:', self._name_to_top_map
         assert len(top) == len(self._name_to_top_map)
 
@@ -102,6 +106,7 @@ class BlobFetcher(Process):
         self._cur = 0
         self._do_flip = do_flip
         self._train_ind = self._db.train_ind
+        self._weight = db.label_weight
 
         self._shuffle_train_inds()
 
@@ -137,5 +142,5 @@ class BlobFetcher(Process):
             minibatch_flip = \
                 [0 if i < len(self._db.train_ind) else 1
                  for i in minibatch_inds]
-            blobs = get_minibatch(minibatch_img_paths, minibatch_labels, minibatch_flip, self._db.flip_attr_pairs)
+            blobs = get_minibatch(minibatch_img_paths, minibatch_labels, minibatch_flip, self._db.flip_attr_pairs, self._weight)
             self._queue.put(blobs)

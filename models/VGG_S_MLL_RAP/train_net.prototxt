@@ -5,6 +5,7 @@ layer {
   type: "Python"
   top: "data"
   top: "attr"
+  top: "weight"
   python_param {
     module: "data_layer.layer"
     layer: "DataLayer"
@@ -333,11 +334,11 @@ layer {
   name: "fc3_e"
   type: "InnerProduct"
   param {
-    lr_mult: 0.5
-    decay_mult: 0.5
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 1
+    lr_mult: 0.4
     decay_mult: 0
   }
   inner_product_param {
@@ -364,11 +365,11 @@ layer {
   name: "fc4_e"
   type: "InnerProduct"
   param {
-    lr_mult: 0.5
-    decay_mult: 0.5
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 1
+    lr_mult: 0.4
     decay_mult: 0
   }
   inner_product_param {
@@ -395,11 +396,11 @@ layer {
   name: "fc5_e"
   type: "InnerProduct"
   param {
-    lr_mult: 0.5
-    decay_mult: 0.5
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 1
+    lr_mult: 0.4
     decay_mult: 0
   }
   inner_product_param {
@@ -435,11 +436,11 @@ layer {
   name: "fc_syn1"
   type: "InnerProduct"
   param {
-    lr_mult: 0.5
-    decay_mult: 0.5
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 1
+    lr_mult: 0.4
     decay_mult: 0
   }
   inner_product_param {
@@ -469,11 +470,11 @@ layer {
   name: "fc_syn2"
   type: "InnerProduct"
   param {
-    lr_mult: 0.5
-    decay_mult: 0.5
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 1
+    lr_mult: 0.4
     decay_mult: 0
   }
   inner_product_param {
@@ -492,7 +493,8 @@ layer {
 layer {
   bottom: "fc_syn2"
   bottom: "attr"
+  bottom: "weight"
   name: "loss"
   top: "loss"
-  type: "SigmoidCrossEntropyLoss"
+  type: "SigmoidWeightedCrossEntropyLoss"
 }

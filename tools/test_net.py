@@ -103,10 +103,10 @@ if __name__ == '__main__':
     if args.db == 'RAP':
         """Load RAP database"""
         from utils.rap_db import RAP
-        db = RAP(os.path.join('data', args.db), args.par_set_id)
+        db = RAP(os.path.join('data', 'dataset', args.db), args.par_set_id)
     else:
         """Load PETA dayanse"""
         from utils.peta_db import PETA
-        db = PETA(os.path.join('data', args.db), args.par_set_id)
+        db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
     test_net(net, db, args.output_dir)

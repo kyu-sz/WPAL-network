@@ -32,15 +32,7 @@ def add_path(path):
 this_dir = osp.dirname(__file__)
 
 # Add project to PYTHONPATH
-project_path = osp.join(this_dir, '..')
+project_path = osp.join(this_dir, '..', '..')
 add_path(project_path)
-
-# Add caffe to PYTHONPATH
-caffe_path = osp.join(project_path, 'caffe', 'python')
-add_path(caffe_path)
-
-# Add lib to PYTHONPATH
-lib_path = osp.join(project_path, 'lib')
-add_path(lib_path)
 
 os.chdir(project_path)

@@ -26,7 +26,7 @@ from utils.blob import img_list_to_blob, prep_img_for_blob
 from wma_net.config import config
 
 
-def get_minibatch(img_paths, labels, flip, flip_attr_pairs):
+def get_minibatch(img_paths, labels, flip, flip_attr_pairs, weight):
     """Construct a minibatch with given image paths and corresponding labels."""
     num_images = len(img_paths)
 
@@ -37,8 +37,9 @@ def get_minibatch(img_paths, labels, flip, flip_attr_pairs):
     # Get the input image blob, formatted for caffe
     img_blob, img_scales = _get_image_blob(img_paths, random_scale_inds, flip)
     attr_blob = _get_attr_blob(labels, flip, flip_attr_pairs)
+    weight_blob = _get_weight_blob(labels, weight)
 
-    blobs = {'data': img_blob, 'attr': attr_blob}
+    blobs = {'data': img_blob, 'attr': attr_blob, 'weight': weight_blob}
 
     return blobs
 
@@ -56,6 +57,16 @@ def _flip_labels(labels, flip, flip_attr_pairs):
         labels[face_right_ind] = labels[face_left_ind]
         labels[face_left_ind] = temp
     return labels
+
+
+def _get_weight_blob(labels, weight):
+    """Builds an input blob from the labels"""
+    blob = np.zeros((labels.__len__(), 1, 1, labels[0].__len__()),
+                    dtype=np.float32)
+    for i in xrange(labels.__len__()):
+        blob[i, :, :, :] = weight
+
+    return blob
 
 
 def _get_attr_blob(labels, flip, flip_attr_pairs):

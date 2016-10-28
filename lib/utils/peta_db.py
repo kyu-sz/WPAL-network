@@ -26,60 +26,64 @@ import evaluate
 
 
 class PETA:
-	"""This tool requires the PETA to be processed into similar form as RAP."""
+    """This tool requires the PETA to be processed into similar form as RAP."""
 
-	def __init__(self, db_path, par_set_id):
-		self._db_path = db_path
+    def __init__(self, db_path, par_set_id):
+        self._db_path = db_path
 
-		try:
-			self.labels = sio.loadmat(osp.join(self._db_path, 'attributeLabels.mat'))['DataLabel']
-		except NotImplementedError:
-			import h5py
-			print h5py.File(osp.join(self._db_path, 'attributeLabels.mat')).keys()
-			self.labels = np.array(h5py.File(osp.join(self._db_path, 'attributeLabels.mat'))['DataLabel']).transpose()
+        try:
+            self.labels = sio.loadmat(osp.join(self._db_path, 'attributeLabels.mat'))['DataLabel']
+        except NotImplementedError:
+            import h5py
+            print h5py.File(osp.join(self._db_path, 'attributeLabels.mat')).keys()
+            self.labels = np.array(h5py.File(osp.join(self._db_path, 'attributeLabels.mat'))['DataLabel']).transpose()
 
-		try:
-			self.name = sio.loadmat(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
-		except NotImplementedError:
-			import h5py
-			print h5py.File(osp.join(self._db_path, 'attributesName.mat')).keys()
-			self.name = h5py.File(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
+        try:
+            self.name = sio.loadmat(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
+        except NotImplementedError:
+            import h5py
+            print h5py.File(osp.join(self._db_path, 'attributesName.mat')).keys()
+            self.name = h5py.File(osp.join(self._db_path, 'attributesName.mat'))['attributesName']
 
-		try:
-			self._partition = sio.loadmat(osp.join(self._db_path, 'partition.mat'))['partition']
-		except NotImplementedError:
-			import h5py
-			print h5py.File(osp.join(self._db_path, 'partition.mat')).keys()
-			self.name = h5py.File(osp.join(self._db_path, 'partition.mat'))['partition']
+        try:
+            self._partition = sio.loadmat(osp.join(self._db_path, 'partition.mat'))['partition']
+        except NotImplementedError:
+            import h5py
+            print h5py.File(osp.join(self._db_path, 'partition.mat')).keys()
+            self.name = h5py.File(osp.join(self._db_path, 'partition.mat'))['partition']
 
-		self.num_attrs = self.name.shape[0]
-		self.test_ind = None
-		self.train_ind = None
-		self.set_partition_set_id(par_set_id)
-		self.attr_group = [range(0, 4)]
-		self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
+        self.num_attrs = self.name.shape[0]
+        self.test_ind = None
+        self.train_ind = None
+        self.label_weight = None
+        self.set_partition_set_id(par_set_id)
+        self.attr_group = [range(0, 4)]
+        self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
 
-	def evaluate_mA(self, attr, inds):
-		return evaluate.mA(attr, self.labels[inds])
+    def evaluate_mA(self, attr, inds):
+        return evaluate.mA(attr, self.labels[inds])
 
-        def evaluate_example_based(self, attr, inds):
-                return evaluate.example_based(attr, self.labels[inds])
+    def evaluate_example_based(self, attr, inds):
+        return evaluate.example_based(attr, self.labels[inds])
 
-	def set_partition_set_id(self, par_set_id):
-		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
-		self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
+    def set_partition_set_id(self, par_set_id):
+        self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
+        self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
+        pos_cnt = sum(self.labels[self.train_ind])
+        self.label_weight = pos_cnt / self.train_ind.size
 
-	def get_img_path(self, img_id):
-		return osp.join(self._db_path, 'Data', str(img_id + 1) + '.png')
+    def get_img_path(self, img_id):
+        return osp.join(self._db_path, 'Data', str(img_id + 1) + '.png')
 
 
 if __name__ == '__main__':
-	db = PETA('/home/ken.yu/databases/ProcessedPeta', 1)
-	print "Labels:", db.labels.shape
-	print db.train_ind.__len__()
-	print db.test_ind.__len__()
-	print 'Max training index: ', max(db.train_ind)
-	print db.get_img_path(0)
-	print db.num_attrs
-	print db.train_ind.__len__(), db.train_ind
-	print db.test_ind.__len__(), db.test_ind
+    db = PETA('data/dataset/ProcessedPeta', 1)
+    print "Labels:", db.labels.shape
+    print db.train_ind.__len__()
+    print db.test_ind.__len__()
+    print 'Max training index: ', max(db.train_ind)
+    print db.get_img_path(0)
+    print db.num_attrs
+    print db.train_ind.__len__(), db.train_ind
+    print db.test_ind.__len__(), db.test_ind
+    print db.label_weight
