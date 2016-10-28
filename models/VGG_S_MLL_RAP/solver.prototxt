@@ -2,7 +2,7 @@ net: "models/VGG_S_MLL_RAP/train_net.prototxt"
 
 base_lr: 0.0002
 lr_policy: "step"
-gamma: 0.5
+gamma: 0.8
 stepsize: 25000
 display: 100
 average_loss: 100

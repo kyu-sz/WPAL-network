@@ -50,15 +50,15 @@ def _get_image_blob(img):
     img_scale_factors = []
 
     
-    for target_size in config.TEST.SCALES:
-        img_scale = float(target_size) / float(img_size_min)
-        # Prevent the biggest axis from being more than MAX_SIZE
-        if np.round(img_scale * img_size_max) > config.TEST.MAX_SIZE:
-            img_scale = float(config.TEST.MAX_SIZE) / float(img_size_max)
-        img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
-                         interpolation=cv2.INTER_LINEAR)
-        img_scale_factors.append(img_scale)
-        processed_images.append(img)
+    target_size = config.TEST.SCALE
+    img_scale = float(target_size) / float(img_size_min)
+    # Prevent the biggest axis from being more than MAX_SIZE
+    if np.round(img_scale * img_size_max) > config.TEST.MAX_SIZE:
+        img_scale = float(config.TEST.MAX_SIZE) / float(img_size_max)
+    img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
+                    interpolation=cv2.INTER_LINEAR)
+    img_scale_factors.append(img_scale)
+    processed_images.append(img)
 
     # Create a blob to hold the input images
     blob = img_list_to_blob(processed_images)
@@ -143,4 +143,7 @@ def test_net(net, db, output_dir, vis=False):
         cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
     print 'Mean accuracy:', db.evaluate_mA(all_attrs, db.test_ind)
+    
+    acc, prec, rec, f1 = db.evaluate_example_based(all_attrs, db.test_ind)
 
+    print 'Acc={:f} Prec={:f} Rec={:f} F1={:f}'.format(acc, prec, rec, f1)

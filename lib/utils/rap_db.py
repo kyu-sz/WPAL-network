@@ -38,8 +38,8 @@ class RAP:
 		self._img_names = rap[0][0][5]
 		self.attr_exp = rap[0][0][6]
 
-		self.attr_group = [range(1, 4), range(4, 7), range(7, 9), range(9, 11), range(11, 15), range(15, 24),
-		                   range(24,30), range(30,36), range(51,55), range(63,75), range(75,83), range(84,92)]
+		self.attr_group = [range(1, 4), range(4, 7), range(7, 9), range(9, 11), 
+		                   range(30,36), range(51,55),]
 
 		self.flip_attr_pairs = [(54, 55)]
 
@@ -55,6 +55,9 @@ class RAP:
 
 	def evaluate_mA(self, attr, inds):
 		return evaluate.mA(attr, self.labels[inds])
+
+	def evaluate_example_based(self, attr, inds):
+		return evaluate.example_based(attr, self.labels[inds])
 
 	def set_partition_set_id(self, par_set_id):
 		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1

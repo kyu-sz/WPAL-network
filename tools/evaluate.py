@@ -53,3 +53,4 @@ if __name__ == '__main__':
         print attr[i]  
 
     print db.evaluate_mA(attr, db.test_ind)
+    print db.evaluate_example_based(attr, db.test_ind)

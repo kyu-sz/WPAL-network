@@ -80,9 +80,9 @@ __C.TRAIN.DO_FLIP = True
 
 __C.TEST = edict()
 
-# Scales to use during testing (can list multiple scales)
-# Each scale is the pixel size of an image's shortest side
-__C.TEST.SCALES = (64, 128, 256,)
+# Scale to use during testing
+# The scale is the pixel size of an image's shortest side
+__C.TEST.SCALE = 128
 
 # Max pixel size of the longest side of a scaled input image
 __C.TEST.MAX_SIZE = 512

@@ -62,6 +62,9 @@ class PETA:
 	def evaluate_mA(self, attr, inds):
 		return evaluate.mA(attr, self.labels[inds])
 
+        def evaluate_example_based(self, attr, inds):
+                return evaluate.example_based(attr, self.labels[inds])
+
 	def set_partition_set_id(self, par_set_id):
 		self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
 		self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
