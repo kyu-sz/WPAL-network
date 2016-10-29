@@ -36,6 +36,8 @@ def mA(attr, gt):
 			':', sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]), \
 			':', sum([(1 - gt[j][i]) for j in xrange(num)])
 		print sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum([(1 - gt[j][i]) for j in xrange(num)])
+		print (sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)]) + sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum([(1 - gt[j][i]) for j in xrange(num)])) / 2
+
 
 	mA = (sum([(
 		           sum([attr[j][i] * gt[j][i] for j in xrange(num)])
