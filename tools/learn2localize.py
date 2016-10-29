@@ -115,4 +115,4 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
-        train(net, db, args.output_dir)
+    train(net, db, args.output_dir)
