@@ -1,9 +1,9 @@
 #!/bin/bash
 # Usage:
-# ./experiments/scripts/wma_net.sh GPU NET WEIGHTS DB DB_SET [options args to {train,test}_net.py]
+# ./experiments/scripts/wpal_net.sh GPU NET WEIGHTS DB DB_SET [options args to {train,test}_net.py]
 #
 # Example:
-# ./experiments/scripts/wma_net.sh 0 VGG_S_MLL data/pretrained/VGG_CNN_S.caffemodel RAP 0 \
+# ./experiments/scripts/wpal_net.sh 0 VGG_S_MLL data/pretrained/VGG_CNN_S.caffemodel RAP 0 \
 #   --set EXP_DIR foobar RNG_SEED 42 TRAIN.SCALES "[400, 500, 600, 700]"
 
 set -x

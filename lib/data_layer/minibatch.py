@@ -27,7 +27,7 @@ import cv2
 import numpy as np
 import numpy.random as npr
 from utils.blob import img_list_to_blob, prep_img_for_blob
-from wma_net.config import config
+from wpal_net.config import config
 
 
 def get_minibatch(img_paths, labels, flip, flip_attr_pairs, weight):

@@ -38,7 +38,7 @@ from easydict import EasyDict as edict
 
 __C = edict()
 # Get config by:
-#   from wma_net.config import config
+#   from wpal_net.config import config
 config = __C
 
 #
@@ -49,7 +49,7 @@ __C.TRAIN = edict()
 
 # Scales to use during training (can list multiple scales)
 # Each scale is the pixel size of an image's shortest side
-__C.TRAIN.SCALES = (64, 128, 256,)
+__C.TRAIN.SCALES = (96, 128, 160,)
 
 # Max pixel size of the longest side of a scaled input image
 __C.TRAIN.MAX_SIZE = 512
@@ -64,7 +64,7 @@ __C.TRAIN.USE_FLIPPED = True
 __C.TRAIN.TEST_ITERS = 1000000
 
 # Iterations between snapshots
-__C.TRAIN.SNAPSHOT_ITERS = 1000
+__C.TRAIN.SNAPSHOT_ITERS = 5000
 
 # solver.prototxt specifies the snapshot path prefix, this adds an optional
 # infix to yield the path: <prefix>[_<infix>]_iters_XYZ.caffemodel

@@ -28,8 +28,8 @@ import os
 import sys
 
 import caffe
-from wma_net.config import config, config_from_file, config_from_list
-from wma_net.train import train_net
+from wpal_net.config import config, config_from_file, config_from_list
+from wpal_net.train import train_net
 
 
 def parse_args():
@@ -51,7 +51,7 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--db', dest='db',
                         help='name of the databse',
-                        default='RAP', type=str)
+                        default=None, type=str)
     parser.add_argument('--setid', dest='par_set_id',
                         help='the index of training and testing data partition set',
                         default='0', type=int)
@@ -70,10 +70,10 @@ def parse_args():
 
     args = parser.parse_args()
 
-    if args.prototxt is None or args.caffemodel is None or args.db is None:
+    if args.solver is None or args.db is None:
         parser.print_help()
         sys.exit()
-        
+
     return args
 
 

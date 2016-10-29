@@ -31,8 +31,8 @@ import sys
 
 import caffe
 from utils.rap_db import RAP
-from wma_net.config import config, config_from_file, config_from_list
-from wma_net.test import test_net
+from wpal_net.config import config, config_from_file, config_from_list
+from wpal_net.test import test_net
 
 
 def parse_args():

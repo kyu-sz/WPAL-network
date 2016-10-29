@@ -30,7 +30,7 @@ from multiprocessing import Process, Queue
 import caffe
 import numpy as np
 from data_layer.minibatch import get_minibatch
-from wma_net.config import config
+from wpal_net.config import config
 
 
 class DataLayer(caffe.Layer):
