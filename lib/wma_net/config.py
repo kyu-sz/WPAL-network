@@ -1,24 +1,28 @@
 #!/usr/bin/env python
 
 # --------------------------------------------------------------------
-# This file is part of WMA Network.
-# 
-# WMA Network is free software: you can redistribute it and/or modify
+# This file is part of
+# Weakly-supervised Pedestrian Attribute Localization Network.
+#
+# Weakly-supervised Pedestrian Attribute Localization Network
+# is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
-# WMA Network is distributed in the hope that it will be useful,
+#
+# Weakly-supervised Pedestrian Attribute Localization Network
+# is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
-# along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
+# along with Weakly-supervised Pedestrian Attribute Localization Network.
+# If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-"""WMA Network config system.
-This file specifies default config options for WMA Network. You should not
+"""WPAL-net config system.
+This file specifies default config options for WPAL-net. You should not
 change values in this file. Instead, you should write a config file (in yaml)
 and use config_from_file(yaml_file) to load it and override the default options.
 Most tools in $ROOT/tools take a --config option to specify an override file.

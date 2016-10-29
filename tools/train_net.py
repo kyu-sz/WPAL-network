@@ -1,20 +1,24 @@
 #!/usr/bin/env python
 
 # --------------------------------------------------------------------
-# This file is part of WMA Network.
+# This file is part of
+# Weakly-supervised Pedestrian Attribute Localization Network.
 # 
-# WMA Network is free software: you can redistribute it and/or modify
+# Weakly-supervised Pedestrian Attribute Localization Network
+# is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# WMA Network is distributed in the hope that it will be useful,
+# Weakly-supervised Pedestrian Attribute Localization Network
+# is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
+# along with Weakly-supervised Pedestrian Attribute Localization Network.
+# If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
 import _init_path
@@ -32,7 +36,7 @@ def parse_args():
     """
     Parse input arguments
     """
-    parser = argparse.ArgumentParser(description='train WMA Network')
+    parser = argparse.ArgumentParser(description='train Weakly-supervised Pedestrian Attribute Localization Network')
     parser.add_argument('--gpu', dest='gpu_id',
                         help='GPU device ID to use (default: -1 meaning using CPU only)',
                         default=-1, type=int)
@@ -64,11 +68,12 @@ def parse_args():
                         help='optional config file',
                         default=None, type=str)
 
-    # if len(sys.argv) == 1:
-    #     parser.print_help()
-    #     sys.exit()
-
     args = parser.parse_args()
+
+    if args.prototxt is None or args.caffemodel is None or args.db is None:
+        parser.print_help()
+        sys.exit()
+        
     return args
 
 

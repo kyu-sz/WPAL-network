@@ -1,23 +1,27 @@
 #!/usr/bin/env python
 
 # --------------------------------------------------------------------
-# This file is part of WMA Network.
-# 
-# WMA Network is free software: you can redistribute it and/or modify
+# This file is part of
+# Weakly-supervised Pedestrian Attribute Localization Network.
+#
+# Weakly-supervised Pedestrian Attribute Localization Network
+# is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
-# WMA Network is distributed in the hope that it will be useful,
+#
+# Weakly-supervised Pedestrian Attribute Localization Network
+# is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
-# along with WMA Network.  If not, see <http://www.gnu.org/licenses/>.
+# along with Weakly-supervised Pedestrian Attribute Localization Network.
+# If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-"""Test a AM network on an imdb (image database)."""
+"""Test a WPAL Network on an imdb (image database)."""
 
 import cPickle
 import os
@@ -35,9 +39,8 @@ def _get_image_blob(img):
     Arguments:
         img (ndarray): a color image in BGR order
     Returns:
-        blob (ndarray): a data blob holding an image pyramid
-        im_scale_factors (list): list of image scales (relative to im) used
-            in the image pyramid
+        blob (ndarray): a data blob holding the image
+        img_scale_factor (double): image scale (relative to img) used
     """
     img_orig = img.astype(np.float32, copy=True)
     img_orig -= config.PIXEL_MEANS
@@ -47,30 +50,27 @@ def _get_image_blob(img):
     img_size_max = np.max(img_shape[0:2])
 
     processed_images = []
-    img_scale_factors = []
-
     
     target_size = config.TEST.SCALE
-    img_scale = float(target_size) / float(img_size_min)
+    img_scale_factor = float(target_size) / float(img_size_min)
     # Prevent the biggest axis from being more than MAX_SIZE
-    if np.round(img_scale * img_size_max) > config.TEST.MAX_SIZE:
-        img_scale = float(config.TEST.MAX_SIZE) / float(img_size_max)
-    img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
-                    interpolation=cv2.INTER_LINEAR)
-    img_scale_factors.append(img_scale)
+    if np.round(img_scale_factor * img_size_max) > config.TEST.MAX_SIZE:
+        img_scale_factor = float(config.TEST.MAX_SIZE) / float(img_size_max)
+    img = cv2.resize(img_orig, None, None, fx=img_scale_factor, fy=img_scale_factor,
+                     interpolation=cv2.INTER_LINEAR)
     processed_images.append(img)
 
     # Create a blob to hold the input images
     blob = img_list_to_blob(processed_images)
 
-    return blob, np.array(img_scale_factors)
+    return blob, img_scale_factor
 
 
 def _get_blobs(im):
-    """Convert an image and RoIs within that image into network inputs."""
+    """Convert an image into network inputs."""
     blobs = {'data' : None}
-    blobs['data'], im_scale_factors = _get_image_blob(im)
-    return blobs, im_scale_factors
+    blobs['data'], img_scale_factor = _get_image_blob(im)
+    return blobs, img_scale_factor
 
 def _attr_group_norm(pred, group):
     for i in group:
@@ -90,7 +90,7 @@ def recognize_attr(net, img, attr_group):
     	attributes (ndarray): K x 1 array of predicted attributes. (K is
     	    specified by database or the net)
     """
-    blobs, im_scale_factors = _get_blobs(img)
+    blobs, img_scale_factor = _get_blobs(img)
 
     # reshape network inputs
     net.blobs['data'].reshape(*(blobs['data'].shape))
@@ -110,7 +110,7 @@ def recognize_attr(net, img, attr_group):
 
 
 def test_net(net, db, output_dir, vis=False):
-    """Test a WMA Network on an image database."""
+    """Test a Weakly-supervised Pedestrian Attribute Localization Network on an image database."""
 
     num_images = len(db.test_ind)
 
@@ -118,9 +118,6 @@ def test_net(net, db, output_dir, vis=False):
 
     # timers
     _t = {'recognize_attr' : Timer()}
-
-    #global debug
-    #debug  = False
     
     cnt = 0
     for i in db.test_ind:
@@ -130,9 +127,6 @@ def test_net(net, db, output_dir, vis=False):
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
-
-        #if cnt > 6000:
-            #debug = True
 
         if cnt % 100 == 0:
             print 'recognize_attr: {:d}/{:d} {:.3f}s' \

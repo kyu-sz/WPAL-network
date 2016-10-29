@@ -1,8 +1,8 @@
-# Weakly-supervised Multi-level Attribute Network
+# Weakly-supervised Pedestrian Attribute Localization Network
 
 By Ken Yu, under guidance of Dr. Zhang Zhang and Prof. Kaiqi Huang.
 
-Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neural Network (CNN) structure designed for recognizing attributes from objects. Currently it is developed to recognize attributes from pedestrians only, using the Richly Annotated Pedestrian (RAP) database or PETA database.
+Weakly-supervised Pedestrian Attribute Localization (WPAL-net) is a Convolutional Neural Network (CNN) structure designed for recognizing attributes from objects as well as localizing them. Currently it is developed to recognize attributes from pedestrians only, using the Richly Annotated Pedestrian (RAP) database or PETA database.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
 
     ```Shell
     # Make sure to clone with --recursive
-    git clone --recursive https://github.com/kyu-sz/Weakly-supervised-Multi-level-Attribute-Network.git
+    git clone --recursive https://github.com/kyu-sz/Weakly-supervised-Pedestrian-Attribute-Localization-Network.git
     ```
 
 2. Build Caffe and pycaffe
@@ -43,7 +43,7 @@ Weakly-supervised Multi-level Attribute Network (WMA-net) is a Convolutional Neu
 5. Create symlinks for the RAP database
 
     ```Shell
-    cd $WMA_NET_ROOT/data
+    cd $WMA_NET_ROOT/data/dataset/
     ln -s $RAP RAP
     ```
 
@@ -55,16 +55,21 @@ To train the model, first fetch a pretrained VGG_CNN_S model by:
 ./data/scripts/fetch_pretrained_vgg_cnn_s_model.sh
 ```
 
-Then run experiment script:
+Then run experiment script for training:
 
 ```Shell
-./experiments/scripts/wma_net.sh 0 VGG_CNN_S \
-    --set EXP_DIR foobar RNG_SEED 42 TRAIN.SCALES "[400, 500, 600, 700]"
+./experiments/example/train_mll_rap_0.sh
+```
+
+Experiment script for testing is also available:
+
+```Shell
+./experiments/example/test_mll_rap.sh
 ```
 
 ## Acknowledgements
 
-Some codes are derived from Mr. Ross Girshick's [py-faster-rcnn](https://github.com/rbgirshick/py-faster-rcnn).
+The project layout and some codes are derived from Mr. Ross Girshick's [py-faster-rcnn](https://github.com/rbgirshick/py-faster-rcnn).
 
 We use VGG_CNN_S as pretrained model. Information can be found on [Mr. K. Simonyan's Gist](https://gist.github.com/ksimonyan/fd8800eeb36e276cd6f9#file-readme-md). It is from the BMVC-2014 paper "Return of the Devil in the Details: Delving Deep into Convolutional Nets":
 	

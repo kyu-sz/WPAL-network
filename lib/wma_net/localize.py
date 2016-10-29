@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # --------------------------------------------------------------------
 # This file is part of
 # Weakly-supervised Pedestrian Attribute Localization Network.
@@ -19,19 +21,8 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-net: "models/VGG_S_MLL_RAP/train_net.prototxt"
+def train():
+	pass
 
-base_lr: 0.0002
-lr_policy: "step"
-gamma: 0.8
-stepsize: 25000
-display: 100
-average_loss: 100
-momentum: 0.9
-weight_decay: 0.0001
-
-# Standard caffe solver snapshotting is replaced by our own snapshot function
-snapshot: 0
-
-# We still use the snapshot prefix, though
-snapshot_prefix: "vgg_s_mll_rap"
+def test():
+	pass

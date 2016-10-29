@@ -3,19 +3,19 @@
 # --------------------------------------------------------------------
 # This file is part of
 # Weakly-supervised Pedestrian Attribute Localization Network.
-# 
+#
 # Weakly-supervised Pedestrian Attribute Localization Network
 # is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Weakly-supervised Pedestrian Attribute Localization Network
 # is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Weakly-supervised Pedestrian Attribute Localization Network.
 # If not, see <http://www.gnu.org/licenses/>.
@@ -32,14 +32,14 @@ import sys
 import caffe
 from utils.rap_db import RAP
 from wma_net.config import config, config_from_file, config_from_list
-from wma_net.test import test_net
+from wma_net.localize import train
 
 
 def parse_args():
     """
     Parse input arguments
     """
-    parser = argparse.ArgumentParser(description='test WPAL-net')
+    parser = argparse.ArgumentParser(description='learn attribute localization of WPAL-net')
     parser.add_argument('--gpu', dest='gpu_id',
                         help='GPU device ID to use (default: -1)',
                         default=-1, type=int)
@@ -47,7 +47,7 @@ def parse_args():
                         help='prototxt file defining the network',
                         default=None, type=str)
     parser.add_argument('--net', dest='caffemodel',
-                        help='model to test',
+                        help='model to use',
                         default=None, type=str)
     parser.add_argument('--cfg', dest='config_file',
                         help='optional config file', default=None, type=str)
@@ -66,8 +66,6 @@ def parse_args():
     parser.add_argument('--outputdir', dest='output_dir',
                         help='the directory to save outputs',
                         default='./output', type=str)
-    parser.add_argument('--vis', dest='vis', help='visualize attribute localization',
-                        action='store_true')
 
     args = parser.parse_args()
 
@@ -117,4 +115,4 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
-    test_net(net, db, args.output_dir, args.vis)
+        train(net, db, args.output_dir)
