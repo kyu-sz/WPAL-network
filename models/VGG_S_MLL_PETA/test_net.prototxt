@@ -170,7 +170,6 @@ layer {
     pad: 2
     kernel_size: 5
   }
-  output: 1
 }
 layer {
   bottom: "conv3_e"
@@ -188,7 +187,6 @@ layer {
     pad: 2
     kernel_size: 5
   }
-  output: 1
 }
 layer {
   bottom: "conv4_e"
@@ -206,7 +204,6 @@ layer {
     pad: 2
     kernel_size: 5
   }
-  output: 1
 }
 layer {
   bottom: "conv5_e"
