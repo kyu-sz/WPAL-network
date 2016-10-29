@@ -180,7 +180,7 @@ layer {
   name: "conv5_e"
   type: "Convolution"
   convolution_param {
-    num_output: 512
+    num_output: 1024
     pad: 2
     kernel_size: 5
   }
@@ -325,7 +325,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 512
+    num_output: 1024
   }
 }
 layer {
@@ -349,7 +349,7 @@ layer {
   name: "fc_syn1"
   type: "InnerProduct"
   inner_product_param {
-    num_output: 1536
+    num_output: 2048
   }
 }
 layer {

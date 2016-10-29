@@ -142,7 +142,7 @@ def test_net(net, db, output_dir, vis=False):
     with open(attr_file, 'wb') as f:
         cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
-    print 'Mean accuracy:', db.evaluate_mA(all_attrs, db.test_ind)
+    print 'mA={:f}'.format(db.evaluate_mA(all_attrs, db.test_ind))
     
     acc, prec, rec, f1 = db.evaluate_example_based(all_attrs, db.test_ind)
 
