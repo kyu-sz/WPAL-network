@@ -24,6 +24,7 @@
 """Test a WPAL Network on an imdb (image database)."""
 
 import cPickle
+import math
 import os
 
 import cv2
@@ -40,7 +41,7 @@ def _get_image_blob(img):
         img (ndarray): a color image in BGR order
     Returns:
         blob (ndarray): a data blob holding the image
-        img_scale_factor (double): image scale (relative to img) used
+        img_scale (double): image scale (relative to img) used
     """
     img_orig = img.astype(np.float32, copy=True)
     img_orig -= config.PIXEL_MEANS
@@ -52,18 +53,18 @@ def _get_image_blob(img):
     processed_images = []
     
     target_size = config.TEST.SCALE
-    img_scale_factor = float(target_size) / float(img_size_min)
+    img_scale = float(target_size) / float(img_size_max)
     # Prevent the biggest axis from being more than MAX_SIZE
-    if np.round(img_scale_factor * img_size_max) > config.TEST.MAX_SIZE:
-        img_scale_factor = float(config.TEST.MAX_SIZE) / float(img_size_max)
-    img = cv2.resize(img_orig, None, None, fx=img_scale_factor, fy=img_scale_factor,
+    if np.round(img_scale * img_size_min * img_scale * img_size_max) > config.TEST.MAX_AREA:
+        img_scale = math.sqrt(float(config.TEST.MAX_AREA) / float(img_size_min * img_size_max))
+    img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
                      interpolation=cv2.INTER_LINEAR)
     processed_images.append(img)
 
     # Create a blob to hold the input images
     blob = img_list_to_blob(processed_images)
 
-    return blob, img_scale_factor
+    return blob, img_scale
 
 
 def _get_blobs(im):
