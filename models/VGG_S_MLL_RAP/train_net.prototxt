@@ -49,7 +49,7 @@ layer {
   convolution_param {
     num_output: 96
     kernel_size: 7
-    stride: 2
+    stride: 3
   }
 }
 layer {
@@ -97,6 +97,7 @@ layer {
   convolution_param {
     num_output: 256
     kernel_size: 5
+    stride: 2
   }
 }
 layer {
@@ -192,6 +193,28 @@ layer {
   type: "ReLU"
 }
 layer {
+  bottom: "conv3"
+  top: "pool3"
+  name: "pool3"
+  type: "Pooling"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 3
+  }
+}
+layer {
+  bottom: "conv4"
+  top: "pool4"
+  name: "pool4"
+  type: "Pooling"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 3
+  }
+}
+layer {
   bottom: "conv5"
   top: "pool5"
   name: "pool5"
@@ -204,7 +227,7 @@ layer {
 }
 ########################## Extra Conv Layers ##########################
 layer {
-  bottom: "conv3"
+  bottom: "pool3"
   top: "conv3_e"
   name: "conv3_e"
   type: "Convolution"
@@ -236,7 +259,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "conv4"
+  bottom: "pool4"
   top: "conv4_e"
   name: "conv4_e"
   type: "Convolution"

@@ -336,10 +336,27 @@ layer {
     num_output: 35
   }
 }
-########################## Loss Layers ##########################
+####################### Predicting Layer #######################
 layer {
   bottom: "fc_syn2"
   name: "pred"
   top: "pred"
   type: "Sigmoid"
+}
+###################### Localization Layers ######################
+layer {
+  bottom: "conv3_e"
+  bottom: "conv4_e"
+  bottom: "conv5_e"
+  top: "heat"
+  name: "heat"
+  type: "Concat"
+}
+layer {
+  bottom: "pool3_e"
+  bottom: "pool4_e"
+  bottom: "pool5_e"
+  top: "score"
+  name: "score"
+  type: "Concat"
 }

@@ -100,6 +100,8 @@ def recognize_attr(net, img, attr_group):
     blobs_out = net.forward(**forward_kwargs)
 
     pred = np.average(blobs_out['pred'], axis=0)
+    heat = np.average(blobs_out['heat'], axis=0)
+    score = np.average(blobs_out['score'], axis=0)
     
     for group in attr_group:
         pred = _attr_group_norm(pred, group)
@@ -107,10 +109,10 @@ def recognize_attr(net, img, attr_group):
     for i in xrange(pred.shape[0]):
         pred[i] = 0 if pred[i] < 0.5 else 1
 
-    return pred
+    return pred, heat, score
 
 
-def test_net(net, db, output_dir, vis=False):
+def test_net(net, db, output_dir, vis=False, vis_attr=0, fixed_weight=None):
     """Test a Weakly-supervised Pedestrian Attribute Localization Network on an image database."""
 
     num_images = len(db.test_ind)
@@ -124,10 +126,20 @@ def test_net(net, db, output_dir, vis=False):
     for i in db.test_ind:
         img = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        attr = recognize_attr(net, img, db.attr_group)
+        attr, heat, score = recognize_attr(net, img, db.attr_group)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
+
+        if vis:
+            if fixed_weight is None:
+                print "Visualization need fixed_weight to be not none!"
+                vis = False
+            else:
+                w_func = lambda x : 0 if score[x] <= 0 else math.exp(score[x] + fixed_weight[x])
+                find_target = lambda x: np.where(heat[x] == score[x])
+                w_sum = sum([w_func(i) for i in xrange(score.__len__())])
+                x = img.shape[1] * sum([w_func[i] * find_target(x)[1] / heat[x]])
 
         if cnt % 100 == 0:
             print 'recognize_attr: {:d}/{:d} {:.3f}s' \
