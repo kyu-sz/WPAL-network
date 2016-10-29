@@ -87,11 +87,11 @@ layer {
   name: "conv2"
   type: "Convolution"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.4
     decay_mult: 0
   }
   convolution_param {
@@ -122,11 +122,11 @@ layer {
   name: "conv3"
   type: "Convolution"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0.3
+    decay_mult: 0.3
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.6
     decay_mult: 0
   }
   convolution_param {
@@ -147,11 +147,11 @@ layer {
   name: "conv4"
   type: "Convolution"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0.4
+    decay_mult: 0.4
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.8
     decay_mult: 0
   }
   convolution_param {
@@ -172,11 +172,11 @@ layer {
   name: "conv5"
   type: "Convolution"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 1
     decay_mult: 0
   }
   convolution_param {
@@ -246,7 +246,7 @@ layer {
   }
   param {
     lr_mult: 2
-    decay_mult: 2
+    decay_mult: 0
   }
   convolution_param {
     weight_filler {
@@ -355,11 +355,11 @@ layer {
   name: "fc3_e"
   type: "InnerProduct"
   param {
-    lr_mult: 0.2
-    decay_mult: 0.2
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 0.4
+    lr_mult: 1
     decay_mult: 0
   }
   inner_product_param {
@@ -386,11 +386,11 @@ layer {
   name: "fc4_e"
   type: "InnerProduct"
   param {
-    lr_mult: 0.2
-    decay_mult: 0.2
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 0.4
+    lr_mult: 1
     decay_mult: 0
   }
   inner_product_param {
@@ -417,11 +417,11 @@ layer {
   name: "fc5_e"
   type: "InnerProduct"
   param {
-    lr_mult: 0.2
-    decay_mult: 0.2
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 0.4
+    lr_mult: 1
     decay_mult: 0
   }
   inner_product_param {
@@ -457,11 +457,11 @@ layer {
   name: "fc_syn1"
   type: "InnerProduct"
   param {
-    lr_mult: 0.2
-    decay_mult: 0.2
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 0.4
+    lr_mult: 1
     decay_mult: 0
   }
   inner_product_param {
@@ -491,11 +491,11 @@ layer {
   name: "fc_syn2"
   type: "InnerProduct"
   param {
-    lr_mult: 0.2
-    decay_mult: 0.2
+    lr_mult: 0.5
+    decay_mult: 0.5
   }
   param {
-    lr_mult: 0.4
+    lr_mult: 1
     decay_mult: 0
   }
   inner_product_param {
