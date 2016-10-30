@@ -32,7 +32,7 @@ from config import cfg
 from recog import recognize_attr
 
 
-def train(net, db, output_dir):
+def learn_bounding(net, db, output_dir):
     bounding = np.ndarray((db.num_attr, cfg.NUM_DETECTOR))  # bounding between attribute and detector
     for i in db.train_ind:
         img = cv2.imread(db.get_img_path(i))
@@ -42,13 +42,31 @@ def train(net, db, output_dir):
                 bounding[j] += score
     bounding_file = os.path.join(output_dir, 'bounding.pkl')
     with open(bounding_file, 'wb') as f:
-        cPickle.dump(bounding_file, f, cPickle.HIGHEST_PROTOCOL)
+        cPickle.dump(bounding, f, cPickle.HIGHEST_PROTOCOL)
 
-    rel_detector_rank = [[j[0]
-                          for j in sorted(enumerate(bounding[i]), key=lambda x: x[1])]
-                         for i in xrange(bounding.__len__())]
+    detector_rank = [[j[0]
+                      for j in sorted(enumerate(bounding[i]), key=lambda x: x[1])]
+                     for i in xrange(bounding.__len__())]
+    high_scores = [[j[1]
+                    for j in sorted(enumerate(bounding[i]), key=lambda x: x[1])]
+                   for i in xrange(bounding.__len__())]
 
-    print rel_detector_rank
+    t = sum(high_scores.all()) / 32 / db.num_attr
+    mat = np.ndarray((db.num_attr, cfg.NUM_DETECTOR))
+    for i in xrange(detector_rank.size[0]):
+        for j in xrange(32):
+            mat[i][j] = t
+    for i in xrange(cfg.NUM_DETECTOR):
+        utilized = 0
+        for j in xrange(detector_rank.size[0]):
+            for k in xrange(32):
+                if detector_rank[j][k] == i:
+                    utilized = 1
+                    break
+            if utilized:
+                break
+
+    print detector_rank
 
 
 def gaussian_filter(size, y, x, var=1):

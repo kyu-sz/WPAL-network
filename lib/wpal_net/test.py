@@ -93,7 +93,9 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
     with open(attr_file, 'wb') as f:
         cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
-    print 'mA={:f}'.format(db.evaluate_mA(all_attrs, db.test_ind))
+    mA, challenging = db.evaluate_mA(all_attrs, db.test_ind)
+    print 'mA={:f}'.format(mA)
+    print 'Challenging attributes:', challenging
     
     acc, prec, rec, f1 = db.evaluate_example_based(all_attrs, db.test_ind)
 

@@ -21,8 +21,6 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import pprint
@@ -31,7 +29,7 @@ import time
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
-from wpal_net.localize import train
+from wpal_net.localize import learn_bounding
 
 
 def parse_args():
@@ -118,4 +116,4 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
-    train(net, db, args.output_dir)
+    learn_bounding(net, db, args.output_dir)

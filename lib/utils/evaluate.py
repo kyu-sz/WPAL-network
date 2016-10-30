@@ -24,6 +24,7 @@ import numpy as np
 def mA(attr, gt):
 	num = attr.__len__()
 	num_attr = attr[0].__len__()
+	challenging = []
 
 	for i in xrange(num_attr):
 		print '--------------------------------------------'
@@ -36,8 +37,12 @@ def mA(attr, gt):
 			':', sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]), \
 			':', sum([(1 - gt[j][i]) for j in xrange(num)])
 		print sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum([(1 - gt[j][i]) for j in xrange(num)])
-		print (sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)]) + sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum([(1 - gt[j][i]) for j in xrange(num)])) / 2
 
+		acc = (sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)]) + sum(
+			[(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum([(1 - gt[j][i]) for j in xrange(num)])) / 2
+		print acc
+		if acc < 0.7:
+			challenging.append(i)
 
 	mA = (sum([(
 		           sum([attr[j][i] * gt[j][i] for j in xrange(num)])
@@ -45,7 +50,7 @@ def mA(attr, gt):
 		           + sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)])
 		           / sum([(1 - gt[j][i]) for j in xrange(num)])
 	           ) for i in xrange(num_attr)])) / (2 * num_attr)
-	return mA
+	return mA, challenging
 
 def example_based(attr, gt):
 	num = attr.__len__()
