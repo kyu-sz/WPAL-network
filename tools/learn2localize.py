@@ -26,12 +26,11 @@ import _init_path
 import argparse
 import os
 import pprint
-import time
 import sys
+import time
 
 import caffe
-from utils.rap_db import RAP
-from wpal_net.config import config, config_from_file, config_from_list
+from wpal_net.config import cfg, cfg_from_file, cfg_from_list
 from wpal_net.localize import train
 
 
@@ -49,13 +48,13 @@ def parse_args():
     parser.add_argument('--net', dest='caffemodel',
                         help='model to use',
                         default=None, type=str)
-    parser.add_argument('--cfg', dest='config_file',
-                        help='optional config file', default=None, type=str)
+    parser.add_argument('--cfg', dest='cfg_file',
+                        help='optional cfg file', default=None, type=str)
     parser.add_argument('--wait', dest='wait',
                         help='wait until net file exists',
                         default=True, type=bool)
-    parser.add_argument('--set', dest='set_configs',
-                        help='set config keys', default=None,
+    parser.add_argument('--set', dest='set_cfgs',
+                        help='set cfg keys', default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--db', dest='db',
                         help='the name of the database',
@@ -69,10 +68,6 @@ def parse_args():
 
     args = parser.parse_args()
 
-    if args.prototxt is None or args.caffemodel is None or args.db is None:
-        parser.print_help()
-        sys.exit()
-
     return args
 
 
@@ -82,15 +77,23 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    if args.config_file is not None:
-        config_from_file(args.config_file)
-    if args.set_configs is not None:
-        config_from_list(args.set_configs)
+    args.prototxt = 'models/VGG_S_MLL_RAP/test_net.prototxt'
+    args.caffemodel = 'data/snapshots/VGG_S_MLL_RAP/0/RAP/vgg_s_mll_rap_iter_5000.caffemodel'
+    args.db = 'RAP'
 
-    config.GPU_ID = args.gpu_id
+    if args.prototxt is None or args.caffemodel is None or args.db is None:
+        parser.print_help()
+        sys.exit()
 
-    print('Using config:')
-    pprint.pprint(config)
+    if args.cfg_file is not None:
+        cfg_from_file(args.cfg_file)
+    if args.set_cfgs is not None:
+        cfg_from_list(args.set_cfgs)
+
+    cfg.GPU_ID = args.gpu_id
+
+    print('Using cfg:')
+    pprint.pprint(cfg)
 
     while not os.path.exists(args.caffemodel) and args.wait:
         print('Waiting for {} to exist...'.format(args.caffemodel))

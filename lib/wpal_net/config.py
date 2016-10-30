@@ -21,13 +21,13 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-"""WPAL-net config system.
-This file specifies default config options for WPAL-net. You should not
-change values in this file. Instead, you should write a config file (in yaml)
-and use config_from_file(yaml_file) to load it and override the default options.
-Most tools in $ROOT/tools take a --config option to specify an override file.
-    - See tools/{train,test}_net.py for example code that uses config_from_file()
-    - See experiments/configs/*.yml for example YAML config override files
+"""WPAL-net cfg system.
+This file specifies default cfg options for WPAL-net. You should not
+change values in this file. Instead, you should write a cfg file (in yaml)
+and use cfg_from_file(yaml_file) to load it and override the default options.
+Most tools in $ROOT/tools take a --cfg option to specify an override file.
+    - See tools/{train,test}_net.py for example code that uses cfg_from_file()
+    - See experiments/cfgs/*.yml for example YAML cfg override files
 """
 
 import os
@@ -37,9 +37,9 @@ import numpy as np
 from easydict import EasyDict as edict
 
 __C = edict()
-# Get config by:
-#   from wpal_net.config import config
-config = __C
+# Get cfg by:
+#   from wpal_net.config import cfg
+cfg = __C
 
 #
 # Training options
@@ -55,7 +55,7 @@ __C.TRAIN.SCALES = (288, 320, 352,)
 __C.TRAIN.MAX_AREA = 40960
 
 # Minibatch size (number of samples per round)
-__C.TRAIN.BATCH_SIZE = 64
+__C.TRAIN.BATCH_SIZE = 128
 
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True
@@ -123,6 +123,8 @@ __C.EXP_DIR = 'default'
 # Default GPU device id
 __C.GPU_ID = 0
 
+__C.NUM_DETECTOR = 2048
+
 
 def get_output_dir(imdb, net=None):
     """Return the directory where experimental artifacts are placed.
@@ -139,7 +141,7 @@ def get_output_dir(imdb, net=None):
 
 
 def _merge_a_into_b(a, b):
-    """Merge config dictionary a into config dictionary b, clobbering the
+    """Merge cfg dictionary a into cfg dictionary b, clobbering the
     options in b whenever they are also specified in a.
     """
     if type(a) is not edict:
@@ -148,7 +150,7 @@ def _merge_a_into_b(a, b):
     for k, v in a.iteritems():
         # a must specify keys that are in b
         if not b.has_key(k):
-            raise KeyError('{} is not a valid config key'.format(k))
+            raise KeyError('{} is not a valid cfg key'.format(k))
 
         # the types must match, too
         old_type = type(b[k])
@@ -157,7 +159,7 @@ def _merge_a_into_b(a, b):
                 v = np.array(v, dtype=b[k].dtype)
             else:
                 raise ValueError(('Type mismatch ({} vs. {}) '
-                                'for config key: {}').format(type(b[k]),
+                                  'for cfg key: {}').format(type(b[k]),
                                                             type(v), k))
 
         # recursively merge dicts
@@ -165,26 +167,26 @@ def _merge_a_into_b(a, b):
             try:
                 _merge_a_into_b(a[k], b[k])
             except:
-                print('Error under config key: {}'.format(k))
+                print('Error under cfg key: {}'.format(k))
                 raise
         else:
             b[k] = v
 
 
-def config_from_file(filename):
-    """Load a config file and merge it into the default options."""
+def cfg_from_file(filename):
+    """Load a cfg file and merge it into the default options."""
     import yaml
     with open(filename, 'r') as f:
-        yaml_config = edict(yaml.load(f))
+        yaml_cfg = edict(yaml.load(f))
 
-    _merge_a_into_b(yaml_config, __C)
+    _merge_a_into_b(yaml_cfg, __C)
 
 
-def config_from_list(config_list):
-    """Set config keys via list (e.g., from command line)."""
+def cfg_from_list(cfg_list):
+    """Set cfg keys via list (e.g., from command line)."""
     from ast import literal_eval
-    assert len(config_list) % 2 == 0
-    for k, v in zip(config_list[0::2], config_list[1::2]):
+    assert len(cfg_list) % 2 == 0
+    for k, v in zip(cfg_list[0::2], cfg_list[1::2]):
         key_list = k.split('.')
         d = __C
         for subkey in key_list[:-1]:

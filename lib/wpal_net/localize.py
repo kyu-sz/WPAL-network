@@ -21,8 +21,43 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-def train():
-	pass
+import cPickle
+import math
+import os
 
-def test():
-	pass
+import cv2
+import numpy as np
+
+from config import cfg
+from recog import recognize_attr
+
+
+def train(net, db, output_dir):
+    bounding = np.ndarray((db.num_attr, cfg.NUM_DETECTOR))  # bounding between attribute and detector
+    for i in db.train_ind:
+        img = cv2.imread(db.get_img_path(i))
+        attr, _, score = recognize_attr(net, img, db.attr_group)
+        for j in xrange(db.labels[i].__len__()):
+            if db.labels[i][j] > 0.5:
+                bounding[j] += score
+    bounding_file = os.path.join(output_dir, 'bounding.pkl')
+    with open(bounding_file, 'wb') as f:
+        cPickle.dump(bounding_file, f, cPickle.HIGHEST_PROTOCOL)
+
+    rel_detector_rank = [[j[0]
+                          for j in sorted(enumerate(bounding[i]), key=lambda x: x[1])]
+                         for i in xrange(bounding.__len__())]
+
+    print rel_detector_rank
+
+
+def gaussian_filter(size, y, x, var=1):
+    filter_map = np.ndarray(size)
+    for i in xrange(0, size[0]):
+        for j in xrange(0, size[1]):
+            filter_map[i][j] = math.exp(-(math.pow(i - x, 2) + math.pow(j - y, 2)) / 2 / var) / 2 / var / math.pi
+    return filter_map
+
+
+if __name__ == '__main__':
+    print gaussian_filter((8, 3), 2, 1)

@@ -43,7 +43,7 @@ Weakly-supervised Pedestrian Attribute Localization (WPAL-net) is a Convolutiona
 5. Create symlinks for the RAP database
 
     ```Shell
-    cd $WMA_NET_ROOT/data/dataset/
+    cd $WPAL_NET_ROOT/data/dataset/
     ln -s $RAP RAP
     ```
 
@@ -58,13 +58,13 @@ To train the model, first fetch a pretrained VGG_CNN_S model by:
 Then run experiment script for training:
 
 ```Shell
-./experiments/example/train_mll_rap_0.sh
+./experiments/example/VGG_CNN_S/train_vgg_s_rap_0.sh
 ```
 
 Experiment script for testing is also available:
 
 ```Shell
-./experiments/example/test_mll_rap.sh
+./experiments/examples/VGG_CNN_S/test_vgg_s_rap.sh
 ```
 
 ## Acknowledgements

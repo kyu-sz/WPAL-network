@@ -29,90 +29,13 @@ import os
 
 import cv2
 import numpy as np
-from utils.blob import img_list_to_blob
 from utils.timer import Timer
 
-from config import config
+from localize import gaussian_filter as gf
+from recog import recognize_attr
 
 
-def _get_image_blob(img):
-    """Converts an image into a network input.
-    Arguments:
-        img (ndarray): a color image in BGR order
-    Returns:
-        blob (ndarray): a data blob holding the image
-        img_scale (double): image scale (relative to img) used
-    """
-    img_orig = img.astype(np.float32, copy=True)
-    img_orig -= config.PIXEL_MEANS
-
-    img_shape = img_orig.shape
-    img_size_min = np.min(img_shape[0:2])
-    img_size_max = np.max(img_shape[0:2])
-
-    processed_images = []
-    
-    target_size = config.TEST.SCALE
-    img_scale = float(target_size) / float(img_size_max)
-    # Prevent the biggest axis from being more than MAX_SIZE
-    if np.round(img_scale * img_size_min * img_scale * img_size_max) > config.TEST.MAX_AREA:
-        img_scale = math.sqrt(float(config.TEST.MAX_AREA) / float(img_size_min * img_size_max))
-    img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
-                     interpolation=cv2.INTER_LINEAR)
-    processed_images.append(img)
-
-    # Create a blob to hold the input images
-    blob = img_list_to_blob(processed_images)
-
-    return blob, img_scale
-
-
-def _get_blobs(im):
-    """Convert an image into network inputs."""
-    blobs = {'data' : None}
-    blobs['data'], img_scale_factor = _get_image_blob(im)
-    return blobs, img_scale_factor
-
-def _attr_group_norm(pred, group):
-    for i in group:
-        pred[i] = 1 if pred[i] == max(pred[group]) else 0
-    return pred
-
-def recognize_attr(net, img, attr_group):
-    """Recognize attributes in a pedestrian image.
-
-    Arguments:
-    	net (caffe.Net): WMA network to use.
-    	img (ndarray): color image to test (in BGR order)
-        attr_group(list of ranges): a list of ranges, each contains indexes
-                                    of attributes that mutually exclude each other.
-
-    Returns:
-    	attributes (ndarray): K x 1 array of predicted attributes. (K is
-    	    specified by database or the net)
-    """
-    blobs, img_scale_factor = _get_blobs(img)
-
-    # reshape network inputs
-    net.blobs['data'].reshape(*(blobs['data'].shape))
-
-    forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
-    blobs_out = net.forward(**forward_kwargs)
-
-    pred = np.average(blobs_out['pred'], axis=0)
-    heat = np.average(blobs_out['heat'], axis=0)
-    score = np.average(blobs_out['score'], axis=0)
-    
-    for group in attr_group:
-        pred = _attr_group_norm(pred, group)
-    
-    for i in xrange(pred.shape[0]):
-        pred[i] = 0 if pred[i] < 0.5 else 1
-
-    return pred, heat, score
-
-
-def test_net(net, db, output_dir, vis=False, vis_attr=0, fixed_weight=None):
+def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=None):
     """Test a Weakly-supervised Pedestrian Attribute Localization Network on an image database."""
 
     num_images = len(db.test_ind)
@@ -132,14 +55,35 @@ def test_net(net, db, output_dir, vis=False, vis_attr=0, fixed_weight=None):
         cnt += 1
 
         if vis:
-            if fixed_weight is None:
-                print "Visualization need fixed_weight to be not none!"
+            if detector_weight is None:
+                print "Visualization need detector_weight to be not none!"
                 vis = False
             else:
-                w_func = lambda x : 0 if score[x] <= 0 else math.exp(score[x] + fixed_weight[x])
+                w_func = lambda x: 0 if score[x] <= 0 else math.exp(score[x] + detector_weight[x])
                 find_target = lambda x: np.where(heat[x] == score[x])
-                w_sum = sum([w_func(i) for i in xrange(score.__len__())])
-                x = img.shape[1] * sum([w_func[i] * find_target(x)[1] / heat[x]])
+                w_sum = sum([w_func(j) for j in xrange(score.__len__())])
+                x = img.shape[1] * sum([w_func[j] / w_sum * find_target(j)[1] / heat[j].shape[1]
+                                        for j in xrange(score.__len__())])
+                y = img.shape[0] * sum([w_func[j] / w_sum * find_target(j)[0] / heat[j].shape[0]
+                                        for j in xrange(score.__len__())])
+                superposition = sum([
+                                        cv2.resize(heat[j] * gf(heat[j].size, y, x), img.shape)
+                                        for j in xrange(score.__len__())
+                                        ])
+                mean = (superposition.max() + superposition.min()) / 2
+                range = superposition.max() - superposition.min()
+                superposition = (superposition - mean) * 128 / range
+                canvas = np.ndarray(img)
+                for j in xrange(img.size[0]):
+                    for k in xrange(img.size[1]):
+                        if superposition[j][k] >= 0:
+                            canvas[j][k][2] = min(255, canvas[j][k][2] + superposition[j][k])
+                        else:
+                            canvas[j][k][0] = min(255, canvas[j][k][0] - superposition[j][k])
+                cv2.imshow(db.get_img_path(i), canvas)
+                cv2.waitKey(0)
+                if save_file is not None:
+                    cv2.imwrite(save_file, img)
 
         if cnt % 100 == 0:
             print 'recognize_attr: {:d}/{:d} {:.3f}s' \

@@ -195,9 +195,9 @@ layer {
   name: "pool3"
   type: "Pooling"
   pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 3
+    pool: AVE
+    kernel_size: 2
+    stride: 1
   }
 }
 layer {
@@ -206,9 +206,9 @@ layer {
   name: "pool4"
   type: "Pooling"
   pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 3
+    pool: AVE
+    kernel_size: 2
+    stride: 1
   }
 }
 layer {
@@ -217,9 +217,9 @@ layer {
   name: "pool5"
   type: "Pooling"
   pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 3
+    pool: AVE
+    kernel_size: 2
+    stride: 1
   }
 }
 ########################## Extra Conv Layers ##########################
@@ -245,8 +245,8 @@ layer {
         value: 0
     }
     num_output: 512
-    pad: 2
-    kernel_size: 5
+    pad: 1
+    kernel_size: 3
   }
 }
 layer {
@@ -277,8 +277,8 @@ layer {
         value: 0
     }
     num_output: 512
-    pad: 2
-    kernel_size: 5
+    pad: 1
+    kernel_size: 3
   }
 }
 layer {
@@ -309,8 +309,8 @@ layer {
         value: 0
     }
     num_output: 1024
-    pad: 2
-    kernel_size: 5
+    pad: 1
+    kernel_size: 3
   }
 }
 layer {

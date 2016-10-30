@@ -21,8 +21,6 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import cPickle
 import os
@@ -36,8 +34,8 @@ def parse_args():
     parser.add_argument('--pkl', dest='pkl',
                         help='Saved attributes.',
                         default='./output/attributes.pkl', type=str)
-    parser.add_argument('--set', dest='set_configs',
-                        help='set config keys', default=None,
+    parser.add_argument('--set', dest='set_cfgs',
+                        help='set cfg keys', default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--db', dest='db',
                         help='the name of the database',

@@ -28,7 +28,7 @@ import google.protobuf as pb2
 from caffe.proto import caffe_pb2
 from utils.timer import Timer
 
-from config import config
+from config import cfg
 from test import test_net
 
 
@@ -47,8 +47,8 @@ class SolverWrapper(object):
         with open(solver_prototxt, 'rt') as f:
             pb2.text_format.Merge(f.read(), self._solver_param)
 
-        infix = ('_' + config.TRAIN.SNAPSHOT_INFIX
-                 if config.TRAIN.SNAPSHOT_INFIX != '' else '')
+        infix = ('_' + cfg.TRAIN.SNAPSHOT_INFIX
+                 if cfg.TRAIN.SNAPSHOT_INFIX != '' else '')
         self._snapshot_prefix = self._solver_param.snapshot_prefix + infix + '_iter_'
 
         if snapshot_path is not None:
@@ -89,11 +89,11 @@ class SolverWrapper(object):
                 print 'speed: {:.3f}s / iter'.format(timer.average_time)
             if self._solver.iter % 10 == 0:
 	        print "Python: iter", self._solver.iter
-            if self._solver.iter % config.TRAIN.SNAPSHOT_ITERS == 0:
+            if self._solver.iter % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = self._solver.iter
                 model_paths.append(self.snapshot())
 
-            if self._solver.iter % config.TRAIN.TEST_ITERS == 0:
+            if self._solver.iter % cfg.TRAIN.TEST_ITERS == 0:
                 test_net(self._solver.test_net, self._db, self._output_dir)
 
         if last_snapshot_iter != self._solver.iter:
@@ -104,7 +104,7 @@ class SolverWrapper(object):
 def train_net(solver_prototxt, db, output_dir,
               snapshot_path=None, max_iters=40000):
     """Train a WMA network."""
-    sw = SolverWrapper(solver_prototxt, db, output_dir, config.TRAIN.DO_FLIP,
+    sw = SolverWrapper(solver_prototxt, db, output_dir, cfg.TRAIN.DO_FLIP,
                        snapshot_path=snapshot_path)
 
     print 'Solving...'

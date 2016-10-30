@@ -38,7 +38,7 @@ class RAP:
         self.labels = rap[0][0][1]
         self.attr_ch = rap[0][0][2]
         self.attr_eng = rap[0][0][3]
-        self.num_attrs = self.attr_eng.shape[0]
+        self.num_attr = self.attr_eng.shape[0]
         self.position = rap[0][0][4]
         self._img_names = rap[0][0][5]
         self.attr_exp = rap[0][0][6]
@@ -83,5 +83,5 @@ if __name__ == '__main__':
     print db.train_ind.shape
     print 'Max training index: ', max(db.train_ind)
     print db.get_img_path(0)
-    print db.num_attrs
+    print db.num_attr
     print db.label_weight

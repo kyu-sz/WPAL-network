@@ -27,10 +27,11 @@ DataLayer implements a Caffe Python layer.
 
 from multiprocessing import Process, Queue
 
-import caffe
 import numpy as np
 from data_layer.minibatch import get_minibatch
-from wpal_net.config import config
+from wpal_net.config import cfg
+
+import caffe
 
 
 class DataLayer(caffe.Layer):
@@ -64,15 +65,15 @@ class DataLayer(caffe.Layer):
 
         # data blob: holds a batch of N images, each with 3 channels
         idx = 0
-        top[idx].reshape(config.TRAIN.BATCH_SIZE, 3, max(config.TRAIN.SCALES), max(config.TRAIN.SCALES))
+        top[idx].reshape(cfg.TRAIN.BATCH_SIZE, 3, max(cfg.TRAIN.SCALES), max(cfg.TRAIN.SCALES))
         self._name_to_top_map['data'] = idx
         idx += 1
 
-        top[idx].reshape(config.TRAIN.BATCH_SIZE, config.NUM_ATTR)
+        top[idx].reshape(cfg.TRAIN.BATCH_SIZE, cfg.NUM_ATTR)
         self._name_to_top_map['attr'] = idx
         idx += 1
 
-        top[idx].reshape(config.TRAIN.BATCH_SIZE, config.NUM_ATTR)
+        top[idx].reshape(cfg.TRAIN.BATCH_SIZE, cfg.NUM_ATTR)
         self._name_to_top_map['weight'] = idx
         idx += 1       
 
@@ -115,7 +116,7 @@ class BlobFetcher(Process):
         self._shuffle_train_inds()
 
         # fix the random seed for reproducibility
-        np.random.seed(config.RNG_SEED)
+        np.random.seed(cfg.RNG_SEED)
 
     def _shuffle_train_inds(self):
         """Randomly permute the training database."""
@@ -127,8 +128,8 @@ class BlobFetcher(Process):
         if self._cur >= len(self._db.train_ind):
             self._shuffle_train_inds()
 
-        minibatch_inds = self._perm[self._cur:self._cur + config.TRAIN.BATCH_SIZE]
-        self._cur += config.TRAIN.BATCH_SIZE
+        minibatch_inds = self._perm[self._cur:self._cur + cfg.TRAIN.BATCH_SIZE]
+        self._cur += cfg.TRAIN.BATCH_SIZE
         return minibatch_inds
 
     def run(self):

@@ -56,7 +56,7 @@ class PETA:
             print h5py.File(osp.join(self._db_path, 'partition.mat')).keys()
             self.name = h5py.File(osp.join(self._db_path, 'partition.mat'))['partition']
 
-        self.num_attrs = self.name.shape[0]
+        self.num_attr = self.name.shape[0]
         self.test_ind = None
         self.train_ind = None
         self.label_weight = None
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     print db.test_ind.__len__()
     print 'Max training index: ', max(db.train_ind)
     print db.get_img_path(0)
-    print db.num_attrs
+    print db.num_attr
     print db.train_ind.__len__(), db.train_ind
     print db.test_ind.__len__(), db.test_ind
     print db.label_weight

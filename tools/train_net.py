@@ -21,15 +21,14 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import sys
 
-import caffe
-from wpal_net.config import config, config_from_file, config_from_list
+from wpal_net.config import cfg, cfg_from_file, cfg_from_list
 from wpal_net.train import train_net
+
+import caffe
 
 
 def parse_args():
@@ -62,10 +61,10 @@ def parse_args():
                         help='randomize (do not use a fixed seed)',
                         action='store_true')
     parser.add_argument('--set', dest='set_cfgs',
-                        help='set config keys', default=None,
+                        help='set cfg keys', default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--cfg', dest='cfg_file',
-                        help='optional config file',
+                        help='optional cfg file',
                         default=None, type=str)
 
     args = parser.parse_args()
@@ -85,11 +84,11 @@ if __name__ == '__main__':
     print(args)
 
     if args.cfg_file is not None:
-        config_from_file(args.cfg_file)
+        cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
-        config_from_list(args.set_cfgs)
+        cfg_from_list(args.set_cfgs)
 
-    config.GPU_ID = args.gpu_id
+    cfg.GPU_ID = args.gpu_id
 
     # set up Caffe
     if args.gpu_id == -1:
@@ -107,7 +106,7 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset',  args.db), args.par_set_id)
 
-    config.NUM_ATTR = db.num_attrs
+    cfg.NUM_ATTR = db.num_attr
 
     print 'Output will be saved to `{:s}`'.format(args.output_dir)
     try:

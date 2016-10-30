@@ -21,18 +21,16 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
 import os
 import pprint
-import time
 import sys
+import time
+
+from wpal_net.config import cfg, cfg_from_file, cfg_from_list
+from wpal_net.test import test_net
 
 import caffe
-from utils.rap_db import RAP
-from wpal_net.config import config, config_from_file, config_from_list
-from wpal_net.test import test_net
 
 
 def parse_args():
@@ -49,13 +47,13 @@ def parse_args():
     parser.add_argument('--net', dest='caffemodel',
                         help='model to test',
                         default=None, type=str)
-    parser.add_argument('--cfg', dest='config_file',
-                        help='optional config file', default=None, type=str)
+    parser.add_argument('--cfg', dest='cfg_file',
+                        help='optional cfg file', default=None, type=str)
     parser.add_argument('--wait', dest='wait',
                         help='wait until net file exists',
                         default=True, type=bool)
-    parser.add_argument('--set', dest='set_configs',
-                        help='set config keys', default=None,
+    parser.add_argument('--set', dest='set_cfgs',
+                        help='set cfg keys', default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--db', dest='db',
                         help='the name of the database',
@@ -84,15 +82,15 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    if args.config_file is not None:
-        config_from_file(args.config_file)
-    if args.set_configs is not None:
-        config_from_list(args.set_configs)
+    if args.cfg_file is not None:
+        cfg_from_file(args.cfg_file)
+    if args.set_cfgs is not None:
+        cfg_from_list(args.set_cfgs)
 
-    config.GPU_ID = args.gpu_id
+    cfg.GPU_ID = args.gpu_id
 
-    print('Using config:')
-    pprint.pprint(config)
+    print('Using cfg:')
+    pprint.pprint(cfg)
 
     while not os.path.exists(args.caffemodel) and args.wait:
         print('Waiting for {} to exist...'.format(args.caffemodel))

@@ -23,9 +23,9 @@ import numpy as np
 
 def mA(attr, gt):
 	num = attr.__len__()
-	num_attrs = attr[0].__len__()
+	num_attr = attr[0].__len__()
 
-	for i in xrange(num_attrs):
+	for i in xrange(num_attr):
 		print '--------------------------------------------'
 		print i
 		print sum([attr[j][i] for j in xrange(num)]), \
@@ -44,12 +44,12 @@ def mA(attr, gt):
 		           / sum([gt[j][i] for j in xrange(num)])
 		           + sum([(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)])
 		           / sum([(1 - gt[j][i]) for j in xrange(num)])
-	           ) for i in xrange(num_attrs)])) / (2 * num_attrs)
+	           ) for i in xrange(num_attr)])) / (2 * num_attr)
 	return mA
 
 def example_based(attr, gt):
 	num = attr.__len__()
-	num_attrs = attr[0].__len__()
+	num_attr = attr[0].__len__()
 
 	acc = 0
 	prec = 0

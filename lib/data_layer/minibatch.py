@@ -27,7 +27,7 @@ import cv2
 import numpy as np
 import numpy.random as npr
 from utils.blob import img_list_to_blob, prep_img_for_blob
-from wpal_net.config import config
+from wpal_net.config import cfg
 
 
 def get_minibatch(img_paths, labels, flip, flip_attr_pairs, weight):
@@ -35,7 +35,7 @@ def get_minibatch(img_paths, labels, flip, flip_attr_pairs, weight):
     num_images = len(img_paths)
 
     # Sample random scales to use for each image in this batch
-    random_scale_inds = npr.randint(0, high=len(config.TRAIN.SCALES),
+    random_scale_inds = npr.randint(0, high=len(cfg.TRAIN.SCALES),
                                     size=num_images)
 
     # Get the input image blob, formatted for caffe
@@ -95,9 +95,9 @@ def _get_image_blob(img_paths, scale_inds, flip):
 	"""Flip the image if required."""
         if flip[i]:
             img = cv2.flip(img, 1)
-        target_size = config.TRAIN.SCALES[scale_inds[i]]
-        img, img_scale = prep_img_for_blob(img, config.PIXEL_MEANS, target_size,
-                                           config.TRAIN.MAX_AREA)
+        target_size = cfg.TRAIN.SCALES[scale_inds[i]]
+        img, img_scale = prep_img_for_blob(img, cfg.PIXEL_MEANS, target_size,
+                                           cfg.TRAIN.MAX_AREA)
         img_scales.append(img_scale)
         processed_imgs.append(img)
 
