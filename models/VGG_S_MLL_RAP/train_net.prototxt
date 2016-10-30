@@ -200,7 +200,7 @@ layer {
   pooling_param {
     pool: AVE
     kernel_size: 2
-    stride: 1
+    stride: 2
   }
 }
 layer {
@@ -211,7 +211,7 @@ layer {
   pooling_param {
     pool: AVE
     kernel_size: 2
-    stride: 1
+    stride: 2
   }
 }
 layer {
@@ -222,7 +222,7 @@ layer {
   pooling_param {
     pool: AVE
     kernel_size: 2
-    stride: 1
+    stride: 2
   }
 }
 ########################## Extra Conv Layers ##########################
