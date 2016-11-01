@@ -27,10 +27,9 @@ import pprint
 import sys
 import time
 
+import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
 from wpal_net.test import test_net
-
-import caffe
 
 
 def parse_args():

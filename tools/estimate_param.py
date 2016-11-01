@@ -29,7 +29,7 @@ import time
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
-from wpal_net.localize import learn_bounding
+from wpal_net.estimate import estimate_param as ep
 
 
 def parse_args():
@@ -63,6 +63,9 @@ def parse_args():
     parser.add_argument('--outputdir', dest='output_dir',
                         help='the directory to save outputs',
                         default='./output', type=str)
+    parser.add_argument('--result', dest='res',
+                        help='the file storing recognition results',
+                        default=None, type=str)
 
     args = parser.parse_args()
 
@@ -76,8 +79,9 @@ if __name__ == '__main__':
     print(args)
 
     args.prototxt = 'models/VGG_S_MLL_RAP/test_net.prototxt'
-    args.caffemodel = 'data/snapshots/VGG_S_MLL_RAP/0/RAP/vgg_s_mll_rap_iter_5000.caffemodel'
+    args.caffemodel = 'data/snapshots/VGG_S_MLL_RAP/0/RAP/vgg_s_mll_rap_iter_40000.caffemodel'
     args.db = 'RAP'
+    args.res = './output/attributes.pkl'
 
     if args.prototxt is None or args.caffemodel is None or args.db is None:
         parser.print_help()
@@ -116,4 +120,4 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
-    learn_bounding(net, db, args.output_dir)
+    ep(net, db, args.output_dir, args.res)

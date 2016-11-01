@@ -24,38 +24,64 @@
 import cPickle
 import math
 import os
+from random import randint
 
 import cv2
 import numpy as np
+from utils.evaluate import mA
 
 from config import cfg
 from recog import recognize_attr
 
 
-def learn_bounding(net, db, output_dir):
-    bounding = np.ndarray((db.num_attr, cfg.NUM_DETECTOR))  # bounding between attribute and detector
-    for i in db.train_ind:
-        img = cv2.imread(db.get_img_path(i))
-        attr, _, score = recognize_attr(net, img, db.attr_group)
-        for j in xrange(db.labels[i].__len__()):
+def estimate_param(net, db, output_dir, res_file):
+    binding = np.ndarray((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
+    attrs = []
+    scores = []
+    labels = []
+
+    if res_file == None:
+        for i in db.train_ind:
+            img = cv2.imread(db.get_img_path(i))
+            attr, _, score = recognize_attr(net, img, db.attr_group)
+            attrs.append(attr)
+            scores.append(score)
+            labels.append(db.labels[i])
+        cPickle.dump({'attrs': attrs, 'scores': scores})
+    else:
+        f = open(res_file, 'rb')
+        pack = cPickle.load(f)
+        attrs = pack['attrs']
+        scores = pack['scores']
+
+    # Find challenging attributes
+    _, challenging = mA(attrs, db.labels[db.train_ind])
+
+    # Estimate detector binding
+    for i in xrange(attrs.__len__()):
+        for j in xrange(labels[i].__len__()):
             if db.labels[i][j] > 0.5:
-                bounding[j] += score
-    bounding_file = os.path.join(output_dir, 'bounding.pkl')
-    with open(bounding_file, 'wb') as f:
-        cPickle.dump(bounding, f, cPickle.HIGHEST_PROTOCOL)
+                binding[j] += scores[i]
+    binding_file = os.path.join(output_dir, 'binding.pkl')
+    with open(binding_file, 'wb') as f:
+        cPickle.dump(binding, f, cPickle.HIGHEST_PROTOCOL)
 
+    # Sort the detectors by scores.
     detector_rank = [[j[0]
-                      for j in sorted(enumerate(bounding[i]), key=lambda x: x[1])]
-                     for i in xrange(bounding.__len__())]
+                      for j in sorted(enumerate(binding[i]), key=lambda x: x[1])]
+                     for i in xrange(binding.__len__())]
     high_scores = [[j[1]
-                    for j in sorted(enumerate(bounding[i]), key=lambda x: x[1])]
-                   for i in xrange(bounding.__len__())]
+                    for j in sorted(enumerate(binding[i]), key=lambda x: x[1])]
+                   for i in xrange(binding.__len__())]
 
+    # Estimate supervision threshold
     t = sum(high_scores.all()) / 32 / db.num_attr
     mat = np.ndarray((db.num_attr, cfg.NUM_DETECTOR))
+    # Find binding of the first 32 detectors with highest scores.
     for i in xrange(detector_rank.size[0]):
         for j in xrange(32):
-            mat[i][j] = t
+            mat[i][j] = 1
+    # Assign the rest detectors randomly to challenging attributes.
     for i in xrange(cfg.NUM_DETECTOR):
         utilized = 0
         for j in xrange(detector_rank.size[0]):
@@ -65,8 +91,15 @@ def learn_bounding(net, db, output_dir):
                     break
             if utilized:
                 break
+        if not utilized:
+            mat[challenging[randint(0, challenging.__len__() - 1)]][i] = 1
 
-    print detector_rank
+    dtl_file = os.path.join(output_dir, 'detector_threshold.pkl')
+    with open(dtl_file, 'wb') as f:
+        cPickle.dump({
+            't':   t,
+            'mat': mat
+        }, f, cPickle.HIGHEST_PROTOCOL)
 
 
 def gaussian_filter(size, y, x, var=1):

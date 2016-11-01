@@ -31,7 +31,7 @@ import cv2
 import numpy as np
 from utils.timer import Timer
 
-from localize import gaussian_filter as gf
+from estimate import gaussian_filter as gf
 from recog import recognize_attr
 
 
@@ -44,12 +44,14 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
 
     # timers
     _t = {'recognize_attr' : Timer()}
-    
+
+    threshold = np.ones(db.num_attr) * 0.5;
+
     cnt = 0
     for i in db.test_ind:
         img = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        attr, heat, score = recognize_attr(net, img, db.attr_group)
+        attr, heat, score = recognize_attr(net, img, db.attr_group, threshold)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
