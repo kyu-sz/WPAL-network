@@ -31,7 +31,7 @@ import cv2
 import numpy as np
 from utils.timer import Timer
 
-from localize import gaussian_filter as gf
+from estimate import gaussian_filter as gf
 from recog import recognize_attr
 
 
@@ -44,12 +44,14 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
 
     # timers
     _t = {'recognize_attr' : Timer()}
-    
+
+    threshold = np.ones(db.num_attr) * 0.5;
+
     cnt = 0
     for i in db.test_ind:
         img = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        attr, heat, score = recognize_attr(net, img, db.attr_group)
+        attr, heat, score = recognize_attr(net, img, db.attr_group, threshold)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
@@ -93,7 +95,9 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
     with open(attr_file, 'wb') as f:
         cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
-    print 'mA={:f}'.format(db.evaluate_mA(all_attrs, db.test_ind))
+    mA, challenging = db.evaluate_mA(all_attrs, db.test_ind)
+    print 'mA={:f}'.format(mA)
+    print 'Challenging attributes:', challenging
     
     acc, prec, rec, f1 = db.evaluate_example_based(all_attrs, db.test_ind)
 

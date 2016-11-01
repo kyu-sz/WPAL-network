@@ -27,10 +27,9 @@ import argparse
 import os
 import sys
 
+import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
 from wpal_net.train import train_net
-
-import caffe
 
 
 def parse_args():

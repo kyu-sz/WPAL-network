@@ -49,7 +49,7 @@ __C.TRAIN = edict()
 
 # Scales to use during training (can list multiple scales)
 # Each scale is the pixel size of an image's longer side
-__C.TRAIN.SCALES = (288, 320, 352,)
+__C.TRAIN.SCALES = (272, 288, 304, 320, 336, 352, 368,)
 
 # Max pixel area size of a scaled input image
 __C.TRAIN.MAX_AREA = 35840
@@ -77,6 +77,9 @@ __C.TRAIN.ASPECT_GROUPING = True
 
 # Whether to do flipping during training
 __C.TRAIN.DO_FLIP = True
+
+# Value range of RGB Jittering.
+__C.TRAIN.RGB_JIT = 32
 
 #
 # Testing options

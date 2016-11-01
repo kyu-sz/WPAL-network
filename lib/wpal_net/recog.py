@@ -52,7 +52,12 @@ def _attr_group_norm(pred, group):
 	return pred
 
 
-def recognize_attr(net, img, attr_group):
+def discretize(attr, threshold):
+	for i in xrange(attr.shape[0]):
+		attr[i] = 0 if attr[i] < threshold[i] else 1
+
+
+def recognize_attr(net, img, attr_group, threshold=None):
 	"""Recognize attributes in a pedestrian image.
 
 	Arguments:
@@ -80,7 +85,8 @@ def recognize_attr(net, img, attr_group):
 	for group in attr_group:
 		pred = _attr_group_norm(pred, group)
 
-	for i in xrange(pred.shape[0]):
-		pred[i] = 0 if pred[i] < 0.5 else 1
+	if threshold is not None:
+		for i in xrange(pred.shape[0]):
+			pred[i] = 0 if pred[i] < threshold[i] else 1
 
 	return pred, heat, score
