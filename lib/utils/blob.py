@@ -11,6 +11,7 @@ import math
 
 import cv2
 import numpy as np
+from wpal_net.config import cfg
 
 
 def img_list_to_blob(images):
@@ -43,5 +44,12 @@ def prep_img_for_blob(img, pixel_means, target_size, max_area):
     if np.round(img_scale * img_size_min * img_scale * img_size_max) > max_area:
         img_scale = math.sqrt(float(max_area) / float(img_size_min * img_size_max))
     img = cv2.resize(img, None, None, fx=img_scale, fy=img_scale, interpolation=cv2.INTER_LINEAR)
+
+    # Perform RGB Jittering
+    h, w, c = img.shape
+    zitter = np.zeros_like(img)
+    for i in xrange(c):
+        zitter[:, :, i] = np.random.randint(0, cfg.TRAIN.RGB_JIT, (h, w)) - cfg.TRAIN.RGB_JIT / 2
+    img = cv2.add(img, zitter)
 
     return img, img_scale

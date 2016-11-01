@@ -39,11 +39,11 @@ layer {
   name: "conv1"
   type: "Convolution"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0.0
+    decay_mult: 0.0
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.1
     decay_mult: 0
   }
   convolution_param {
@@ -87,11 +87,11 @@ layer {
   name: "conv2"
   type: "Convolution"
   param {
-    lr_mult: 0.2
-    decay_mult: 0.2
+    lr_mult: 0.1
+    decay_mult: 0.1
   }
   param {
-    lr_mult: 0.4
+    lr_mult: 0.2
     decay_mult: 0
   }
   convolution_param {
@@ -123,11 +123,11 @@ layer {
   name: "conv3"
   type: "Convolution"
   param {
-    lr_mult: 0.3
-    decay_mult: 0.3
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 0.6
+    lr_mult: 0.4
     decay_mult: 0
   }
   convolution_param {
@@ -148,11 +148,11 @@ layer {
   name: "conv4"
   type: "Convolution"
   param {
-    lr_mult: 0.4
-    decay_mult: 0.4
+    lr_mult: 0.3
+    decay_mult: 0.3
   }
   param {
-    lr_mult: 0.8
+    lr_mult: 0.6
     decay_mult: 0
   }
   convolution_param {
@@ -173,11 +173,11 @@ layer {
   name: "conv5"
   type: "Convolution"
   param {
-    lr_mult: 0.5
-    decay_mult: 0.5
+    lr_mult: 0.4
+    decay_mult: 0.4
   }
   param {
-    lr_mult: 1
+    lr_mult: 0.8
     decay_mult: 0
   }
   convolution_param {
@@ -404,6 +404,15 @@ layer {
   type: "ReLU"
 }
 layer {
+  bottom: "fc3_e"
+  top: "fc3_e"
+  name: "drop3"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   bottom: "pool4_e"
   top: "fc4_e"
   name: "fc4_e"
@@ -435,6 +444,15 @@ layer {
   type: "ReLU"
 }
 layer {
+  bottom: "fc4_e"
+  top: "fc4_e"
+  name: "drop4"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   bottom: "pool5_e"
   top: "fc5_e"
   name: "fc5_e"
@@ -464,6 +482,15 @@ layer {
   top: "fc5_e"
   name: "relu5_e"
   type: "ReLU"
+}
+layer {
+  bottom: "fc5_e"
+  top: "fc5_e"
+  name: "drop5"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
 }
 ########################## Synthesis Layers ##########################
 layer {
