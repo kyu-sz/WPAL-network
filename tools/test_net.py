@@ -21,6 +21,8 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
+import _init_path
+
 import argparse
 import os
 import pprint
