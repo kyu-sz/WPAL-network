@@ -21,6 +21,8 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
+import _init_path
+
 import argparse
 import os
 import pprint
@@ -78,10 +80,12 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
+    args.gpu_id = 2
     args.prototxt = 'models/VGG_S_MLL_RAP/test_net.prototxt'
-    args.caffemodel = 'data/snapshots/VGG_S_MLL_RAP/0/RAP/vgg_s_mll_rap_iter_40000.caffemodel'
+    args.caffemodel = 'data/snapshots/VGG_S_MLL_RAP/0/RAP/vgg_s_mll_rap_iter_75000.caffemodel'
     args.db = 'RAP'
-    args.res = './output/attributes.pkl'
+    #args.res = 'output/val.pkl'
+    #args.res = './output/attributes.pkl'
 
     if args.prototxt is None or args.caffemodel is None or args.db is None:
         parser.print_help()
@@ -103,13 +107,14 @@ if __name__ == '__main__':
 
     # set up Caffe
     if args.gpu_id == -1:
-	    caffe.set_mode_cpu()
+        caffe.set_mode_cpu()
     else:
-	    caffe.set_mode_gpu()
-	    caffe.set_device(args.gpu_id)
+        caffe.set_mode_gpu()
+        caffe.set_device(args.gpu_id)
 
-    net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
-    net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
+    if args.res is None:
+        net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
+        net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
     if args.db == 'RAP':
         """Load RAP database"""

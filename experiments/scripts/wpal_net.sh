@@ -44,7 +44,7 @@ set -x
 
 time ./tools/test_net.py --gpu ${GPU_ID} \
   --def models/${NET}/test_net.prototxt \
-  -db ${DB}
+  --db ${DB}
   --setid ${DB_SET} \
   --net ${NET_FINAL} \
   ${EXTRA_ARGS}

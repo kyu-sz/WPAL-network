@@ -41,22 +41,29 @@ def estimate_param(net, db, output_dir, res_file):
     labels = []
 
     if res_file == None:
+        cnt = 0
         for i in db.train_ind:
             img = cv2.imread(db.get_img_path(i))
             attr, _, score = recognize_attr(net, img, db.attr_group)
             attrs.append(attr)
-            scores.append(score)
+            scores.append([score[x][0][0] for x in range(len(score))]) 
             labels.append(db.labels[i])
-        cPickle.dump({'attrs': attrs, 'scores': scores})
+            cnt += 1
+            if cnt % 1000 == 0:
+                print 'Tested: {}/{}'.format(cnt, db.train_ind.__len__())
+ 
+        val_file = os.path.join(output_dir, 'val.pkl')
+        with open(val_file, 'wb') as f:
+            cPickle.dump({'attrs': attrs, 'scores': scores}, f, cPickle.HIGHEST_PROTOCOL)
     else:
+        print 'Loading stored results.'
         f = open(res_file, 'rb')
         pack = cPickle.load(f)
         attrs = pack['attrs']
         scores = pack['scores']
+        labels = db.labels[db.train_ind]
 
-    # Find challenging attributes
-    _, challenging = mA(attrs, db.labels[db.train_ind])
-
+    print attrs.__len__(), labels[0].__len__(), db.labels.shape
     # Estimate detector binding
     for i in xrange(attrs.__len__()):
         for j in xrange(labels[i].__len__()):
@@ -81,6 +88,10 @@ def estimate_param(net, db, output_dir, res_file):
     for i in xrange(detector_rank.size[0]):
         for j in xrange(32):
             mat[i][j] = 1
+
+    # Find challenging attributes
+    _, challenging = mA(attrs, db.labels[db.train_ind])
+
     # Assign the rest detectors randomly to challenging attributes.
     for i in xrange(cfg.NUM_DETECTOR):
         utilized = 0

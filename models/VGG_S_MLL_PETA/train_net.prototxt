@@ -340,6 +340,15 @@ layer {
   type: "ReLU"
 }
 layer {
+  bottom: "pool3_e"
+  top: "pool3_e"
+  name: "drop3_p"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   bottom: "conv4_e"
   top: "pool4_e"
   name: "pool4_e"
@@ -356,6 +365,15 @@ layer {
   type: "ReLU"
 }
 layer {
+  bottom: "pool4_e"
+  top: "pool4_e"
+  name: "drop4_p"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
   bottom: "conv5_e"
   top: "pool5_e"
   name: "pool5_e"
@@ -370,6 +388,15 @@ layer {
   top: "pool5_e"
   name: "relu5_e"
   type: "ReLU"
+}
+layer {
+  bottom: "pool5_e"
+  top: "pool5_e"
+  name: "drop5_p"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
 }
 ########################## Independent FC Layers ##########################
 layer {

@@ -21,6 +21,8 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
+import _init_path
+
 import argparse
 import cPickle
 import os
@@ -57,11 +59,11 @@ if __name__ == '__main__':
     if args.db == 'RAP':
         """Load RAP database"""
         from utils.rap_db import RAP
-        db = RAP(os.path.join('data', args.db), args.par_set_id)
+        db = RAP(os.path.join('data', 'datasets', args.db), args.par_set_id)
     else:
         """Load PETA dayanse"""
         from utils.peta_db import PETA
-        db = PETA(os.path.join('data', args.db), args.par_set_id)
+        db = PETA(os.path.join('data', 'datasets', args.db), args.par_set_id)
 
     f = open(args.pkl, 'rb')
     attr = cPickle.load(f)

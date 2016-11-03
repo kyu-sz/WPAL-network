@@ -79,7 +79,10 @@ __C.TRAIN.ASPECT_GROUPING = True
 __C.TRAIN.DO_FLIP = True
 
 # Value range of RGB Jittering.
-__C.TRAIN.RGB_JIT = 32
+__C.TRAIN.RGB_JIT = 16
+
+# Number of detectors to reserve when finding unutilized detectors.
+__C.TRAIN.NUM_RESERVE_DETECTOR = 64
 
 #
 # Testing options
