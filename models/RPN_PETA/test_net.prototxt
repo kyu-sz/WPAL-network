@@ -85,9 +85,11 @@ layer {
   top: "conv2"
   param {
     lr_mult: 0.1
+    decay_mult: 0.1
   }
   param {
     lr_mult: 0.2
+    decay_mult: 0
   }
   convolution_param {
     num_output: 256
@@ -132,9 +134,11 @@ layer {
   top: "conv3"
   param {
     lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
     lr_mult: 0.4
+    decay_mult: 0
   }
   convolution_param {
     num_output: 512
@@ -155,9 +159,11 @@ layer {
   top: "conv4"
   param {
     lr_mult: 0.3
+    decay_mult: 0.3
   }
   param {
     lr_mult: 0.6
+    decay_mult: 0
   }
   convolution_param {
     num_output: 512
@@ -178,9 +184,11 @@ layer {
   top: "conv5"
   param {
     lr_mult: 0.4
+    decay_mult: 0.4
   }
   param {
     lr_mult: 0.8
+    decay_mult: 0
   }
   convolution_param {
     num_output: 512
@@ -194,42 +202,9 @@ layer {
   bottom: "conv5"
   top: "conv5"
 }
-layer {
-  bottom: "conv3"
-  top: "pool3"
-  name: "pool3"
-  type: "Pooling"
-  pooling_param {
-    pool: AVE
-    kernel_size: 2
-    stride: 2
-  }
-}
-layer {
-  bottom: "conv4"
-  top: "pool4"
-  name: "pool4"
-  type: "Pooling"
-  pooling_param {
-    pool: AVE
-    kernel_size: 2
-    stride: 2
-  }
-}
-layer {
-  bottom: "conv5"
-  top: "pool5"
-  name: "pool5"
-  type: "Pooling"
-  pooling_param {
-    pool: AVE
-    kernel_size: 2
-    stride: 2
-  }
-}
 ########################## Extra Conv Layers ##########################
 layer {
-  bottom: "pool3"
+  bottom: "conv3"
   top: "conv3_e"
   name: "conv3_e"
   type: "Convolution"
@@ -261,7 +236,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "pool4"
+  bottom: "conv4"
   top: "conv4_e"
   name: "conv4_e"
   type: "Convolution"
@@ -293,7 +268,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "pool5"
+  bottom: "conv5"
   top: "conv5_e"
   name: "conv5_e"
   type: "Convolution"
