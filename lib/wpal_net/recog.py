@@ -79,7 +79,9 @@ def recognize_attr(net, img, attr_group, threshold=None):
 	blobs_out = net.forward(**forward_kwargs)
 
 	pred = np.average(blobs_out['pred'], axis=0)
-	heat = np.average(blobs_out['heat'], axis=0)
+	heat3 = np.average(blobs_out['heat3'], axis=0)
+	heat4 = np.average(blobs_out['heat4'], axis=0)
+	heat5 = np.average(blobs_out['heat5'], axis=0)
 	score = np.average(blobs_out['score'], axis=0)
 
 	for group in attr_group:
@@ -89,4 +91,4 @@ def recognize_attr(net, img, attr_group, threshold=None):
 		for i in xrange(pred.shape[0]):
 			pred[i] = 0 if pred[i] < threshold[i] else 1
 
-	return pred, heat, score
+	return pred, heat3, heat4, heat5, score

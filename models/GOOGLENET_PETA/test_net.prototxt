@@ -2302,10 +2302,20 @@ layer {
 ###################### Localization Layers ######################
 layer {
   bottom: "conv3_e"
+  top: "heat3"
+  name: "heat3"
+  type: "Concat"
+}
+layer {
   bottom: "conv4_e"
+  top: "heat4"
+  name: "heat4"
+  type: "Concat"
+}
+layer {
   bottom: "conv5_e"
-  top: "heat"
-  name: "heat"
+  top: "heat5"
+  name: "heat5"
   type: "Concat"
 }
 layer {

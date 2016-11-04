@@ -51,7 +51,7 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
     for i in db.test_ind:
         img = cv2.imread(db.get_img_path(i))
         _t['recognize_attr'].tic()
-        attr, heat, score = recognize_attr(net, img, db.attr_group, threshold)
+        attr, heat3, heat4, heat5, score = recognize_attr(net, img, db.attr_group, threshold)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
@@ -64,12 +64,15 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
                 w_func = lambda x: 0 if score[x] <= 0 else math.exp(score[x] + detector_weight[x])
                 find_target = lambda x: np.where(heat[x] == score[x])
                 w_sum = sum([w_func(j) for j in xrange(score.__len__())])
-                x = img.shape[1] * sum([w_func[j] / w_sum * find_target(j)[1] / heat[j].shape[1]
+                get_heat_map = lambda x: heat3[x] if x < heat3.shape[0] else \
+                                         heat4[x - heat3.shape[0]] if  x - heat3.shape[0] < heat4.shape[0] else \
+                                         heat5[x - heat3.shape[0] - heat4.shape[0]]
+                x = img.shape[1] * sum([w_func[j] / w_sum * find_target(j)[1] / get_heat_map(j).shape[1]
                                         for j in xrange(score.__len__())])
-                y = img.shape[0] * sum([w_func[j] / w_sum * find_target(j)[0] / heat[j].shape[0]
+                y = img.shape[0] * sum([w_func[j] / w_sum * find_target(j)[0] / get_heat_map(j).shape[0]
                                         for j in xrange(score.__len__())])
                 superposition = sum([
-                                        cv2.resize(heat[j] * gf(heat[j].size, y, x), img.shape)
+                                        cv2.resize(heat[j] * gf(get_heat_map(j).size, y, x), img.shape)
                                         for j in xrange(score.__len__())
                                         ])
                 mean = (superposition.max() + superposition.min()) / 2
