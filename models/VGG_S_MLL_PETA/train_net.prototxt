@@ -43,7 +43,7 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
