@@ -21,14 +21,12 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-import _init_path
-
 import argparse
+import cPickle
 import os
 import pprint
 import sys
 import time
-import cPickle
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
@@ -124,4 +122,7 @@ if __name__ == '__main__':
     f = open(args.dweight, 'rb')
     dweight = cPickle.load(f)
 
-    localize(net, db, args.output_dir, dweight, args.attr_id, True, os.path.join(args.output_dir, 'loc'))
+    localize(net, db, args.output_dir, dweight,
+             attr_id=args.attr_id,
+             vis=True,
+             save_dir=os.path.join(args.output_dir, 'loc'))

@@ -22,7 +22,6 @@
 # --------------------------------------------------------------------
 
 import cPickle
-import math
 import os
 
 import cv2
@@ -105,15 +104,3 @@ def estimate_param(net, db, output_dir, res_file):
                 break
         if utilized == 0:
             unutilized_detector.append(i)
-
-
-def gaussian_filter(shape, y, x, var=1):
-    filter_map = np.ndarray(shape)
-    for i in xrange(0, shape[0]):
-        for j in xrange(0, shape[1]):
-            filter_map[i][j] = math.exp(-(math.pow(i - x, 2) + math.pow(j - y, 2)) / 2 / var) / 2 / var / math.pi
-    return filter_map
-
-
-if __name__ == '__main__':
-    print gaussian_filter((8, 3), 2, 1)
