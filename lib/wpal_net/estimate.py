@@ -65,17 +65,18 @@ def estimate_param(net, db, output_dir, res_file):
     for v in scores:
         ave += np.array(v)
     ave /= len(scores)
+    sigma = np.sqrt(sum([s * s for s in scores])/len(scores) - ave * ave)
 
     binding = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
     # Estimate detector binding
     for i in xrange(len(attrs[0])):
         pos_ind = np.where(labels[:][i] > 0.5)[0]
         for j in pos_ind:
-            binding[i] += np.array(scores[j]) / (ave * len(pos_ind))
+            binding[i] += (np.array(scores[j]) - ave) / (sigma * len(pos_ind))
 
     detector_file = os.path.join(output_dir, 'detector.pkl')
     with open(detector_file, 'wb') as f:
-        cPickle.dump({'ave':ave,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
+        cPickle.dump({'ave':ave,'sigma':sigma,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
     # Sort the detectors by scores.
     detector_rank = [[j[0]
                       for j in sorted(enumerate(b), key=lambda x: x[1], reverse=1)]

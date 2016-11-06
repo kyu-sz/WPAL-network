@@ -122,9 +122,9 @@ if __name__ == '__main__':
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
     f = open(args.dweight, 'rb')
-    dweight = cPickle.load(f)
+    pack = cPickle.load(f)
 
-    localize(net, db, args.output_dir, dweight,
+    localize(net, db, args.output_dir, pack['ave'], pack['sigma'], pack['binding'],
              attr_id=args.attr_id,
              vis=True,
              save_dir=os.path.join(args.output_dir, 'loc'))

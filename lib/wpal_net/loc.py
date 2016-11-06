@@ -41,7 +41,7 @@ def gaussian_filter(shape, y, x, var=1):
     return filter_map
 
 
-def localize(net, db, output_dir, ave, dweight, attr_id=-1, vis=False, save_dir=None):
+def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, save_dir=None):
     """Test localization of a WPAL Network."""
 
     num_images = len(db.test_ind)
@@ -92,8 +92,8 @@ def localize(net, db, output_dir, ave, dweight, attr_id=-1, vis=False, save_dir=
         canvas = np.array(img, dtype=float)
         for attr in attr_list:
             w_func = lambda x: 0\
-                if score[x] <= 0 or dweight[attr][x] < weight_threshold[attr]\
-                else math.exp(score[x] / ave[x] + dweight[attr][x])
+                if dweight[attr][x] < weight_threshold[attr]\
+                else math.exp(dweight[attr][x]) * (score[x] - ave[x]) / sigma[x]
             w_sum = sum([w_func(j) for j in xrange(len(score))])
             get_heat_map = lambda x: heat3[x] if x < heat3.shape[0] else \
                 heat4[x - heat3.shape[0]] if x - heat3.shape[0] < heat4.shape[0] else \
