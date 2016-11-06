@@ -76,31 +76,4 @@ def estimate_param(net, db, output_dir, res_file):
     detector_file = os.path.join(output_dir, 'detector.pkl')
     with open(detector_file, 'wb') as f:
         cPickle.dump({'ave':ave,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
-    # Sort the detectors by scores.
-    detector_rank = [[j[0]
-                      for j in sorted(enumerate(b), key=lambda x: x[1], reverse=1)]
-                     for b in binding]
-    high_scores = [sorted(binding[i], reverse=1)[0:cfg.TRAIN.NUM_RESERVE_DETECTOR]
-                   for i in xrange(len(binding))]
 
-    # Estimate supervision threshold
-    t = sum(sum(high_scores[i]) for i in xrange(len(high_scores))) / len(high_scores) / len(high_scores[0])
-    mat = np.zeros((db.num_attr, cfg.NUM_DETECTOR))
-    # Find binding of the first cfg.TRAIN.NUM_RESERVE_DETECTOR detectors with highest scores.
-    for i in xrange(len(detector_rank)):
-        for j in xrange(cfg.TRAIN.NUM_RESERVE_DETECTOR):
-            mat[i][detector_rank[i][j]] = 1
-
-    # Find challenging attributes
-    # _, challenging = mA(attrs, db.labels[db.train_ind])
-
-    # Assign the rest detectors randomly to challenging attributes.
-    unutilized_detector = []
-    for i in xrange(cfg.NUM_DETECTOR):
-        utilized = 0
-        for j in xrange(len(mat)):
-            if mat[j][i] == 1:
-                utilized = 1
-                break
-        if utilized == 0:
-            unutilized_detector.append(i)
