@@ -41,7 +41,7 @@ def estimate_param(net, db, output_dir, res_file):
         cnt = 0
         for i in db.train_ind:
             img = cv2.imread(db.get_img_path(i))
-            attr, _, score = recognize_attr(net, img, db.attr_group)
+            attr, _, _, _, score = recognize_attr(net, img, db.attr_group)
             attrs.append(attr)
             scores.append([score[x][0][0] for x in range(len(score))])
             labels.append(db.labels[i])
@@ -105,20 +105,12 @@ def estimate_param(net, db, output_dir, res_file):
                 break
         if utilized == 0:
             unutilized_detector.append(i)
-            #       mat[challenging[randint(0, challenging.__len__() - 1)]][i] = 1
-
-    dtl_file = os.path.join(output_dir, 'detector_threshold.pkl')
-    with open(dtl_file, 'wb') as f:
-        cPickle.dump({
-            't': t,
-
-        }, f, cPickle.HIGHEST_PROTOCOL)
 
 
-def gaussian_filter(size, y, x, var=1):
-    filter_map = np.ndarray(size)
-    for i in xrange(0, size[0]):
-        for j in xrange(0, size[1]):
+def gaussian_filter(shape, y, x, var=1):
+    filter_map = np.ndarray(shape)
+    for i in xrange(0, shape[0]):
+        for j in xrange(0, shape[1]):
             filter_map[i][j] = math.exp(-(math.pow(i - x, 2) + math.pow(j - y, 2)) / 2 / var) / 2 / var / math.pi
     return filter_map
 

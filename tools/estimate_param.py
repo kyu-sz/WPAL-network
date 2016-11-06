@@ -80,13 +80,6 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    args.gpu_id = 2
-    args.prototxt = 'models/VGG_S_MLL_RAP/test_net.prototxt'
-    args.caffemodel = 'data/snapshots/VGG_S_MLL_RAP/0/RAP/vgg_s_mll_rap_iter_75000.caffemodel'
-    args.db = 'RAP'
-    #args.res = 'output/val.pkl'
-    #args.res = './output/attributes.pkl'
-
     if args.prototxt is None or args.caffemodel is None or args.db is None:
         parser.print_help()
         sys.exit()

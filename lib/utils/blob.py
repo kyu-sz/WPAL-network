@@ -32,7 +32,7 @@ def img_list_to_blob(images):
     return blob
 
 
-def prep_img_for_blob(img, pixel_means, target_size, max_area):
+def prep_img_for_blob(img, pixel_means, target_size, max_area, min_size):
     """Mean subtract and scale an image for use in a blob."""
     img = img.astype(np.float32, copy=False)
     img -= pixel_means
@@ -43,6 +43,9 @@ def prep_img_for_blob(img, pixel_means, target_size, max_area):
     # Prevent the scaled area from being more than MAX_AREA
     if np.round(img_scale * img_size_min * img_scale * img_size_max) > max_area:
         img_scale = math.sqrt(float(max_area) / float(img_size_min * img_size_max))
+    # Prevent the shorter sides from being less than MIN_SIZE
+    if np.round(img_scale * img_size_min < min_size):
+        img_scale = np.round(min_size / img_size_min) + 1
     img = cv2.resize(img, None, None, fx=img_scale, fy=img_scale, interpolation=cv2.INTER_LINEAR)
 
     # Perform RGB Jittering

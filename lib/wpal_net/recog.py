@@ -29,6 +29,10 @@ def _get_image_blob(img):
 	# Prevent the biggest axis from being more than MAX_SIZE
 	if np.round(img_scale * img_size_min * img_scale * img_size_max) > cfg.TEST.MAX_AREA:
 		img_scale = math.sqrt(float(cfg.TEST.MAX_AREA) / float(img_size_min * img_size_max))
+	# Prevent the shorter sides from being less than MIN_SIZE
+	if np.round(img_scale * img_size_min < cfg.MIN_SIZE):
+		img_scale = np.round(cfg.MIN_SIZE / img_size_min) + 1
+
 	img = cv2.resize(img_orig, None, None, fx=img_scale, fy=img_scale,
 	                 interpolation=cv2.INTER_LINEAR)
 	processed_images.append(img)

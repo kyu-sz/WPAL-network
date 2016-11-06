@@ -41,7 +41,7 @@ def mA(attr, gt):
 		acc = (sum([attr[j][i] * gt[j][i] for j in xrange(num)]) / sum([gt[j][i] for j in xrange(num)]) + sum(
 			[(1 - attr[j][i]) * (1 - gt[j][i]) for j in xrange(num)]) / sum([(1 - gt[j][i]) for j in xrange(num)])) / 2
 		print acc
-		if acc < 0.7:
+		if acc < 0.75:
 			challenging.append(i)
 
 	mA = (sum([(

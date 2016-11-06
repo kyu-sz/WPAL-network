@@ -97,7 +97,7 @@ def _get_image_blob(img_paths, scale_inds, flip):
             img = cv2.flip(img, 1)
         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
         img, img_scale = prep_img_for_blob(img, cfg.PIXEL_MEANS, target_size,
-                                           cfg.TRAIN.MAX_AREA)
+                                           cfg.TRAIN.MAX_AREA, cfg.MIN_SIZE)
         img_scales.append(img_scale)
         processed_imgs.append(img)
 

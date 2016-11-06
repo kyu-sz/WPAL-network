@@ -23,7 +23,7 @@ net: "models/GOOGLENET_PETA/train_net.prototxt"
 
 base_lr: 0.001
 lr_policy: "step"
-gamma: 0.5
+gamma: 0.75
 stepsize: 20000
 display: 100
 average_loss: 100

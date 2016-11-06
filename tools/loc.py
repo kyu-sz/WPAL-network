@@ -28,10 +28,11 @@ import os
 import pprint
 import sys
 import time
+import cPickle
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
-from wpal_net.test import test_net
+from wpal_net.loc import localize
 
 
 def parse_args():
@@ -65,10 +66,16 @@ def parse_args():
     parser.add_argument('--outputdir', dest='output_dir',
                         help='the directory to save outputs',
                         default='./output', type=str)
+    parser.add_argument('--detector-weight', dest='dweight',
+                        help='the cPickle file storing the weights of detectors',
+                        default=None, type=str)
+    parser.add_argument('--attr-id', dest='attr_id',
+                        help='the ID of the attribute to be localized and visualized. -1 for whole body outline',
+                        default=-1, type=int)
 
     args = parser.parse_args()
 
-    if args.prototxt is None or args.caffemodel is None or args.db is None:
+    if args.prototxt is None or args.caffemodel is None or args.db is None or args.dweight is None:
         parser.print_help()
         sys.exit()
 
@@ -114,4 +121,7 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
-    test_net(net, db, args.output_dir)
+    f = open(args.dweight, 'rb')
+    dweight = cPickle.load(f)
+
+    localize(net, db, args.output_dir, dweight, args.attr_id, True, os.path.join(args.output_dir, 'loc'))

@@ -48,20 +48,20 @@ cfg = __C
 __C.TRAIN = edict()
 
 # Scales to use during training (can list multiple scales)
-# Each scale is the pixel size of an image's longer side
-__C.TRAIN.SCALES = (272, 288, 304, 320, 336, 352, 368,)
+# Each scale is the pixel size of an image's longer sides
+__C.TRAIN.SCALES = (368, 384, 400, 416, 432, 448, 464, 480, 496, 512, 528)
 
 # Max pixel area size of a scaled input image
-__C.TRAIN.MAX_AREA = 35840
+__C.TRAIN.MAX_AREA = 129024
 
 # Minibatch size (number of samples per round)
-__C.TRAIN.BATCH_SIZE = 128
+__C.TRAIN.BATCH_SIZE = 16
 
 # Use horizontally-flipped images during training?
 __C.TRAIN.USE_FLIPPED = True
 
 # Iterations between tests
-__C.TRAIN.TEST_ITERS = 1000000
+__C.TRAIN.TEST_ITERS = 10000000
 
 # Iterations between snapshots
 __C.TRAIN.SNAPSHOT_ITERS = 5000
@@ -91,17 +91,19 @@ __C.TRAIN.NUM_RESERVE_DETECTOR = 64
 __C.TEST = edict()
 
 # Scale to use during testing
-# The scale is the pixel size of an image's longer side
-__C.TEST.SCALE = 320
+# The scale is the pixel size of a test image's longer sides
+__C.TEST.SCALE = 448
 
 # Max pixel area size of a scaled input image
-__C.TEST.MAX_AREA = 35840
+__C.TEST.MAX_AREA = 129024
 
 
 #
 # MISC
 #
 
+# Min pixel size of an input image's shorter side.
+__C.MIN_SIZE = 32
 
 # Pixel mean values (BGR order) as a (1, 1, 3) array
 # We use the same pixel mean for all networks even though it's not exactly what

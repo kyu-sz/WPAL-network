@@ -35,7 +35,7 @@ from estimate import gaussian_filter as gf
 from recog import recognize_attr
 
 
-def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=None):
+def test_net(net, db, output_dir):
     """Test a Weakly-supervised Pedestrian Attribute Localization Network on an image database."""
 
     num_images = len(db.test_ind)
@@ -49,46 +49,13 @@ def test_net(net, db, output_dir, vis=False, detector_weight=None, save_file=Non
 
     cnt = 0
     for i in db.test_ind:
-        img = cv2.imread(db.get_img_path(i))
+        img_path = db.get_img_path(i)
+        img = cv2.imread(img_path)
         _t['recognize_attr'].tic()
         attr, heat3, heat4, heat5, score = recognize_attr(net, img, db.attr_group, threshold)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
-
-        if vis:
-            if detector_weight is None:
-                print "Visualization need detector_weight to be not none!"
-                vis = False
-            else:
-                w_func = lambda x: 0 if score[x] <= 0 else math.exp(score[x] + detector_weight[x])
-                find_target = lambda x: np.where(heat[x] == score[x])
-                w_sum = sum([w_func(j) for j in xrange(score.__len__())])
-                get_heat_map = lambda x: heat3[x] if x < heat3.shape[0] else \
-                                         heat4[x - heat3.shape[0]] if  x - heat3.shape[0] < heat4.shape[0] else \
-                                         heat5[x - heat3.shape[0] - heat4.shape[0]]
-                x = img.shape[1] * sum([w_func[j] / w_sum * find_target(j)[1] / get_heat_map(j).shape[1]
-                                        for j in xrange(score.__len__())])
-                y = img.shape[0] * sum([w_func[j] / w_sum * find_target(j)[0] / get_heat_map(j).shape[0]
-                                        for j in xrange(score.__len__())])
-                superposition = sum([
-                                        cv2.resize(heat[j] * gf(get_heat_map(j).size, y, x), img.shape)
-                                        for j in xrange(score.__len__())
-                                        ])
-                mean = (superposition.max() + superposition.min()) / 2
-                range = superposition.max() - superposition.min()
-                superposition = (superposition - mean) * 128 / range
-                canvas = np.ndarray(img)
-                for j in xrange(img.size[0]):
-                    for k in xrange(img.size[1]):
-                        if superposition[j][k] >= 0:
-                            canvas[j][k][2] = min(255, canvas[j][k][2] + superposition[j][k])
-                        else:
-                            canvas[j][k][0] = min(255, canvas[j][k][0] - superposition[j][k])
-                cv2.imshow(db.get_img_path(i), canvas)
-                cv2.waitKey(0)
-                if save_file is not None:
-                    cv2.imwrite(save_file, img)
 
         if cnt % 100 == 0:
             print 'recognize_attr: {:d}/{:d} {:.3f}s' \

@@ -47,7 +47,7 @@ class DataLayer(caffe.Layer):
         self._db = db
 
         """Enable prefetch."""
-        self._blob_queue = Queue(10)
+        self._blob_queue = Queue(32)
         self._prefetch_process = BlobFetcher(self._blob_queue, self._db, do_flip)
         self._prefetch_process.start()
 
