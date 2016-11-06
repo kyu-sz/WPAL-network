@@ -49,7 +49,8 @@ def prep_img_for_blob(img, pixel_means, target_size, max_area, min_size):
     img = cv2.resize(img, None, None, fx=img_scale, fy=img_scale, interpolation=cv2.INTER_LINEAR)
     img = cv2.warpAffine(img,
                          cv2.getRotationMatrix2D((img.shape[1] / 2, img.shape[0] / 2),
-                                                 np.random.randint(-30, 30), 1))
+                                                 np.random.randint(-15, 15), 1),
+                         (img.shape[1],img.shape[0]))
 
     # Perform RGB Jittering
     h, w, c = img.shape

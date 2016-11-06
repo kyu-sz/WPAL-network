@@ -31,7 +31,6 @@ import cv2
 import numpy as np
 from utils.timer import Timer
 
-from estimate import gaussian_filter as gf
 from recog import recognize_attr
 
 
