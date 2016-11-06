@@ -73,9 +73,9 @@ def estimate_param(net, db, output_dir, res_file):
         for j in pos_ind:
             binding[i] += np.array(scores[j]) / (ave * len(pos_ind))
 
-    binding_file = os.path.join(output_dir, 'binding.pkl')
-    with open(binding_file, 'wb') as f:
-        cPickle.dump(binding, f, cPickle.HIGHEST_PROTOCOL)
+    detector_file = os.path.join(output_dir, 'detector.pkl')
+    with open(detector_file, 'wb') as f:
+        cPickle.dump({'ave':ave,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
     # Sort the detectors by scores.
     detector_rank = [[j[0]
                       for j in sorted(enumerate(b), key=lambda x: x[1], reverse=1)]
