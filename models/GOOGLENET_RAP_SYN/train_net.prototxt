@@ -2142,7 +2142,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "inception_5e/output"
+  bottom: "inception_5b/output"
   top: "conv5_l"
   name: "conv5_l"
   type: "Convolution"
@@ -2382,7 +2382,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "inception_5e/output"
+  bottom: "inception_5b/output"
   top: "conv5_es"
   name: "conv5_es"
   type: "Convolution"
