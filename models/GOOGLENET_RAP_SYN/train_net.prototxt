@@ -2813,23 +2813,23 @@ layer {
   bottom: "pool3_es"
   bottom: "attr"
   bottom: "weight"
-  name: "loss"
-  top: "loss"
+  name: "loss_es3"
+  top: "loss_es3"
   type: "SigmoidWeightedCrossEntropyLoss"
 }
 layer {
   bottom: "pool4_es"
   bottom: "attr"
   bottom: "weight"
-  name: "loss"
-  top: "loss"
+  name: "loss_es4"
+  top: "loss_es4"
   type: "SigmoidWeightedCrossEntropyLoss"
 }
 layer {
   bottom: "pool5_es"
   bottom: "attr"
   bottom: "weight"
-  name: "loss"
-  top: "loss"
+  name: "loss_es5"
+  top: "loss_es3"
   type: "SigmoidWeightedCrossEntropyLoss"
 }
