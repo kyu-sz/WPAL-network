@@ -60,23 +60,26 @@ def estimate_param(net, db, output_dir, res_file):
         labels = db.labels[db.train_ind]
         print 'Stored results loaded!'
 
-    # Calculate average score of a detector
-    ave = np.zeros(cfg.NUM_DETECTOR)
-    for v in scores:
-        ave += np.array(v)
-    ave /= len(scores)
-    sigma = np.sqrt(sum([s * s for s in scores])/len(scores) - ave * ave)
-
+    pos_ave = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
+    neg_ave = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
     binding = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
     # Estimate detector binding
-    for i in xrange(len(attrs[0])):
+    for i in xrange(db.num_attr):
         pos_ind = np.where(labels[:][i] > 0.5)[0]
+        neg_ind = np.where(labels[:][i] < 0.5)[0]
+        pos_sum = np.zeros(cfg.NUM_DETECTOR)
+        neg_sum = np.zeros(cfg.NUM_DETECTOR)
         for j in pos_ind:
-            binding[i] += (np.array(scores[j]) - ave) / (sigma * len(pos_ind))
+            pos_sum += np.exp(np.array(scores[j]))
+        for j in neg_ind:
+            neg_sum += np.exp(np.array(scores[j]))
+        pos_ave[i] = pos_sum / len(pos_ind)
+        neg_ave[i] = neg_sum / len(neg_sum)
+    binding = pos_ave / neg_ave
 
     detector_file = os.path.join(output_dir, 'detector.pkl')
     with open(detector_file, 'wb') as f:
-        cPickle.dump({'ave':ave,'sigma':sigma,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
+        cPickle.dump({'pos_ave':pos_ave,'neg_ave':neg_ave,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
     # Sort the detectors by scores.
     detector_rank = [[j[0]
                       for j in sorted(enumerate(b), key=lambda x: x[1], reverse=1)]
