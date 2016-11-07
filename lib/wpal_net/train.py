@@ -89,7 +89,7 @@ class SolverWrapper(object):
             if self._solver.iter % (10 * self._solver_param.display) == 0:
                 print 'speed: {:.3f}s / iter'.format(timer.average_time)
             if self._solver.iter % 10 == 0:
-            print "Python: iter", self._solver.iter
+                print "Python: iter", self._solver.iter
             if self._solver.iter % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = self._solver.iter
                 model_paths.append(self.snapshot())
