@@ -2233,7 +2233,7 @@ layer {
   }
 }
 layer {
-  bottom: "conv4_ft"
+  bottom: "conv4_l"
   top: "conv4_l"
   name: "ReLU4_l"
   type: "ReLU"
@@ -2265,7 +2265,7 @@ layer {
   }
 }
 layer {
-  bottom: "conv5_ft"
+  bottom: "conv5_l"
   top: "conv5_l"
   name: "ReLU5_l"
   type: "ReLU"
