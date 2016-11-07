@@ -28,13 +28,13 @@ import os
 
 import cv2
 import numpy as np
-from utils.timer import Timer
 
 from recog import recognize_attr
 from wpal_net.config import cfg
 
 
 def gaussian_filter(shape, y, x, var=1):
+    var = var * var * 100
     filter_map = np.ndarray(shape)
     for i in xrange(0, shape[0]):
         for j in xrange(0, shape[1]):
@@ -48,9 +48,6 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
     num_images = len(db.test_ind)
 
     all_attrs = [[] for _ in xrange(num_images)]
-
-    # timers
-    _t = {'recognize_attr' : Timer()}
 
     threshold = np.ones(db.num_attr) * 0.5;
 
@@ -80,9 +77,7 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
         img_area = h * w
         cross_len = math.sqrt(img_area) * 0.05
 
-        _t['recognize_attr'].tic()
         attr, heat3, heat4, heat5, score = recognize_attr(net, img, db.attr_group, threshold)
-        _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1
 
@@ -91,7 +86,8 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
                 .format(name, db.attr_eng[attr_id][0][0])
             continue
 
-        canvas = np.array(img, dtype=float)
+        #total_superposition = (np.zeros_like(img, dtype=float) + 1) * [16,-16,-16]
+        total_superposition = np.zeros_like(img, dtype=float)
         for attr in attr_list:
             w_func = lambda x: 0\
                 if dweight[attr][x] < weight_threshold[attr]\
@@ -111,9 +107,9 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
 
             target = [find_target(j)[:] for j in xrange(len(score))]
             # Center of the feature.
-            x = sum([w_func(j) / w_sum * target[j][1] / np.array(heat[j]).shape[1]
-                     for j in xrange(len(score))])
             y = sum([w_func(j) / w_sum * target[j][0] / np.array(heat[j]).shape[0]
+                     for j in xrange(len(score))])
+            x = sum([w_func(j) / w_sum * target[j][1] / np.array(heat[j]).shape[1]
                      for j in xrange(len(score))])
             # Superposition of the heat maps.
             superposition = sum([cv2.resize(w_func(j) / w_sum * heat[j]
@@ -129,38 +125,51 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
             superposition = (superposition - mean) * 255 / val_range
             for j in xrange(h):
                 for k in xrange(w):
-                    canvas[j][k][2] += superposition[j][k]
-                    canvas[j][k][0] -= superposition[j][k]
-            cv2.line(canvas, (w * x - cross_len, h * y), (w * x + cross_len, h * y), (0, 255, 255))
-            cv2.line(canvas, (w * x, h * y - cross_len), (w * x, h * y + cross_len), (0, 255, 255))
+                    total_superposition[j][k][2] += superposition[j][k]
+                    total_superposition[j][k][1] -= superposition[j][k]
+                    total_superposition[j][k][0] -= superposition[j][k]
+            cv2.line(total_superposition, (w * x - cross_len, h * y), (w * x + cross_len, h * y), (0, 255, 255))
+            cv2.line(total_superposition, (w * x, h * y - cross_len), (w * x, h * y + cross_len), (0, 255, 255))
 
             for j in xrange(h):
                 for k in xrange(w):
-                    canvas[j][k][2] = min(255, max(0, canvas[j][k][2]))
-                    canvas[j][k][0] = min(255, max(0, canvas[j][k][0]))
-            cv2.imshow("Loc", canvas.astype('uint8'))
+                    total_superposition[j][k][2] = min(255, max(0, total_superposition[j][k][2]))
+                    total_superposition[j][k][1] = min(255, max(0, total_superposition[j][k][1]))
+                    total_superposition[j][k][0] = min(255, max(0, total_superposition[j][k][0]))
+            cv2.imshow("sup", total_superposition.astype('uint8'))
+            cv2.imshow("img", img)
 
             for j in [_[0] for _ in sorted(enumerate([w_func(k) for k in xrange(len(score))]),
                                            key=lambda x:x[1],
                                            reverse=1)][0:8]:
                 print name, j, w_func(j)
-                val_scale = 255 / max(max(__) for __ in heat[j])
-                cv2.imshow("Heat", cv2.resize((heat[j] * val_scale).astype('uint8'), (img.shape[1], img.shape[0])))
+                val_scale = 255.0 / max(max(__) for __ in heat[j])
+                canvas = np.zeros_like(img)
+                canvas[..., 2] = cv2.resize((heat[j] * val_scale).astype('uint8'), (img.shape[1], img.shape[0]))
+                _y = 1.0 * target[j][0] / np.array(heat[j]).shape[0]
+                _x = 1.0 * target[j][1] / np.array(heat[j]).shape[1]
+                cv2.line(canvas, (w * _x - cross_len, h * _y), (w * _x + cross_len, h * _y), (0, 255, 255))
+                cv2.line(canvas, (w * _x, h * _y - cross_len), (w * _x, h * _y + cross_len), (0, 255, 255))
+                cv2.imshow("heat", canvas)
                 cv2.waitKey(0)
 
+        canvas = total_superposition + img
         for j in xrange(h):
             for k in xrange(w):
                 canvas[j][k][2] = min(255, max(0, canvas[j][k][2]))
+                canvas[j][k][1] = min(255, max(0, canvas[j][k][1]))
                 canvas[j][k][0] = min(255, max(0, canvas[j][k][0]))
         canvas = canvas.astype('uint8')
 
         if vis:
-            cv2.imshow("Loc", canvas)
+            cv2.imshow("img", canvas)
             cv2.waitKey(0)
         if save_dir is not None:
             cv2.imwrite(os.path.join(save_dir, name), img)
 
-    cv2.destroyWindow("Loc")
+    cv2.destroyWindow("heat")
+    cv2.destroyWindow("sup")
+    cv2.destroyWindow("img")
 
 if __name__ == '__main__':
     print gaussian_filter((8, 3), 2, 1)

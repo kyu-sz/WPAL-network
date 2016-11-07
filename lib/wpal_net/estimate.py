@@ -62,7 +62,6 @@ def estimate_param(net, db, output_dir, res_file):
 
     pos_ave = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
     neg_ave = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
-    binding = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
     # Estimate detector binding
     for i in xrange(db.num_attr):
         pos_ind = np.where(labels[:][i] > 0.5)[0]
