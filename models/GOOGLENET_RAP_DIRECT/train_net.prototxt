@@ -2331,7 +2331,7 @@ layer {
 }
 layer {
   bottom: "fc4_es2"
-  top: "fc4_e2s"
+  top: "fc4_es2"
   name: "fc4_es2"
   type: "ReLU"
 }
