@@ -2830,6 +2830,6 @@ layer {
   bottom: "attr"
   bottom: "weight"
   name: "loss_es5"
-  top: "loss_es3"
+  top: "loss_es5"
   type: "SigmoidWeightedCrossEntropyLoss"
 }
