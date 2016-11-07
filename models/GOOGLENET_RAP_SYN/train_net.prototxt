@@ -2646,11 +2646,12 @@ layer {
   }
   convolution_param {
     weight_filler {
-        type: "xavier"
+        type: "gaussian"
+        std: 0.005
     }
     bias_filler {
         type: "constant"
-        value: 0
+        value: 0.1
     }
     num_output: 92
     kernel_size: 1
@@ -2678,11 +2679,12 @@ layer {
   }
   convolution_param {
     weight_filler {
-        type: "xavier"
+        type: "gaussian"
+        std: 0.005
     }
     bias_filler {
         type: "constant"
-        value: 0
+        value: 0.1
     }
     num_output: 92
     kernel_size: 1
@@ -2709,11 +2711,12 @@ layer {
   }
   convolution_param {
     weight_filler {
-        type: "xavier"
+        type: "gaussian"
+        std: 0.005
     }
     bias_filler {
         type: "constant"
-        value: 0
+        value: 0.1
     }
     num_output: 92
     kernel_size: 1

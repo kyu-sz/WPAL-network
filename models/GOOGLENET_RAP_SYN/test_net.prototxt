@@ -2350,27 +2350,27 @@ layer {
 }
 ###################### Localization Layers ######################
 layer {
-  bottom: "conv3_e"
+  bottom: "conv3_l"
   top: "heat3"
   name: "heat3"
   type: "Concat"
 }
 layer {
-  bottom: "conv4_e"
+  bottom: "conv4_l"
   top: "heat4"
   name: "heat4"
   type: "Concat"
 }
 layer {
-  bottom: "conv5_e"
+  bottom: "conv5_l"
   top: "heat5"
   name: "heat5"
   type: "Concat"
 }
 layer {
-  bottom: "pool3_e"
-  bottom: "pool4_e"
-  bottom: "pool5_e"
+  bottom: "pool3_l"
+  bottom: "pool4_l"
+  bottom: "pool5_l"
   top: "score"
   name: "score"
   type: "Concat"
