@@ -205,7 +205,7 @@ layer {
   bottom: "conv5"
   top: "conv5"
 }
-########################## Extra Conv Layers ##########################
+########################## Feature Transform Conv Layers ##########################
 layer {
   bottom: "conv3"
   top: "conv3_e"

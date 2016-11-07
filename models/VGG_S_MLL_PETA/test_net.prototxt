@@ -222,7 +222,7 @@ layer {
     stride: 2
   }
 }
-########################## Extra Conv Layers ##########################
+########################## Feature Transform Conv Layers ##########################
 layer {
   bottom: "pool3"
   top: "conv3_e"

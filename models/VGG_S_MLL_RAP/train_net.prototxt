@@ -192,7 +192,7 @@ layer {
   name: "ReLU5"
   type: "ReLU"
 }
-########################## Extra Conv Layers ##########################
+########################## Feature Transform Conv Layers ##########################
 layer {
   bottom: "conv3"
   top: "conv3_e"
