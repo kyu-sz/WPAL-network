@@ -2076,106 +2076,9 @@ layer {
   bottom: "inception_5b/pool_proj"
   top: "inception_5b/output"
 }
-########################## Feature Transform Conv Layers ##########################
-layer {
-  bottom: "inception_4a/output"
-  top: "conv3_ft"
-  name: "conv3_ft"
-  type: "Convolution"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    weight_filler {
-        type: "xavier"
-    }
-    bias_filler {
-        type: "constant"
-        value: 0
-    }
-    num_output: 512
-    pad: 1
-    kernel_size: 3
-  }
-}
-layer {
-  bottom: "conv3_ft"
-  top: "conv3_ft"
-  name: "ReLU3_ft"
-  type: "ReLU"
-}
-layer {
-  bottom: "inception_4d/output"
-  top: "conv4_ft"
-  name: "conv4_ft"
-  type: "Convolution"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    weight_filler {
-        type: "xavier"
-    }
-    bias_filler {
-        type: "constant"
-        value: 0
-    }
-    num_output: 512
-    pad: 1
-    kernel_size: 3
-  }
-}
-layer {
-  bottom: "conv4_ft"
-  top: "conv4_ft"
-  name: "ReLU4_ft"
-  type: "ReLU"
-}
-layer {
-  bottom: "inception_5b/output"
-  top: "conv5_ft"
-  name: "conv5_ft"
-  type: "Convolution"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    weight_filler {
-        type: "xavier"
-    }
-    bias_filler {
-        type: "constant"
-        value: 0
-    }
-    num_output: 1024
-    pad: 1
-    kernel_size: 3
-  }
-}
-layer {
-  bottom: "conv5_ft"
-  top: "conv5_ft"
-  name: "ReLU5_ft"
-  type: "ReLU"
-}
 ########################## Latent Feature Layers ##########################
 layer {
-  bottom: "conv3_ft"
+  bottom: "inception_4a/output"
   top: "conv3_l"
   name: "conv3_l"
   type: "Convolution"
@@ -2207,7 +2110,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "conv4_ft"
+  bottom: "inception_4d/output"
   top: "conv4_l"
   name: "conv4_l"
   type: "Convolution"
@@ -2239,7 +2142,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "conv5_ft"
+  bottom: "inception_5e/output"
   top: "conv5_l"
   name: "conv5_l"
   type: "Convolution"
@@ -2415,7 +2318,7 @@ layer {
 }
 ########################## Explicit Searching Layers ##########################
 layer {
-  bottom: "conv3_ft"
+  bottom: "inception_4a/output"
   top: "conv3_es"
   name: "conv3_es"
   type: "Convolution"
@@ -2447,7 +2350,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "conv4_ft"
+  bottom: "inception_4d/output"
   top: "conv4_es"
   name: "conv4_es"
   type: "Convolution"
@@ -2479,7 +2382,7 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "conv5_ft"
+  bottom: "inception_5e/output"
   top: "conv5_es"
   name: "conv5_es"
   type: "Convolution"
