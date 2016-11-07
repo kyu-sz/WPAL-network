@@ -67,13 +67,14 @@ class SolverWrapper(object):
         net = self._solver.net
 
         filename = self._snapshot_prefix + ('{:d}'.format(self._solver.iter) + '.caffemodel')
-        filename = os.path.join(self._output_dir, filename)
+        filepath = os.path.join(self._output_dir, filename)
 
-	print 'Attempting to save snapshot to \"{:s}\"'.format(filename)
+        print 'Attempting to save snapshot to \"{}\"'.format(filepath)
+        os.makedirs(self._output_dir)
         net.save(str(filename))
-        print 'Wrote snapshot to: {:s}'.format(filename)
+        print 'Wrote snapshot to: {:s}'.format(filepath)
 
-        return filename
+        return filepath
 
     def train_model(self, max_iters):
         """Network training loop."""
@@ -88,7 +89,7 @@ class SolverWrapper(object):
             if self._solver.iter % (10 * self._solver_param.display) == 0:
                 print 'speed: {:.3f}s / iter'.format(timer.average_time)
             if self._solver.iter % 10 == 0:
-	        print "Python: iter", self._solver.iter
+            print "Python: iter", self._solver.iter
             if self._solver.iter % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = self._solver.iter
                 model_paths.append(self.snapshot())

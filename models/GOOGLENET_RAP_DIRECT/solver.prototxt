@@ -19,7 +19,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-net: "models/GOOGLENET_RAP_SYN/train_net.prototxt"
+net: "models/GOOGLENET_RAP_DIRECT/train_net.prototxt"
 
 base_lr: 0.001
 lr_policy: "step"
@@ -34,4 +34,4 @@ weight_decay: 0.0005
 snapshot: 0
 
 # We still use the snapshot prefix, though
-snapshot_prefix: "googlenet_rap_syn"
+snapshot_prefix: "googlenet_rap_direct"

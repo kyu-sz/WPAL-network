@@ -19,7 +19,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-name: "GOOGLENET_RAP_SYN"
+name: "GOOGLENET_RAP_DIRECT"
 
 input: "data"
 
