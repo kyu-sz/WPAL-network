@@ -2076,7 +2076,7 @@ layer {
   bottom: "inception_5b/pool_proj"
   top: "inception_5b/output"
 }
-########################## Extra Conv Layers ##########################
+########################## Feature Transform Conv Layers ##########################
 layer {
   bottom: "inception_4a/output"
   top: "conv3_e"
