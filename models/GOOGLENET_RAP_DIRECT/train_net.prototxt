@@ -2369,7 +2369,7 @@ layer {
 }
 #------- Global Pooling -------#
 layer {
-  bottom: "fc3_es"
+  bottom: "fc3_es2"
   top: "pool3_es"
   name: "pool3_es"
   type: "Pooling"
@@ -2394,7 +2394,7 @@ layer {
   }
 }
 layer {
-  bottom: "fc4_es"
+  bottom: "fc4_es2"
   top: "pool4_es"
   name: "pool4_es"
   type: "Pooling"
@@ -2417,8 +2417,9 @@ layer {
   dropout_param {
     dropout_ratio: 0.5
   }
-}layer {
-  bottom: "fc5_es"
+}
+layer {
+  bottom: "fc5_es2"
   top: "pool5_es"
   name: "pool5_es"
   type: "Pooling"
