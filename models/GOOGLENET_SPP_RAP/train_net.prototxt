@@ -2181,7 +2181,7 @@ layer {
   type: "SPP"
   spp_param {
     pool: MAX
-    global_pooling: 1
+    pyramid_height: 3
   }
 }
 layer {
@@ -2219,7 +2219,7 @@ layer {
   type: "SPP"
   spp_param {
     pool: MAX
-    global_pooling: 1
+    pyramid_height: 3
   }
 }
 layer {
