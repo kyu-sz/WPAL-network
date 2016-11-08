@@ -72,7 +72,7 @@ class SolverWrapper(object):
         print 'Attempting to save snapshot to \"{}\"'.format(filepath)
         if not os.path.exists(self._output_dir):        
             os.makedirs(self._output_dir)
-        net.save(str(filename))
+        net.save(str(filepath))
         print 'Wrote snapshot to: {:s}'.format(filepath)
 
         return filepath

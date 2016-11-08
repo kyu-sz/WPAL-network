@@ -2104,7 +2104,7 @@ layer {
 layer {
   bottom: "conv3_e"
   top: "conv3_e"
-  name: "ReLU3_e"
+  name: "prelu_conv3_e"
   type: "ReLU"
 }
 layer {
@@ -2136,7 +2136,7 @@ layer {
 layer {
   bottom: "conv4_e"
   top: "conv4_e"
-  name: "ReLU4_e"
+  name: "prelu_conv4_e"
   type: "ReLU"
 }
 layer {
@@ -2168,7 +2168,7 @@ layer {
 layer {
   bottom: "conv5_e"
   top: "conv5_e"
-  name: "ReLU5_e"
+  name: "prelu_conv5_e"
   type: "ReLU"
 }
 ########################## SPP Layers ##########################
@@ -2241,7 +2241,7 @@ layer {
 layer {
   bottom: "fc3_e"
   top: "fc3_e"
-  name: "relu3_e"
+  name: "prelu_fc3_e"
   type: "ReLU"
 }
 layer {
@@ -2281,7 +2281,7 @@ layer {
 layer {
   bottom: "fc4_e"
   top: "fc4_e"
-  name: "relu4_e"
+  name: "prelu_fc4_e"
   type: "ReLU"
 }
 layer {
@@ -2321,7 +2321,7 @@ layer {
 layer {
   bottom: "fc5_e"
   top: "fc5_e"
-  name: "relu5_e"
+  name: "prelu_fc5_e"
   type: "ReLU"
 }
 layer {
@@ -2347,8 +2347,39 @@ layer {
   top: "fc_syn1"
   name: "fc_syn1"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
     num_output: 2048
+  }
+}
+layer {
+  bottom: "fc_syn1"
+  top: "fc_syn1"
+  name: "prelu_syn1"
+  type: "ReLU"
+}
+layer {
+  bottom: "fc_syn1"
+  top: "fc_syn1"
+  name: "drop"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
   }
 }
 layer {
@@ -2356,7 +2387,23 @@ layer {
   top: "fc_syn2"
   name: "fc_syn2"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
     num_output: 92
   }
 }

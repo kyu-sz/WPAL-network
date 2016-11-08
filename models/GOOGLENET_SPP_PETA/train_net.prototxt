@@ -2106,7 +2106,7 @@ layer {
 layer {
   bottom: "conv3_e"
   top: "conv3_e"
-  name: "ReLU3_e"
+  name: "relu_conv3_e"
   type: "ReLU"
 }
 layer {
@@ -2138,7 +2138,7 @@ layer {
 layer {
   bottom: "conv4_e"
   top: "conv4_e"
-  name: "ReLU4_e"
+  name: "relu_conv4_e"
   type: "ReLU"
 }
 layer {
@@ -2170,7 +2170,7 @@ layer {
 layer {
   bottom: "conv5_e"
   top: "conv5_e"
-  name: "ReLU5_e"
+  name: "relu_conv5_e"
   type: "ReLU"
 }
 ########################## SPP Layers ##########################
@@ -2243,7 +2243,7 @@ layer {
 layer {
   bottom: "fc3_e"
   top: "fc3_e"
-  name: "relu3_e"
+  name: "relu_fc3_e"
   type: "ReLU"
 }
 layer {
@@ -2283,7 +2283,7 @@ layer {
 layer {
   bottom: "fc4_e"
   top: "fc4_e"
-  name: "relu4_e"
+  name: "relu_fc4_e"
   type: "ReLU"
 }
 layer {
@@ -2323,7 +2323,7 @@ layer {
 layer {
   bottom: "fc5_e"
   top: "fc5_e"
-  name: "relu5_e"
+  name: "relu_fc5_e"
   type: "ReLU"
 }
 layer {
@@ -2368,6 +2368,12 @@ layer {
     }
     num_output: 2048
   }
+}
+layer {
+  bottom: "fc_syn1"
+  top: "fc_syn1"
+  name: "relu_syn1"
+  type: "ReLU"
 }
 layer {
   bottom: "fc_syn1"

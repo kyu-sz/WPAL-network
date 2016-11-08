@@ -49,7 +49,7 @@ __C.TRAIN = edict()
 
 # Scales to use during training (can list multiple scales)
 # Each scale is the pixel size of an image's longer sides
-__C.TRAIN.SCALES = (368, 384, 400, 416, 432, 448, 464, 480, 496, 512, 528)
+__C.TRAIN.SCALES = (384, 400, 416, 432, 448, 464, 480, 496, 512)
 
 # Max pixel area size of a scaled input image
 __C.TRAIN.MAX_AREA = 102144
