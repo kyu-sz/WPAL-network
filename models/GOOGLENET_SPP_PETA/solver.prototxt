@@ -21,8 +21,8 @@
 
 net: "models/GOOGLENET_SPP_PETA/train_net.prototxt"
 
-regularization_type: "L1"
-base_lr: 0.0005
+#regularization_type: "L1"
+base_lr: 0.001
 lr_policy: "step"
 gamma: 0.75
 stepsize: 20000

@@ -49,10 +49,10 @@ __C.TRAIN = edict()
 
 # Scales to use during training (can list multiple scales)
 # Each scale is the pixel size of an image's longer sides
-__C.TRAIN.SCALES = (336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496)
+__C.TRAIN.SCALES = (368, 384, 400, 416, 432, 448, 464, 480, 496, 512, 528)
 
 # Max pixel area size of a scaled input image
-__C.TRAIN.MAX_AREA = 93184
+__C.TRAIN.MAX_AREA = 102144
 
 # Minibatch size (number of samples per round)
 __C.TRAIN.BATCH_SIZE = 16
@@ -92,10 +92,10 @@ __C.TEST = edict()
 
 # Scale to use during testing
 # The scale is the pixel size of a test image's longer sides
-__C.TEST.SCALE = 416
+__C.TEST.SCALE = 448
 
 # Max pixel area size of a scaled input image
-__C.TEST.MAX_AREA = 93184
+__C.TEST.MAX_AREA = 102144
 
 
 #
