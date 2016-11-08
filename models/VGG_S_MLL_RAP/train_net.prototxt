@@ -208,7 +208,7 @@ layer {
   }
   convolution_param {
     weight_filler {
-        type: "xavier"
+        type: "msra"
     }
     bias_filler {
         type: "constant"
@@ -240,7 +240,7 @@ layer {
   }
   convolution_param {
     weight_filler {
-        type: "xavier"
+        type: "msra"
     }
     bias_filler {
         type: "constant"
@@ -272,7 +272,7 @@ layer {
   }
   convolution_param {
     weight_filler {
-        type: "xavier"
+        type: "msra"
     }
     bias_filler {
         type: "constant"
