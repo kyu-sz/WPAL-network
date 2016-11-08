@@ -52,7 +52,7 @@ __C.TRAIN = edict()
 __C.TRAIN.SCALES = (336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496)
 
 # Max pixel area size of a scaled input image
-__C.TRAIN.MAX_AREA = 106496
+__C.TRAIN.MAX_AREA = 93184
 
 # Minibatch size (number of samples per round)
 __C.TRAIN.BATCH_SIZE = 16
@@ -95,7 +95,7 @@ __C.TEST = edict()
 __C.TEST.SCALE = 416
 
 # Max pixel area size of a scaled input image
-__C.TEST.MAX_AREA = 106496
+__C.TEST.MAX_AREA = 93184
 
 
 #
@@ -103,7 +103,7 @@ __C.TEST.MAX_AREA = 106496
 #
 
 # Min pixel size of an input image's shorter side.
-__C.MIN_SIZE = 64
+__C.MIN_SIZE = 96
 
 # Pixel mean values (BGR order) as a (1, 1, 3) array
 # We use the same pixel mean for all networks even though it's not exactly what
