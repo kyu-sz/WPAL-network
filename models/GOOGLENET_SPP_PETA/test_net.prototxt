@@ -2181,19 +2181,9 @@ layer {
     pool: MAX
     pyramid_height: 2
     base_bin_h: 3
-    overlap_ratio_h: 0.1
-    base_bin_w: 1
+    overlap_ratio_h: 0.2
     fineness_w: 3
-    overlap_ratio_w: 0.1
-  }
-}
-layer {
-  bottom: "spp3"
-  top: "spp3"
-  name: "drop3_spp"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
+    overlap_ratio_w: 0.2
   }
 }
 layer {
@@ -2206,18 +2196,8 @@ layer {
     pyramid_height: 2
     base_bin_h: 3
     overlap_ratio_h: 0.1
-    base_bin_w: 1
     fineness_w: 3
     overlap_ratio_w: 0.1
-  }
-}
-layer {
-  bottom: "spp4"
-  top: "spp4"
-  name: "drop4_spp"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
   }
 }
 layer {
@@ -2227,18 +2207,9 @@ layer {
   type: "SPP"
   spp_param {
     pool: MAX
-    pyramid_height: 1
-    base_bin_h: 3
-    base_bin_w: 1
-  }
-}
-layer {
-  bottom: "spp5"
-  top: "spp5"
-  name: "drop5_spp"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.5
+    pyramid_height: 2
+    fineness_h: 3
+    fineness_w: 1
   }
 }
 ########################## Independent FC Layers ##########################
