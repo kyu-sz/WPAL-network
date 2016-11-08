@@ -19,7 +19,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-name: "GOOGLENET_SPP_RAP"
+name: "GOOGLENET_SPP_PETA"
 
 input: "data"
 
@@ -2374,7 +2374,7 @@ layer {
   name: "fc_syn2"
   type: "InnerProduct"
   inner_product_param {
-    num_output: 92
+    num_output: 35
   }
 }
 ####################### Predicting Layer #######################
