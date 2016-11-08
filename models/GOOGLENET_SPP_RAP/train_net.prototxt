@@ -2098,7 +2098,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 512
+    num_output: 256
     pad: 1
     kernel_size: 3
   }
@@ -2130,7 +2130,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 512
+    num_output: 264
     pad: 1
     kernel_size: 3
   }
@@ -2162,7 +2162,7 @@ layer {
         type: "constant"
         value: 0
     }
-    num_output: 1024
+    num_output: 512
     pad: 1
     kernel_size: 3
   }
@@ -2182,7 +2182,7 @@ layer {
   spp_param {
     pool: MAX
     pyramid_height: 2
-    base_bin_h: 3
+    fineness_h: 5
     overlap_ratio_h: 0.2
     fineness_w: 3
     overlap_ratio_w: 0.2
@@ -2196,7 +2196,7 @@ layer {
   spp_param {
     pool: MAX
     pyramid_height: 2
-    base_bin_h: 3
+    fineness_h: 3
     overlap_ratio_h: 0.1
     fineness_w: 3
     overlap_ratio_w: 0.1
