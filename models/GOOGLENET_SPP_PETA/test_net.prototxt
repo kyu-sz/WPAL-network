@@ -2179,7 +2179,12 @@ layer {
   type: "SPP"
   spp_param {
     pool: MAX
-    pyramid_height: 3
+    pyramid_height: 2
+    base_bin_h: 3
+    overlap_ratio_h: 0.1
+    base_bin_w: 1
+    fineness_w: 3
+    overlap_ratio_w: 0.1
   }
 }
 layer {
@@ -2198,7 +2203,12 @@ layer {
   type: "SPP"
   spp_param {
     pool: MAX
-    pyramid_height: 3
+    pyramid_height: 2
+    base_bin_h: 3
+    overlap_ratio_h: 0.1
+    base_bin_w: 1
+    fineness_w: 3
+    overlap_ratio_w: 0.1
   }
 }
 layer {
@@ -2217,7 +2227,9 @@ layer {
   type: "SPP"
   spp_param {
     pool: MAX
-    pyramid_height: 3
+    pyramid_height: 1
+    base_bin_h: 3
+    base_bin_w: 1
   }
 }
 layer {
@@ -2252,7 +2264,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 1024
+    num_output: 512
   }
 }
 layer {
@@ -2292,7 +2304,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 1024
+    num_output: 512
   }
 }
 layer {
@@ -2332,7 +2344,7 @@ layer {
         type: "constant"
         value: 0.1
     }
-    num_output: 2048
+    num_output: 1024
   }
 }
 layer {
@@ -2365,7 +2377,7 @@ layer {
   name: "fc_syn1"
   type: "InnerProduct"
   inner_product_param {
-    num_output: 4096
+    num_output: 2048
   }
 }
 layer {
