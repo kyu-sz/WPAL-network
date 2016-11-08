@@ -19,17 +19,19 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-name: "GOOGLENET_RAP"
+name: "GOOGLENET_SPP_RAP"
 
-input: "data"
-
-input_shape {
-  dim: 1
-  dim: 3
-  dim: 224
-  dim: 224
+layer {
+  name: "input-data"
+  type: "Python"
+  top: "data"
+  top: "attr"
+  top: "weight"
+  python_param {
+    module: "data_layer.layer"
+    layer: "DataLayer"
+  }
 }
-
 ########################## GOOGLENET ##########################
 layer {
   name: "conv1/7x7_s2"
@@ -2171,40 +2173,67 @@ layer {
   name: "ReLU5_e"
   type: "ReLU"
 }
-########################## Global Pooling Layers ##########################
+########################## SPP Layers ##########################
 layer {
   bottom: "conv3_e"
-  top: "pool3_e"
-  name: "pool3_e"
-  type: "Pooling"
-  pooling_param {
+  top: "spp3"
+  name: "spp3"
+  type: "SPP"
+  spp_param {
     pool: MAX
     global_pooling: 1
+  }
+}
+layer {
+  bottom: "spp3"
+  top: "spp3"
+  name: "drop3_spp"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
   }
 }
 layer {
   bottom: "conv4_e"
-  top: "pool4_e"
-  name: "pool4_e"
-  type: "Pooling"
-  pooling_param {
+  top: "spp4"
+  name: "spp4"
+  type: "SPP"
+  spp_param {
     pool: MAX
-    global_pooling: 1
+    pyramid_height: 3
+  }
+}
+layer {
+  bottom: "spp4"
+  top: "spp4"
+  name: "drop4_spp"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
   }
 }
 layer {
   bottom: "conv5_e"
-  top: "pool5_e"
-  name: "pool5_e"
-  type: "Pooling"
-  pooling_param {
+  top: "spp5"
+  name: "spp5"
+  type: "SPP"
+  spp_param {
     pool: MAX
     global_pooling: 1
   }
 }
+layer {
+  bottom: "spp5"
+  top: "spp5"
+  name: "drop5_spp"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
 ########################## Independent FC Layers ##########################
 layer {
-  bottom: "pool3_e"
+  bottom: "spp3"
   top: "fc3_e"
   name: "fc3_e"
   type: "InnerProduct"
@@ -2235,7 +2264,16 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "pool4_e"
+  bottom: "fc3_e"
+  top: "fc3_e"
+  name: "drop3"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  bottom: "spp4"
   top: "fc4_e"
   name: "fc4_e"
   type: "InnerProduct"
@@ -2266,7 +2304,16 @@ layer {
   type: "ReLU"
 }
 layer {
-  bottom: "pool5_e"
+  bottom: "fc4_e"
+  top: "fc4_e"
+  name: "drop4"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  bottom: "spp5"
   top: "fc5_e"
   name: "fc5_e"
   type: "InnerProduct"
@@ -2296,6 +2343,15 @@ layer {
   name: "relu5_e"
   type: "ReLU"
 }
+layer {
+  bottom: "fc5_e"
+  top: "fc5_e"
+  name: "drop5"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
 ########################## Synthesis Layers ##########################
 layer {
   name: "concat"
@@ -2310,8 +2366,33 @@ layer {
   top: "fc_syn1"
   name: "fc_syn1"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
-    num_output: 2048
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
+    num_output: 4096
+  }
+}
+layer {
+  bottom: "fc_syn1"
+  top: "fc_syn1"
+  name: "drop"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.5
   }
 }
 layer {
@@ -2319,41 +2400,32 @@ layer {
   top: "fc_syn2"
   name: "fc_syn2"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
     num_output: 92
   }
 }
-####################### Predicting Layer #######################
+########################## Loss Layer ##########################
 layer {
   bottom: "fc_syn2"
-  name: "pred"
-  top: "pred"
-  type: "Sigmoid"
-}
-###################### Localization Layers ######################
-layer {
-  bottom: "conv3_e"
-  top: "heat3"
-  name: "heat3"
-  type: "Concat"
-}
-layer {
-  bottom: "conv4_e"
-  top: "heat4"
-  name: "heat4"
-  type: "Concat"
-}
-layer {
-  bottom: "conv5_e"
-  top: "heat5"
-  name: "heat5"
-  type: "Concat"
-}
-layer {
-  bottom: "pool3_e"
-  bottom: "pool4_e"
-  bottom: "pool5_e"
-  top: "score"
-  name: "score"
-  type: "Concat"
+  bottom: "attr"
+  bottom: "weight"
+  name: "loss"
+  top: "loss"
+  type: "SigmoidWeightedCrossEntropyLoss"
 }

@@ -336,12 +336,6 @@ layer {
 layer {
   bottom: "pool3_e"
   top: "pool3_e"
-  name: "relu3_e"
-  type: "ReLU"
-}
-layer {
-  bottom: "pool3_e"
-  top: "pool3_e"
   name: "drop3_p"
   type: "Dropout"
   dropout_param {
@@ -361,12 +355,6 @@ layer {
 layer {
   bottom: "pool4_e"
   top: "pool4_e"
-  name: "relu4_e"
-  type: "ReLU"
-}
-layer {
-  bottom: "pool4_e"
-  top: "pool4_e"
   name: "drop4_p"
   type: "Dropout"
   dropout_param {
@@ -382,12 +370,6 @@ layer {
     pool: MAX
     global_pooling: 1
   }
-}
-layer {
-  bottom: "pool5_e"
-  top: "pool5_e"
-  name: "relu5_e"
-  type: "ReLU"
 }
 layer {
   bottom: "pool5_e"
@@ -513,6 +495,12 @@ layer {
 layer {
   bottom: "fc5_e"
   top: "fc5_e"
+layer {
+  bottom: "pool3_e"
+  top: "pool3_e"
+  name: "relu3_e"
+  type: "ReLU"
+}
   name: "drop5"
   type: "Dropout"
   dropout_param {

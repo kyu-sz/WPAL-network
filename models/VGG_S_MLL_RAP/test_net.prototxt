@@ -299,12 +299,6 @@ layer {
   }
 }
 layer {
-  bottom: "pool3_e"
-  top: "pool3_e"
-  name: "relu3_e"
-  type: "ReLU"
-}
-layer {
   bottom: "conv4_e"
   top: "pool4_e"
   name: "pool4_e"
@@ -315,12 +309,6 @@ layer {
   }
 }
 layer {
-  bottom: "pool4_e"
-  top: "pool4_e"
-  name: "relu4_e"
-  type: "ReLU"
-}
-layer {
   bottom: "conv5_e"
   top: "pool5_e"
   name: "pool5_e"
@@ -329,12 +317,6 @@ layer {
     pool: MAX
     global_pooling: 1
   }
-}
-layer {
-  bottom: "pool5_e"
-  top: "pool5_e"
-  name: "relu5_e"
-  type: "ReLU"
 }
 ########################## Independent FC Layers ##########################
 layer {

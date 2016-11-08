@@ -29,6 +29,7 @@ input_shape {
   dim: 224
   dim: 224
 }
+
 ########################## GOOGLENET ##########################
 layer {
   name: "conv1/7x7_s2"
@@ -2076,8 +2077,8 @@ layer {
 ########################## Feature Transform Conv Layers ##########################
 layer {
   bottom: "inception_4a/output"
-  top: "conv3_ft"
-  name: "conv3_ft"
+  top: "conv3_e"
+  name: "conv3_e"
   type: "Convolution"
   param {
     lr_mult: 1
@@ -2101,15 +2102,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_ft"
-  top: "conv3_ft"
-  name: "ReLU3_ft"
+  bottom: "conv3_e"
+  top: "conv3_e"
+  name: "ReLU3_e"
   type: "ReLU"
 }
 layer {
   bottom: "inception_4d/output"
-  top: "conv4_ft"
-  name: "conv4_ft"
+  top: "conv4_e"
+  name: "conv4_e"
   type: "Convolution"
   param {
     lr_mult: 1
@@ -2133,15 +2134,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv4_ft"
-  top: "conv4_ft"
-  name: "ReLU4_ft"
+  bottom: "conv4_e"
+  top: "conv4_e"
+  name: "ReLU4_e"
   type: "ReLU"
 }
 layer {
   bottom: "inception_5b/output"
-  top: "conv5_ft"
-  name: "conv5_ft"
+  top: "conv5_e"
+  name: "conv5_e"
   type: "Convolution"
   param {
     lr_mult: 1
@@ -2165,16 +2166,16 @@ layer {
   }
 }
 layer {
-  bottom: "conv5_ft"
-  top: "conv5_ft"
-  name: "ReLU5_ft"
+  bottom: "conv5_e"
+  top: "conv5_e"
+  name: "ReLU5_e"
   type: "ReLU"
 }
-########################## Explicit Searching Conv Layers ##########################
+########################## Global Pooling Layers ##########################
 layer {
-  bottom: "conv3_ft"
-  top: "pool3_ft"
-  name: "pool3_ft"
+  bottom: "conv3_e"
+  top: "pool3_e"
+  name: "pool3_e"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -2182,15 +2183,9 @@ layer {
   }
 }
 layer {
-  bottom: "pool3_ft"
-  top: "pool3_ft"
-  name: "relu3_ft"
-  type: "ReLU"
-}
-layer {
-  bottom: "conv4_ft"
-  top: "pool4_ft"
-  name: "pool4_ft"
+  bottom: "conv4_e"
+  top: "pool4_e"
+  name: "pool4_e"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -2198,79 +2193,115 @@ layer {
   }
 }
 layer {
-  bottom: "pool4_ft"
-  top: "pool4_ft"
-  name: "relu4_ft"
-  type: "ReLU"
-}
-layer {
-  bottom: "conv5_ft"
-  top: "pool5_ft"
-  name: "pool5_ft"
+  bottom: "conv5_e"
+  top: "pool5_e"
+  name: "pool5_e"
   type: "Pooling"
   pooling_param {
     pool: MAX
     global_pooling: 1
   }
-}
-layer {
-  bottom: "pool5_ft"
-  top: "pool5_ft"
-  name: "relu5_ft"
-  type: "ReLU"
 }
 ########################## Independent FC Layers ##########################
 layer {
-  bottom: "pool3_ft"
-  top: "fc3_ft"
-  name: "fc3_ft"
+  bottom: "pool3_e"
+  top: "fc3_e"
+  name: "fc3_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
     num_output: 512
   }
 }
 layer {
-  bottom: "fc3_ft"
-  top: "fc3_ft"
-  name: "relu3_ft"
+  bottom: "fc3_e"
+  top: "fc3_e"
+  name: "relu3_e"
   type: "ReLU"
 }
 layer {
-  bottom: "pool4_ft"
-  top: "fc4_ft"
-  name: "fc4_ft"
+  bottom: "pool4_e"
+  top: "fc4_e"
+  name: "fc4_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
     num_output: 512
   }
 }
 layer {
-  bottom: "fc4_ft"
-  top: "fc4_ft"
-  name: "relu4_ft"
+  bottom: "fc4_e"
+  top: "fc4_e"
+  name: "relu4_e"
   type: "ReLU"
 }
 layer {
-  bottom: "pool5_ft"
-  top: "fc5_ft"
-  name: "fc5_ft"
+  bottom: "pool5_e"
+  top: "fc5_e"
+  name: "fc5_e"
   type: "InnerProduct"
+  param {
+    lr_mult: 0.5
+    decay_mult: 0.5
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
   inner_product_param {
+    weight_filler {
+        type: "gaussian"
+        std: 0.005
+    }
+    bias_filler {
+        type: "constant"
+        value: 0.1
+    }
     num_output: 1024
   }
 }
 layer {
-  bottom: "fc5_ft"
-  top: "fc5_ft"
-  name: "relu5_ft"
+  bottom: "fc5_e"
+  top: "fc5_e"
+  name: "relu5_e"
   type: "ReLU"
 }
 ########################## Synthesis Layers ##########################
 layer {
   name: "concat"
-  bottom: "fc3_ft"
-  bottom: "fc4_ft"
-  bottom: "fc5_ft"
+  bottom: "fc3_e"
+  bottom: "fc4_e"
+  bottom: "fc5_e"
   top: "concat"
   type: "Concat"
 }
@@ -2301,27 +2332,27 @@ layer {
 }
 ###################### Localization Layers ######################
 layer {
-  bottom: "conv3_ft"
+  bottom: "conv3_e"
   top: "heat3"
   name: "heat3"
   type: "Concat"
 }
 layer {
-  bottom: "conv4_ft"
+  bottom: "conv4_e"
   top: "heat4"
   name: "heat4"
   type: "Concat"
 }
 layer {
-  bottom: "conv5_ft"
+  bottom: "conv5_e"
   top: "heat5"
   name: "heat5"
   type: "Concat"
 }
 layer {
-  bottom: "pool3_ft"
-  bottom: "pool4_ft"
-  bottom: "pool5_ft"
+  bottom: "pool3_e"
+  bottom: "pool4_e"
+  bottom: "pool5_e"
   top: "score"
   name: "score"
   type: "Concat"
