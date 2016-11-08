@@ -97,6 +97,7 @@ if __name__ == '__main__':
     else:
         caffe.set_mode_gpu()
         caffe.set_device(args.gpu_id)
+    caffe.set_random_seed(cfg.RNG_SEED)
 
     if args.db == 'RAP':
         """Load RAP database"""

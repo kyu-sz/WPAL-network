@@ -22,7 +22,7 @@
 net: "models/GOOGLENET_RAP/train_net.prototxt"
 
 regularization_type: "L1"
-base_lr: 0.001
+base_lr: 0.0001
 lr_policy: "step"
 gamma: 0.75
 stepsize: 20000
