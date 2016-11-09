@@ -60,14 +60,14 @@ def estimate_param(net, db, output_dir, res_file):
         labels = db.labels[db.train_ind]
         print 'Stored results loaded!'
 
-    pos_ave = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
-    neg_ave = np.zeros((db.num_attr, cfg.NUM_DETECTOR))  # binding between attribute and detector
+    pos_ave = np.zeros((db.num_attr, len(scores)))  # binding between attribute and detector or detector bin
+    neg_ave = np.zeros((db.num_attr, len(scores)))  # binding between attribute and detector or detector bin
     # Estimate detector binding
     for i in xrange(db.num_attr):
         pos_ind = np.where(labels[:][i] > 0.5)[0]
         neg_ind = np.where(labels[:][i] < 0.5)[0]
-        pos_sum = np.zeros(cfg.NUM_DETECTOR)
-        neg_sum = np.zeros(cfg.NUM_DETECTOR)
+        pos_sum = np.zeros(len(scores))
+        neg_sum = np.zeros(len(scores))
         for j in pos_ind:
             pos_sum += np.exp(np.array(scores[j]))
         for j in neg_ind:
@@ -79,10 +79,4 @@ def estimate_param(net, db, output_dir, res_file):
     detector_file = os.path.join(output_dir, 'detector.pkl')
     with open(detector_file, 'wb') as f:
         cPickle.dump({'pos_ave':pos_ave,'neg_ave':neg_ave,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
-    # Sort the detectors by scores.
-    detector_rank = [[j[0]
-                      for j in sorted(enumerate(b), key=lambda x: x[1], reverse=1)]
-                     for b in binding]
-    high_scores = [sorted(binding[i], reverse=1)[0:cfg.TRAIN.NUM_RESERVE_DETECTOR]
-                   for i in xrange(len(binding))]
 

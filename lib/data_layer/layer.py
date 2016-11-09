@@ -21,7 +21,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-"""The data layer used during training to train a WPAL-net.
+"""The data layer used during training to train a WPAL-network.
 DataLayer implements a Caffe Python layer.
 """
 
@@ -35,7 +35,7 @@ import caffe
 
 
 class DataLayer(caffe.Layer):
-    """WPAL-net data layer used for training."""
+    """WPAL-network data layer used for training."""
 
     def _get_next_minibatch(self):
         """Return the blobs to be used for the next mini-batch.

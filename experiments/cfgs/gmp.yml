@@ -1,0 +1,24 @@
+SPP: False
+LOC:
+    LAYERS:
+        - {
+            NAME: conv3_e
+            NUM_DETECTOR: 512
+            NUM_BIN:
+                - [1,1]
+            OVERLAP: [0, 0]
+        }
+        - {
+            NAME: conv4_e
+            NUM_DETECTOR: 512
+            NUM_BIN:
+                - [1,1]
+            OVERLAP: [0, 0]
+        }
+        - {
+            NAME: conv5_e:
+            NUM_DETECTOR: 1024
+            NUM_BIN:
+                - [1,1]
+            OVERLAP: [0, 0]
+        }
