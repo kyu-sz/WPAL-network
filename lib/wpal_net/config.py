@@ -21,8 +21,8 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------
 
-"""WPAL-net cfg system.
-This file specifies default cfg options for WPAL-net. You should not
+"""WPAL-network cfg system.
+This file specifies default cfg options for WPAL-network. You should not
 change values in this file. Instead, you should write a cfg file (in yaml)
 and use cfg_from_file(yaml_file) to load it and override the default options.
 Most tools in $ROOT/tools take a --cfg option to specify an override file.
@@ -97,6 +97,13 @@ __C.TEST.SCALE = 448
 # Max pixel area size of a scaled input image
 __C.TEST.MAX_AREA = 114688
 
+#
+# Attribute localizing options
+#
+
+__C.LOC = edict()
+
+__C.LOC.SPP = False
 
 #
 # MISC

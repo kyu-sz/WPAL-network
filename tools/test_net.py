@@ -38,7 +38,7 @@ def parse_args():
     """
     Parse input arguments
     """
-    parser = argparse.ArgumentParser(description='test WPAL-net')
+    parser = argparse.ArgumentParser(description='test WPAL-network')
     parser.add_argument('--gpu', dest='gpu_id',
                         help='GPU device ID to use (default: -1)',
                         default=-1, type=int)
