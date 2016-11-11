@@ -108,6 +108,8 @@ if __name__ == '__main__':
     if args.res is None:
         net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
         net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
+    else:
+        net = None
 
     if args.db == 'RAP':
         """Load RAP database"""

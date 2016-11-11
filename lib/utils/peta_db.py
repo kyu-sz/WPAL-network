@@ -71,10 +71,13 @@ class PETA:
         return evaluate.example_based(attr, self.labels[inds])
 
     def set_partition_set_id(self, par_set_id):
-        self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
-        self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
+        #self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1
+        #self.test_ind = self._partition[par_set_id][0][0][0][1][0] - 1
+        self.train_ind = filter(lambda x:x%5!=par_set_id, xrange(self.labels.shape[0]))
+        self.test_ind = filter(lambda x:x%5==par_set_id, xrange(self.labels.shape[0]))
+        
         pos_cnt = sum(self.labels[self.train_ind])
-        self.label_weight = pos_cnt / self.train_ind.size
+        self.label_weight = pos_cnt / len(self.train_ind)
 
     def get_img_path(self, img_id):
         return osp.join(self._db_path, 'Data', str(img_id + 1) + '.png')
@@ -83,11 +86,11 @@ class PETA:
 if __name__ == '__main__':
     db = PETA('data/dataset/ProcessedPeta', 1)
     print "Labels:", db.labels.shape
-    print db.train_ind.__len__()
-    print db.test_ind.__len__()
+    print len(db.train_ind)
+    print len(db.test_ind)
     print 'Max training index: ', max(db.train_ind)
     print db.get_img_path(0)
     print db.num_attr
-    print db.train_ind.__len__(), db.train_ind
-    print db.test_ind.__len__(), db.test_ind
+    print db.train_ind
+    print db.test_ind
     print db.label_weight
