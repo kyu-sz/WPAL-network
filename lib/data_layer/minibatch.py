@@ -92,7 +92,7 @@ def _get_image_blob(img_paths, scale_inds, flip):
     img_scales = []
     for i in xrange(num_images):
         img = cv2.imread(img_paths[i])
-	"""Flip the image if required."""
+        """Flip the image if required."""
         if flip[i]:
             img = cv2.flip(img, 1)
         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
