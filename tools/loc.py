@@ -124,7 +124,7 @@ if __name__ == '__main__':
     f = open(args.dweight, 'rb')
     pack = cPickle.load(f)
 
-    localize(net, db, args.output_dir, pack['ave'], pack['sigma'], pack['binding'],
+    localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
              attr_id=args.attr_id,
              vis=True,
              save_dir=os.path.join(args.output_dir, 'loc'))

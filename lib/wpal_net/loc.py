@@ -49,7 +49,7 @@ def zero_mask(size, y, x, h, w):
     return mask
 
 
-def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, save_dir=None):
+def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=False, save_dir=None):
     """Test localization of a WPAL Network."""
 
     num_images = len(db.test_ind)
@@ -66,7 +66,7 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
         attr_list = []
         attr_list.append(attr_id)
 
-    weight_threshold = [sorted(center_x,reverse=1)[64] for center_x in dweight]
+    weight_threshold = [sorted(center_x,reverse=1)[512] for center_x in dweight]
 
     num_bin_per_detector = []
     num_bin_per_layer = []
@@ -82,7 +82,7 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
         cnt = 0
         for layer_ind_iter in xrange(len(num_bin_per_layer)):
             if bin_ind < num_bin_per_layer[layer_ind_iter] + cnt:
-                return layer_ind_iter,
+                return layer_ind_iter
             cnt += num_bin_per_layer[layer_ind_iter]
 
     cnt = 0
@@ -127,8 +127,8 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
 
         def get_effect_area(bin_ind):
             layer_ind = find_layer_ind(bin_ind)
-            for j in xrange(layer_ind):
-                bin_ind -= num_bin_per_layer[j]
+            for former_layer_ind in xrange(layer_ind):
+                bin_ind -= num_bin_per_layer[former_layer_ind]
             bin_ind %= num_bin_per_detector[layer_ind]
             l = cfg.LOC.LAYERS[layer_ind]
             for num_bin_per_level in l.NUM_BIN:
@@ -146,12 +146,13 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
 
         # find the target a bin detects.
         # TODO: check the target location against the bin's region
-        def find_target(bin_ind, effect_area):
+        def find_target(bin_ind):
+            effect_area = get_effect_area(bin_ind)
             locs = np.where(find_heat_map(bin_ind) == score[bin_ind])
             if len(locs[0]) > 1:
                 for loc in locs:
                     if effect_area[0] <= loc[0] < effect_area[0] + effect_area[2]\
-                        and effect_area[1] <= loc[1] < effect_area[1] + effect_area[3]:
+                            and effect_area[1] <= loc[1] < effect_area[1] + effect_area[3]:
                         return loc
                 return locs[0]
             else:
@@ -163,9 +164,9 @@ def localize(net, db, output_dir, ave, sigma, dweight, attr_id=-1, vis=False, sa
         total_superposition = np.zeros_like(img, dtype=float)
         for a in attr_list:
             # calc the actual contribution weights
-            w_func = lambda center_x: 0\
-                if dweight[a][center_x] < weight_threshold[a]\
-                else score[center_x] * dweight[a][center_x]
+            w_func = lambda x: 0\
+                if dweight[a][x] < weight_threshold[a]\
+                else score[x] * dweight[a][x]
             w_sum = sum([w_func(j) for j in xrange(len(score))])
 
             # Center of the feature.

@@ -103,7 +103,9 @@ __C.TEST.MAX_AREA = 114688
 
 __C.LOC = edict()
 
-__C.LOC.SPP = False
+__C.LOC.LAYERS = []
+
+__C.SPP = False
 
 #
 # MISC
