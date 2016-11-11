@@ -31,7 +31,7 @@ from config import cfg
 from recog import recognize_attr
 
 
-def estimate_param(net, db, output_dir, res_file):
+def estimate_param(net, db, output_dir, res_file, save_res=False):
     attrs = []
     scores = []
     labels = []
@@ -42,39 +42,43 @@ def estimate_param(net, db, output_dir, res_file):
             img = cv2.imread(db.get_img_path(i))
             attr, _, _, _, score = recognize_attr(net, img, db.attr_group)
             attrs.append(attr)
-            scores.append([score[x][0][0] for x in range(len(score))])
+            scores.append([x for x in score])
             labels.append(db.labels[i])
             cnt += 1
             if cnt % 1000 == 0:
                 print 'Tested: {}/{}'.format(cnt, db.train_ind.__len__())
 
-        val_file = os.path.join(output_dir, 'val.pkl')
-        with open(val_file, 'wb') as f:
-            cPickle.dump({'attrs': attrs, 'scores': scores}, f, cPickle.HIGHEST_PROTOCOL)
+        if save_res:
+            print 'Saving results...'
+            val_file = os.path.join(output_dir, 'val.pkl')
+            with open(val_file, 'wb') as f:
+                cPickle.dump({'attrs': attrs, 'scores': scores}, f, cPickle.HIGHEST_PROTOCOL)
+            print 'Results stored to {}!'.format(val_file)
     else:
-        print 'Loading stored results.'
-        f = open(res_file, 'rb')
-        pack = cPickle.load(f)
+        print 'Loading stored results from {}.'.format(res_file)
+        pack = cPickle.load(open(res_file, 'rb'))
         attrs = pack['attrs']
         scores = pack['scores']
         labels = db.labels[db.train_ind]
         print 'Stored results loaded!'
 
-    pos_ave = np.zeros((db.num_attr, len(scores)))  # binding between attribute and detector or detector bin
-    neg_ave = np.zeros((db.num_attr, len(scores)))  # binding between attribute and detector or detector bin
+    pos_ave = np.zeros((db.num_attr, len(scores[0])))  # binding between attribute and detector or detector bin
+    neg_ave = np.zeros((db.num_attr, len(scores[0])))  # binding between attribute and detector or detector bin
     # Estimate detector binding
     for i in xrange(db.num_attr):
-        pos_ind = np.where(labels[:][i] > 0.5)[0]
-        neg_ind = np.where(labels[:][i] < 0.5)[0]
-        pos_sum = np.zeros(len(scores))
-        neg_sum = np.zeros(len(scores))
+        pos_ind = np.where(np.array([x[i] for x in labels]) > 0.5)[0]
+        neg_ind = np.where(np.array([x[i] for x in labels]) < 0.5)[0]
+        print 'For attr {}: pos={}; neg={}'.format(i, len(pos_ind),len(neg_ind))
+        pos_sum = np.zeros(len(scores[0]), dtype=float)
+        neg_sum = np.zeros(len(scores[0]), dtype=float)
         for j in pos_ind:
-            pos_sum += np.exp(np.array(scores[j]))
+            pos_sum += np.array(scores[j])
         for j in neg_ind:
-            neg_sum += np.exp(np.array(scores[j]))
+            neg_sum += np.array(scores[j])
         pos_ave[i] = pos_sum / len(pos_ind)
         neg_ave[i] = neg_sum / len(neg_sum)
-    binding = pos_ave / neg_ave
+        print 'Estimated attr {}/{}'.format(i, db.num_attr)
+    binding = np.exp(pos_ave / neg_ave)
 
     detector_file = os.path.join(output_dir, 'detector.pkl')
     with open(detector_file, 'wb') as f:
