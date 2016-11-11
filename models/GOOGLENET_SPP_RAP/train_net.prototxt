@@ -94,11 +94,11 @@ layer {
   bottom: "pool1/norm1"
   top: "conv2/3x3_reduce"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -125,11 +125,11 @@ layer {
   bottom: "conv2/3x3_reduce"
   top: "conv2/3x3"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -817,11 +817,11 @@ layer {
   bottom: "inception_4a/output"
   top: "inception_4b/1x1"
   param {
-    lr_mult: 0.1
-    decay_mult: 0.1
+    lr_mult: 0.2
+    decay_mult: 0.2
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.4
     decay_mult: 0
   }
   convolution_param {
@@ -2182,10 +2182,10 @@ layer {
   spp_param {
     pool: MAX
     pyramid_height: 2
-    fineness_h: 5
-    overlap_ratio_h: 0.2
+    fineness_h: 3
+    overlap_ratio_h: 0.3
     fineness_w: 3
-    overlap_ratio_w: 0.2
+    overlap_ratio_w: 0.3
   }
 }
 layer {
@@ -2229,9 +2229,9 @@ layer {
     pool: MAX
     pyramid_height: 2
     fineness_h: 3
-    overlap_ratio_h: 0.2
+    overlap_ratio_h: 0.1
     fineness_w: 1
-    overlap_ratio_w: 0.2
+    overlap_ratio_w: 0.1
   }
 }
 layer {

@@ -2180,10 +2180,10 @@ layer {
   spp_param {
     pool: MAX
     pyramid_height: 2
-    fineness_h: 5
-    overlap_ratio_h: 0.2
+    fineness_h: 3
+    overlap_ratio_h: 0.3
     fineness_w: 3
-    overlap_ratio_w: 0.2
+    overlap_ratio_w: 0.3
   }
 }
 layer {
@@ -2209,9 +2209,9 @@ layer {
     pool: MAX
     pyramid_height: 2
     fineness_h: 3
-    overlap_ratio_h: 0.2
+    overlap_ratio_h: 0.1
     fineness_w: 1
-    overlap_ratio_w: 0.2
+    overlap_ratio_w: 0.1
   }
 }
 ########################## Independent FC Layers ##########################
