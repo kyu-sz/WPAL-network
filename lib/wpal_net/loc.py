@@ -42,10 +42,10 @@ def gaussian_filter(shape, center_y, center_x, var=1):
     return filter_map
 
 
-def zero_mask(size, y, x, h, w):
+def zero_mask(size, area):
     mask = np.zeros(size)
-    for i in xrange(y, y + h):
-        mask[x:x+w] += 1
+    for i in xrange(int(math.floor(area['y'])), min(size[0], int(math.ceil(area['y'] + area['h'])))):
+        mask[i][int(math.floor(area['x'])):min(size[1], int(math.ceil(area['x'] + area['w'])))] += 1
     return mask
 
 
@@ -72,18 +72,31 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
     num_bin_per_layer = []
     for layer in cfg.LOC.LAYERS:
         bin_cnt = 0
-        for num_bin_per_level in layer.NUM_BIN:
-            bin_cnt += num_bin_per_level[0] * num_bin_per_level[1]
+        for level in layer.LEVELS:
+            bin_cnt += level[0] * level[1]
         num_bin_per_detector.append(bin_cnt)
         num_bin_per_layer.append(bin_cnt * layer.NUM_DETECTOR)
 
     # find the index of layer the bin belongs to, given a global index of a bin
     def find_layer_ind(bin_ind):
-        cnt = 0
-        for layer_ind_iter in xrange(len(num_bin_per_layer)):
-            if bin_ind < num_bin_per_layer[layer_ind_iter] + cnt:
-                return layer_ind_iter
-            cnt += num_bin_per_layer[layer_ind_iter]
+        for i in xrange(len(num_bin_per_layer)):
+            if bin_ind < num_bin_per_layer[i]:
+                return i
+            bin_ind -= num_bin_per_layer[i]
+
+    def locate_bin_in_layer(bin_ind):
+        layer_ind = layer_inds[bin_ind]
+        """return: level_ind, detector_ind, bin_y, bin_x"""
+        layer = cfg.LOC.LAYERS[layer_ind]
+        for i in xrange(layer_ind):
+            bin_ind -= num_bin_per_layer[i]
+        for i in xrange(len(layer.LEVELS)):
+            level = layer.LEVELS[i]
+            if bin_ind >= level[0] * level[1] * layer.NUM_DETECTOR:
+                bin_ind -= level[0] * level[1] * layer.NUM_DETECTOR
+            else:
+                return i, bin_ind / (level[0] * level[1]),\
+                       bin_ind % (level[0] * level[1]) / level[1], bin_ind % level[1]
 
     cnt = 0
     for img_ind in db.test_ind:
@@ -112,6 +125,8 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                 .format(name, db.attr_eng[attr_id][0][0])
             continue
 
+        layer_inds = [find_layer_ind(x) for x in xrange(len(score))]
+
         # concat the heat maps before the detectors
         heat_maps = []
         for hm in heat3:
@@ -123,56 +138,60 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
 
         # find heat map of a bin
         def find_heat_map(bin_ind):
-            return heat_maps[bin_ind / num_bin_per_detector[find_layer_ind(bin_ind)]]
+            layer_ind = layer_inds[bin_ind]
+            heat_ind = 0
+            for i in xrange(layer_ind):
+                heat_ind += cfg.LOC.LAYERS[i].NUM_DETECTOR
+            _, detector_ind, _, _ = locate_bin_in_layer(bin_ind)
+            return heat_maps[heat_ind + detector_ind]
+
+        bin2heat = [find_heat_map(x) for x in xrange(len(score))]
 
         def get_effect_area(bin_ind):
-            layer_ind = find_layer_ind(bin_ind)
-            for former_layer_ind in xrange(layer_ind):
-                bin_ind -= num_bin_per_layer[former_layer_ind]
-            bin_ind %= num_bin_per_detector[layer_ind]
-            l = cfg.LOC.LAYERS[layer_ind]
-            for num_bin_per_level in l.NUM_BIN:
-                if bin_ind >= num_bin_per_level[0] * num_bin_per_level[1]:
-                    bin_ind -= num_bin_per_level[0] * num_bin_per_level[1]
-                else:
-                    heat = find_heat_map(bin_ind)
-                    y = bin_ind / num_bin_per_level[0]
-                    x = bin_ind % num_bin_per_level[0]
-                    bin_h = heat.shape[0] * (1 + layer.OVERLAP[0] * (num_bin_per_level[0] - 1)) / num_bin_per_level[0]
-                    bin_w = heat.shape[1] * (1 + layer.OVERLAP[1] * (num_bin_per_level[1] - 1)) / num_bin_per_level[1]
-                    y_start = (1 - layer.OVERLAP[0]) * y * bin_h
-                    x_start = (1 - layer.OVERLAP[1]) * x * bin_h
-                    return y_start, x_start, bin_h, bin_w
+            layer_ind = layer_inds[bin_ind]
+            heat = bin2heat[bin_ind]
+            level_ind, _, y, x = locate_bin_in_layer(bin_ind)
+            layer = cfg.LOC.LAYERS[layer_ind]
+            level = layer.LEVELS[level_ind]
+            bin_h = heat.shape[0] * (1 + layer.OVERLAP[0] * (level[0] - 1)) / level[0]
+            bin_w = heat.shape[1] * (1 + layer.OVERLAP[1] * (level[1] - 1)) / level[1]
+            y_start = (1 - layer.OVERLAP[0]) * y * bin_h
+            x_start = (1 - layer.OVERLAP[1]) * x * bin_h
+            return {'y': y_start, 'x': x_start, 'h': bin_h, 'w': bin_w}
 
         # find the target a bin detects.
         # TODO: check the target location against the bin's region
         def find_target(bin_ind):
+            layer_ind = layer_inds[bin_ind]
             effect_area = get_effect_area(bin_ind)
-            locs = np.where(find_heat_map(bin_ind) == score[bin_ind])
+            locs = np.where(bin2heat[bin_ind] == score[bin_ind])
+            if len(locs[0]) == 0:
+                print 'Cannot find max value {} of bin {}'.format(score[bin_ind], bin_ind)
+                return [0]
             if len(locs[0]) > 1:
-                for loc in locs:
-                    if effect_area[0] <= loc[0] < effect_area[0] + effect_area[2]\
-                            and effect_area[1] <= loc[1] < effect_area[1] + effect_area[3]:
+                for i in xrange(len(locs[0])):
+                    loc = [locs[0][i], locs[1][i]]
+                    if effect_area['y'] <= loc[0] < effect_area['y'] + effect_area['h']\
+                            and effect_area['x'] <= loc[1] < effect_area['x'] + effect_area['w']:
                         return loc
-                return locs[0]
-            else:
-                return locs
+            return locs[0][0], locs[1][0]
 
         # find all the targets in advance
-        target = [find_target(j)[:] for j in xrange(len(score))]
+        target = [find_target(j) for j in xrange(len(score))]
 
         total_superposition = np.zeros_like(img, dtype=float)
         for a in attr_list:
             # calc the actual contribution weights
-            w_func = lambda x: 0\
-                if dweight[a][x] < weight_threshold[a]\
-                else score[x] * dweight[a][x]
+            def w_func(x):
+                return 0\
+                    if dweight[a][x] < weight_threshold[a]\
+                    else score[x] / (pos_ave[a][x] if attr[a] else neg_ave[a][x]) * dweight[a][x]
             w_sum = sum([w_func(j) for j in xrange(len(score))])
 
             # Center of the feature.
-            center_y = sum([w_func(j) / w_sum * target[j][0] / np.array(find_heat_map(j)).shape[0]
+            center_y = sum([w_func(j) / w_sum * (target[j][0]+0.5) / bin2heat[j].shape[0]
                      for j in xrange(len(score))])
-            center_x = sum([w_func(j) / w_sum * target[j][1] / np.array(find_heat_map(j)).shape[1]
+            center_x = sum([w_func(j) / w_sum * (target[j][1]+0.5) / bin2heat[j].shape[1]
                      for j in xrange(len(score))])
             # Superposition of the heat maps.
             superposition = sum([cv2.resize(w_func(j) / w_sum * find_heat_map(j)
@@ -192,8 +211,14 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                     total_superposition[j][k][2] += superposition[j][k]
                     total_superposition[j][k][1] -= superposition[j][k]
                     total_superposition[j][k][0] -= superposition[j][k]
-            cv2.line(total_superposition, (img_width * center_x - cross_len, img_height * center_y), (img_width * center_x + cross_len, img_height * center_y), (0, 255, 255))
-            cv2.line(total_superposition, (img_width * center_x, img_height * center_y - cross_len), (img_width * center_x, img_height * center_y + cross_len), (0, 255, 255))
+            cv2.line(total_superposition,
+                     (int(img_width * center_x - cross_len), int(img_height * center_y)),
+                     (int(img_width * center_x + cross_len), int(img_height * center_y)),
+                     (0, 255, 255))
+            cv2.line(total_superposition,
+                     (int(img_width * center_x), int(img_height * center_y - cross_len)),
+                     (int(img_width * center_x), int(img_height * center_y + cross_len)),
+                     (0, 255, 255))
 
             for j in xrange(img_height):
                 for k in xrange(img_width):
@@ -212,9 +237,15 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                 canvas[..., 2] = cv2.resize((find_heat_map(j) * val_scale).astype('uint8'), (img.shape[1], img.shape[0]))
                 _y = 1.0 * target[j][0] / np.array(find_heat_map(j)).shape[0]
                 _x = 1.0 * target[j][1] / np.array(find_heat_map(j)).shape[1]
-                cv2.line(canvas, (img_width * _x - cross_len, img_height * _y), (img_width * _x + cross_len, img_height * _y), (0, 255, 255))
-                cv2.line(canvas, (img_width * _x, img_height * _y - cross_len), (img_width * _x, img_height * _y + cross_len), (0, 255, 255))
-                cv2.imshow("heat_maps", canvas)
+                cv2.line(canvas,
+                         (int(img_width * _x - cross_len), int(img_height * _y)),
+                         (int(img_width * _x + cross_len), int(img_height * _y)),
+                         (0, 255, 255))
+                cv2.line(canvas,
+                         (int(img_width * _x), int(img_height * _y - cross_len)),
+                         (int(img_width * _x), int(img_height * _y + cross_len)),
+                         (0, 255, 255))
+                cv2.imshow("Masked heat map", canvas)
                 cv2.waitKey(0)
 
         canvas = total_superposition + img
