@@ -51,7 +51,7 @@ def test_net(net, db, output_dir):
         img_path = db.get_img_path(i)
         img = cv2.imread(img_path)
         _t['recognize_attr'].tic()
-        attr, heat3, heat4, heat5, score = recognize_attr(net, img, db.attr_group, threshold)
+        attr, heat3, heat4, heat5, score, _ = recognize_attr(net, img, db.attr_group, threshold)
         _t['recognize_attr'].toc()
         all_attrs[cnt] = attr
         cnt += 1

@@ -29,6 +29,7 @@ import os
 import pprint
 import sys
 import time
+import numpy as np
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
@@ -102,16 +103,6 @@ if __name__ == '__main__':
         print('Waiting for {} to exist...'.format(args.caffemodel))
         time.sleep(10)
 
-    # set up Caffe
-    if args.gpu_id == -1:
-        caffe.set_mode_cpu()
-    else:
-        caffe.set_mode_gpu()
-        caffe.set_device(args.gpu_id)
-
-    net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
-    net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
-
     if args.db == 'RAP':
         """Load RAP database"""
         from utils.rap_db import RAP
@@ -123,6 +114,16 @@ if __name__ == '__main__':
 
     f = open(args.dweight, 'rb')
     pack = cPickle.load(f)
+
+    # set up Caffe
+    if args.gpu_id == -1:
+        caffe.set_mode_cpu()
+    else:
+        caffe.set_mode_gpu()
+        caffe.set_device(args.gpu_id)
+
+    net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
+    net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
     localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
              attr_id=args.attr_id,

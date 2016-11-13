@@ -28,6 +28,7 @@ import os
 import pprint
 import sys
 import time
+import numpy as np
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
@@ -120,4 +121,14 @@ if __name__ == '__main__':
         from utils.peta_db import PETA
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
-    ep(net, db, args.output_dir, args.res)
+    binding, pos_ave, neg_ave = ep(net, db, args.output_dir, args.res)
+
+    sorted_detector_ind = [[y[0] for y in sorted(enumerate(x), key=lambda x: x[1], reverse=1)] for x in binding]
+    low_detector_ind = [np.where(np.array(z) < 10240)[0] for z in sorted_detector_ind]
+    for i in xrange(len(low_detector_ind)):
+        x = low_detector_ind[i]
+        inds = []
+        for y in x[0:5]:
+            inds.append((y, 1 if sorted_detector_ind[i][y] < 5120 else 2))
+        if inds[4][0] < 1000 and sum(inds[j][1] for j in xrange(5)) < 10:
+            print db.attr_eng[i][0][0], inds

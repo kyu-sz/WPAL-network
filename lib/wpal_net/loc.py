@@ -30,11 +30,10 @@ import cv2
 import numpy as np
 
 from recog import recognize_attr
-from wpal_net.config import cfg
+from config import cfg
 
 
 def gaussian_filter(shape, center_y, center_x, var=1):
-    var = var * var * 100
     filter_map = np.ndarray(shape)
     for i in xrange(0, shape[0]):
         for j in xrange(0, shape[1]):
@@ -52,6 +51,8 @@ def zero_mask(size, area):
 def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=False, save_dir=None):
     """Test localization of a WPAL Network."""
 
+    cfg.TEST.MAX_AREA = int(cfg.TEST.MAX_AREA / 2)
+
     num_images = len(db.test_ind)
 
     all_attrs = [[] for _ in xrange(num_images)]
@@ -66,7 +67,8 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
         attr_list = []
         attr_list.append(attr_id)
 
-    weight_threshold = [sorted(center_x,reverse=1)[512] for center_x in dweight]
+    dweight = np.log(dweight)
+    weight_threshold = [sorted(x, reverse=1)[512] for x in dweight]
 
     num_bin_per_detector = []
     num_bin_per_layer = []
@@ -107,18 +109,25 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                 .format(name, db.attr_eng[attr_id][0][0])
             continue
 
+        # check directory for saving visualization images
+        vis_img_dir = os.path.join(output_dir, 'vis', 'body' if attr_id == -1 else db.attr_eng[attr_id][0][0], name)
+        if not os.path.exists(vis_img_dir):
+            os.makedirs(vis_img_dir)
+
         # prepare the image
         img = cv2.imread(img_path)
-        img_width = img.shape[1] * cfg.TEST.SCALE / img.shape[0]
-        img_height = cfg.TEST.SCALE
+        print img.shape[0], img.shape[1]
+
+        # pass the image throught the test net.
+        attr, heat3, heat4, heat5, score, img_scale = recognize_attr(net, img, db.attr_group, threshold)
+        all_attrs[cnt] = attr
+        cnt += 1
+
+        img_height = int(img.shape[0] * img_scale)
+        img_width = int(img.shape[1] * img_scale)
         img = cv2.resize(img, (img_width, img_height))
         img_area = img_height * img_width
         cross_len = math.sqrt(img_area) * 0.05
-
-        # pass the image throught the test net.
-        attr, heat3, heat4, heat5, score = recognize_attr(net, img, db.attr_group, threshold)
-        all_attrs[cnt] = attr
-        cnt += 1
 
         if attr_id != -1 and attr[attr_id] != 1:
             print 'Image {} skipped for failing to be recognized attribute {} from!' \
@@ -173,8 +182,8 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                     loc = [locs[0][i], locs[1][i]]
                     if effect_area['y'] <= loc[0] < effect_area['y'] + effect_area['h']\
                             and effect_area['x'] <= loc[1] < effect_area['x'] + effect_area['w']:
-                        return loc
-            return locs[0][0], locs[1][0]
+                        return loc[0] + 0.5, loc[1] + 0.5
+            return locs[0][0] + 0.5, locs[1][0] + 0.5
 
         # find all the targets in advance
         target = [find_target(j) for j in xrange(len(score))]
@@ -189,23 +198,23 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
             w_sum = sum([w_func(j) for j in xrange(len(score))])
 
             # Center of the feature.
-            center_y = sum([w_func(j) / w_sum * (target[j][0]+0.5) / bin2heat[j].shape[0]
+            center_y = sum([w_func(j) / w_sum * target[j][0] / bin2heat[j].shape[0]
                      for j in xrange(len(score))])
-            center_x = sum([w_func(j) / w_sum * (target[j][1]+0.5) / bin2heat[j].shape[1]
+            center_x = sum([w_func(j) / w_sum * target[j][1] / bin2heat[j].shape[1]
                      for j in xrange(len(score))])
             # Superposition of the heat maps.
-            superposition = sum([cv2.resize(w_func(j) / w_sum * find_heat_map(j)
-                                            * gaussian_filter(find_heat_map(j).shape,
-                                                              center_y * find_heat_map(j).shape[0],
-                                                              center_x * find_heat_map(j).shape[1],
-                                                              img_area / find_heat_map(j).shape[0] * find_heat_map(j).shape[1])
-                                            * zero_mask(find_heat_map(j).shape, get_effect_area(j)),
+            superposition = sum([cv2.resize(w_func(j) / w_sum * bin2heat[j].astype(float)
+                                            * gaussian_filter(bin2heat[j].shape,
+                                                              center_y * bin2heat[j].shape[0],
+                                                              center_x * bin2heat[j].shape[1],
+                                                              img_area / bin2heat[j].shape[0] * bin2heat[j].shape[1])
+                                            * zero_mask(bin2heat[j].shape, get_effect_area(j)),
                                             (img_width, img_height))
                                  for j in xrange(len(score))])
 
             mean = (superposition.max() + superposition.min()) / 2
             val_range = superposition.max() - superposition.min()
-            superposition = (superposition - mean) * 255 / val_range
+            superposition = (superposition - mean) * 255 / val_range / len(attr_list)
             for j in xrange(img_height):
                 for k in xrange(img_width):
                     total_superposition[j][k][2] += superposition[j][k]
@@ -220,33 +229,39 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                      (int(img_width * center_x), int(img_height * center_y + cross_len)),
                      (0, 255, 255))
 
-            for j in xrange(img_height):
-                for k in xrange(img_width):
-                    total_superposition[j][k][2] = min(255, max(0, total_superposition[j][k][2]))
-                    total_superposition[j][k][1] = min(255, max(0, total_superposition[j][k][1]))
-                    total_superposition[j][k][0] = min(255, max(0, total_superposition[j][k][0]))
-            cv2.imshow("sup", total_superposition.astype('uint8'))
-            cv2.imshow("img", img)
+            if attr_id != -1:
+                for j in xrange(img_height):
+                    for k in xrange(img_width):
+                        total_superposition[j][k][2] = min(255, max(0, total_superposition[j][k][2]))
+                        total_superposition[j][k][1] = min(255, max(0, total_superposition[j][k][1]))
+                        total_superposition[j][k][0] = min(255, max(0, total_superposition[j][k][0]))
+                cv2.imshow("sup", total_superposition.astype('uint8'))
+                cv2.imshow("img", img)
 
-            for j in [_[0] for _ in sorted(enumerate([w_func(k) for k in xrange(len(score))]),
-                                           key=lambda x:x[1],
-                                           reverse=1)][0:8]:
-                print name, j, w_func(j)
-                val_scale = 255.0 / max(max(__) for __ in find_heat_map(j))
-                canvas = np.zeros_like(img)
-                canvas[..., 2] = cv2.resize((find_heat_map(j) * val_scale).astype('uint8'), (img.shape[1], img.shape[0]))
-                _y = 1.0 * target[j][0] / np.array(find_heat_map(j)).shape[0]
-                _x = 1.0 * target[j][1] / np.array(find_heat_map(j)).shape[1]
-                cv2.line(canvas,
-                         (int(img_width * _x - cross_len), int(img_height * _y)),
-                         (int(img_width * _x + cross_len), int(img_height * _y)),
-                         (0, 255, 255))
-                cv2.line(canvas,
-                         (int(img_width * _x), int(img_height * _y - cross_len)),
-                         (int(img_width * _x), int(img_height * _y + cross_len)),
-                         (0, 255, 255))
-                cv2.imshow("Masked heat map", canvas)
-                cv2.waitKey(0)
+                for j in [_[0] for _ in sorted(enumerate([w_func(k) for k in xrange(len(score))]),
+                                               key=lambda x:x[1],
+                                               reverse=1)][0:8]:
+                    print name, j, w_func(j)
+                    val_scale = 255.0 / max(max(__) for __ in bin2heat[j])
+                    canvas = np.zeros_like(img)
+                    canvas[..., 2] = cv2.resize((bin2heat[j] * val_scale).astype('uint8'),
+                                                (img.shape[1], img.shape[0]))
+                    _y = 1.0 * target[j][0] / bin2heat[j].shape[0]
+                    _x = 1.0 * target[j][1] / bin2heat[j].shape[1]
+                    cv2.line(canvas,
+                             (int(img_width * _x - cross_len), int(img_height * _y)),
+                             (int(img_width * _x + cross_len), int(img_height * _y)),
+                             (0, 255, 255))
+                    cv2.line(canvas,
+                             (int(img_width * _x), int(img_height * _y - cross_len)),
+                             (int(img_width * _x), int(img_height * _y + cross_len)),
+                             (0, 255, 255))
+                    cv2.imshow("Masked heat map", canvas)
+                    cv2.waitKey(0)
+
+                    print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
+                    cv2.imwrite(os.path.join(vis_img_dir, 'heat{}.jpg'.format(j)),
+                                canvas)
 
         canvas = total_superposition + img
         for j in xrange(img_height):
@@ -259,8 +274,8 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
         if vis:
             cv2.imshow("img", canvas)
             cv2.waitKey(0)
-        if save_dir is not None:
-            cv2.imwrite(os.path.join(save_dir, name), img)
+        print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
+        cv2.imwrite(os.path.join(vis_img_dir, 'final.jpg'), canvas)
 
     cv2.destroyWindow("heat_maps")
     cv2.destroyWindow("sup")
