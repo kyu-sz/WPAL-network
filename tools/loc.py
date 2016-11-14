@@ -70,8 +70,13 @@ def parse_args():
     parser.add_argument('--detector-weight', dest='dweight',
                         help='the cPickle file storing the weights of detectors',
                         default=None, type=str)
+    parser.add_argument('--display', dest='display',
+                        help='whether to display on screen',
+                        default=1, type=str)
     parser.add_argument('--attr-id', dest='attr_id',
-                        help='the ID of the attribute to be localized and visualized. -1 for whole body outline',
+                        help='the ID of the attribute to be localized and visualized.'
+                             ' -1 for whole body outline.'
+                             ' -2 for all attributes.',
                         default=-1, type=int)
 
     args = parser.parse_args()
@@ -125,7 +130,18 @@ if __name__ == '__main__':
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
-    localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
-             attr_id=args.attr_id,
-             vis=True,
-             save_dir=os.path.join(args.output_dir, 'loc'))
+    if args.attr_id == -2:
+        for a in xrange(db.num_attr):
+            localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                     attr_id=a,
+                     vis=args.display,
+                     save_dir=os.path.join(args.output_dir, 'loc'))
+        localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                 attr_id=-1,
+                 vis=args.display,
+                 save_dir=os.path.join(args.output_dir, 'loc'))
+    else:
+        localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                 attr_id=args.attr_id,
+                 vis=args.display,
+                 save_dir=os.path.join(args.output_dir, 'loc'))

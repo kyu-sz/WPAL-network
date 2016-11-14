@@ -25,12 +25,15 @@
 
 import math
 import os
-
 import cv2
 import numpy as np
+from scipy.cluster.vq import kmeans, vq
+from scipy.misc import imresize
+import pylab
 
 from recog import recognize_attr
 from config import cfg
+from utils.kmeans import weighted_kmeans
 
 
 def gaussian_filter(shape, center_y, center_x, var=1):
@@ -47,8 +50,28 @@ def zero_mask(size, area):
         mask[i][int(math.floor(area['x'])):min(size[1], int(math.ceil(area['x'] + area['w'])))] += 1
     return mask
 
+def cluster_heat(img, k, stepsX, max_round=1000):
+    """Return centroids of heat clusters (in x-y order)."""
+    stepsY = stepsX * img.shape[0] / img.shape[1]
 
-def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=False, save_dir=None):
+    thresh = max(np.mean(img), np.median(img), 0)
+
+    dy = img.shape[0] / stepsY
+    dx = img.shape[1] / stepsX
+
+    act_points = []
+    for y in xrange(stepsY):
+        for x in xrange(stepsX):
+            score = img[y * dy: (y + 1) * dy, x * dx: (x + 1) * dx]
+            if score > thresh:
+                act_points.append([x, y, score])
+    act_points = np.array(act_points)
+
+    centroids, clusterAssment = weighted_kmeans(act_points, 4, max_round)
+    return centroids
+
+
+def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display=True, save_dir=None):
     """Test localization of a WPAL Network."""
 
     cfg.TEST.MAX_AREA = int(cfg.TEST.MAX_AREA / 2)
@@ -88,7 +111,7 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
 
     def locate_bin_in_layer(bin_ind):
         layer_ind = layer_inds[bin_ind]
-        """return: level_ind, detector_ind, bin_y, bin_x"""
+        """return: level_ind, detector_ind, bincentroids[1], bincentroids[0]"""
         layer = cfg.LOC.LAYERS[layer_ind]
         for i in xrange(layer_ind):
             bin_ind -= num_bin_per_layer[i]
@@ -108,11 +131,6 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
             print 'Image {} skipped for it is a negative sample for attribute {}!' \
                 .format(name, db.attr_eng[attr_id][0][0])
             continue
-
-        # check directory for saving visualization images
-        vis_img_dir = os.path.join(output_dir, 'vis', 'body' if attr_id == -1 else db.attr_eng[attr_id][0][0], name)
-        if not os.path.exists(vis_img_dir):
-            os.makedirs(vis_img_dir)
 
         # prepare the image
         img = cv2.imread(img_path)
@@ -134,7 +152,13 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                 .format(name, db.attr_eng[attr_id][0][0])
             continue
 
-        cv2.imshow("img", img)
+        # check directory for saving visualization images
+        vis_img_dir = os.path.join(output_dir, 'display', 'body' if attr_id == -1 else db.attr_eng[attr_id][0][0], name)
+        if not os.path.exists(vis_img_dir):
+            os.makedirs(vis_img_dir)
+
+        if display:
+            cv2.imshow("img", img)
 
         layer_inds = [find_layer_ind(x) for x in xrange(len(score))]
 
@@ -190,6 +214,7 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
         # find all the targets in advance
         target = [find_target(j) for j in xrange(len(score))]
 
+        canvas = np.array(img)
         total_superposition = np.zeros(img.shape[0:2], dtype=float)
         for a in attr_list:
             # calc the actual contribution weights
@@ -214,10 +239,27 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                                             (img_width, img_height))
                                  for j in xrange(len(score))])
 
-            mean = (superposition.max() + superposition.min()) / 2
+            thresh = min(np.median(superposition), np.mean(superposition))
             val_range = superposition.max() - superposition.min()
-            superposition = (superposition - mean) * 255 / val_range / len(attr_list)
+            superposition = (superposition - thresh) * 255 / val_range / len(attr_list)
             total_superposition += superposition
+
+            expected_num_centroids = 2
+            centroids = cluster_heat(superposition,
+                                     expected_num_centroids + 2,
+                                     img.shape[1],
+                                     max_round=1000 / len(attr_list))
+
+            print centroids
+            for c in centroids[:expected_num_centroids]:
+                cv2.line(canvas,
+                         (int(c[0] - cross_len), int(c[1])),
+                         (int(c[0] + cross_len), int(c[1])),
+                         (0, 255, 255))
+                cv2.line(canvas,
+                         (int(c[0]), int(c[1] - cross_len)),
+                         (int(c[0]), int(c[1] + cross_len)),
+                         (0, 255, 255))
 
             if attr_id != -1:
                 for j in [_[0] for _ in sorted(enumerate([w_func(k) for k in xrange(len(score))]),
@@ -228,32 +270,34 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                     canvas = np.zeros_like(img)
                     canvas[..., 2] = cv2.resize((bin2heat[j] * val_scale).astype('uint8'),
                                                 (img.shape[1], img.shape[0]))
-                    _y = 1.0 * target[j][0] / bin2heat[j].shape[0]
-                    _x = 1.0 * target[j][1] / bin2heat[j].shape[1]
+                    y = 1.0 * target[j][0] / bin2heat[j].shape[0]
+                    x = 1.0 * target[j][1] / bin2heat[j].shape[1]
                     cv2.line(canvas,
-                             (int(img_width * _x - cross_len), int(img_height * _y)),
-                             (int(img_width * _x + cross_len), int(img_height * _y)),
+                             (int(img_width * x - cross_len), int(img_height * y)),
+                             (int(img_width * x + cross_len), int(img_height * y)),
                              (0, 255, 255))
                     cv2.line(canvas,
-                             (int(img_width * _x), int(img_height * _y - cross_len)),
-                             (int(img_width * _x), int(img_height * _y + cross_len)),
+                             (int(img_width * x), int(img_height * y - cross_len)),
+                             (int(img_width * x), int(img_height * y + cross_len)),
                              (0, 255, 255))
-                    cv2.imshow("heat", canvas)
-                    cv2.waitKey(0)
+                    if display:
+                        cv2.imshow("heat", canvas)
+                        cv2.waitKey(100)
 
                     print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
                     cv2.imwrite(os.path.join(vis_img_dir, 'heat{}.jpg'.format(j)),
                                 canvas)
 
-        canvas = np.array(img)
+            print 'Localized attribute {}: {}!'.format(a, db.attr_eng[a][0][0])
+
         for j in xrange(img_height):
             for k in xrange(img_width):
-                canvas[j][k][2] = min(255, max(0, canvas[j][k][2] + total_superposition[j][k]))
+                canvas[j][k][2] = min(255, max(0, canvas[j][k][2] + max(0, total_superposition[j][k])))
                 canvas[j][k][1] = min(255, max(0, canvas[j][k][1]))
                 canvas[j][k][0] = min(255, max(0, canvas[j][k][0]))
         canvas = canvas.astype('uint8')
 
-        if vis:
+        if display:
             cv2.imshow("img", canvas)
             cv2.waitKey(0)
         print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
