@@ -22,11 +22,11 @@
 # --------------------------------------------------------------------
 
 import os.path as osp
-
 import numpy as np
 import scipy.io as sio
 
 import evaluate
+from wpal_net.config import cfg
 
 class RAP:
     def __init__(self, db_path, par_set_id):
@@ -59,10 +59,14 @@ class RAP:
         self.set_partition_set_id(par_set_id)
 
     def evaluate_mA(self, attr, inds):
-        return evaluate.mA(attr, self.labels[inds])
+        cut_attr = [x[0:cfg.TEST.MAX_NUM_ATTR] for x in attr]
+        cut_gt = [x[0:cfg.TEST.MAX_NUM_ATTR] for x in self.labels[inds]]
+        return evaluate.mA(cut_attr, cut_gt)
 
     def evaluate_example_based(self, attr, inds):
-        return evaluate.example_based(attr, self.labels[inds])
+        cut_attr = [x[0:cfg.TEST.MAX_NUM_ATTR] for x in attr]
+        cut_gt = [x[0:cfg.TEST.MAX_NUM_ATTR] for x in self.labels[inds]]
+        return evaluate.example_based(cut_attr, cut_gt)
 
     def set_partition_set_id(self, par_set_id):
         self.train_ind = self._partition[par_set_id][0][0][0][0][0] - 1

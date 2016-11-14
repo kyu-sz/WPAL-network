@@ -30,9 +30,8 @@ import os
 import cv2
 import numpy as np
 from utils.timer import Timer
-
 from recog import recognize_attr
-
+from wpal_net.config import cfg
 
 def test_net(net, db, output_dir):
     """Test a Weakly-supervised Pedestrian Attribute Localization Network on an image database."""
@@ -64,10 +63,18 @@ def test_net(net, db, output_dir):
     with open(attr_file, 'wb') as f:
         cPickle.dump(all_attrs, f, cPickle.HIGHEST_PROTOCOL)
 
-    mA, challenging = db.evaluate_mA(all_attrs, db.test_ind)
+    mA, accPerAttr, challenging = db.evaluate_mA(all_attrs, db.test_ind)
     print 'mA={:f}'.format(mA)
     print 'Challenging attributes:', challenging
-    
+
     acc, prec, rec, f1 = db.evaluate_example_based(all_attrs, db.test_ind)
 
     print 'Acc={:f} Prec={:f} Rec={:f} F1={:f}'.format(acc, prec, rec, f1)
+
+    acc_file = os.path.join(output_dir, 'acc.txt')
+    with open(acc_file, 'w') as f:
+        for i in xrange(min(db.num_attr, cfg.TEST.MAX_NUM_ATTR)):
+            f.write('{}: {}\n'.format(db.attr_eng[i][0][0], accPerAttr[i]))
+        f.write('mA: {}\n'.format(mA))
+        f.write('Acc: {} \t Prec: {} \t Rec: {} \t F1: {}\n'.format(acc, prec, rec, f1))
+

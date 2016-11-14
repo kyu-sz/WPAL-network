@@ -97,6 +97,9 @@ __C.TEST.SCALE = 448
 # Max pixel area size of a scaled input image
 __C.TEST.MAX_AREA = 114688
 
+# To limit testing attributes on RAP.
+__C.TEST.MAX_NUM_ATTR = 92
+
 #
 # Attribute localizing options
 #
