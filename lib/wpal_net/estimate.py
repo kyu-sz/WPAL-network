@@ -40,7 +40,7 @@ def estimate_param(net, db, output_dir, res_file, save_res=False):
         cnt = 0
         for i in db.train_ind:
             img = cv2.imread(db.get_img_path(i))
-            attr, _, _, _, score = recognize_attr(net, img, db.attr_group)
+            attr, _, _, _, score, _ = recognize_attr(net, img, db.attr_group)
             attrs.append(attr)
             scores.append([x for x in score])
             labels.append(db.labels[i])
@@ -82,5 +82,6 @@ def estimate_param(net, db, output_dir, res_file, save_res=False):
 
     detector_file = os.path.join(output_dir, 'detector.pkl')
     with open(detector_file, 'wb') as f:
-        cPickle.dump({'pos_ave':pos_ave,'neg_ave':neg_ave,'binding':binding}, f, cPickle.HIGHEST_PROTOCOL)
+        cPickle.dump({'pos_ave': pos_ave, 'neg_ave': neg_ave, 'binding': binding}, f, cPickle.HIGHEST_PROTOCOL)
 
+    return binding, pos_ave, neg_ave

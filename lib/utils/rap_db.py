@@ -89,5 +89,5 @@ if __name__ == '__main__':
     print db.get_img_path(0)
     print db.num_attr
     print db.label_weight
-    print db.attr_ch[0]
-    print str(db.attr_ch[0])
+    print db.attr_eng[0][0][0]
+    print db.attr_eng[1][0][0]

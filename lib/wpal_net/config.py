@@ -106,7 +106,9 @@ __C.TEST.MAX_NUM_ATTR = 92
 
 __C.LOC = edict()
 
-__C.LOC.SPP = False
+__C.LOC.LAYERS = []
+
+__C.SPP = False
 
 #
 # MISC

@@ -74,7 +74,7 @@ def recognize_attr(net, img, attr_group, threshold=None):
 		attributes (ndarray): K x 1 array of predicted attributes. (K is
 			specified by database or the net)
 	"""
-	blobs, img_scale_factor = _get_blobs(img)
+	blobs, img_scale = _get_blobs(img)
 
 	# reshape network inputs
 	net.blobs['data'].reshape(*(blobs['data'].shape))
@@ -95,4 +95,4 @@ def recognize_attr(net, img, attr_group, threshold=None):
 		for i in xrange(pred.shape[0]):
 			pred[i] = 0 if pred[i] < threshold[i] else 1
 
-	return pred, heat3, heat4, heat5, score
+	return pred, heat3, heat4, heat5, score, img_scale
