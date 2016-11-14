@@ -134,6 +134,8 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                 .format(name, db.attr_eng[attr_id][0][0])
             continue
 
+        cv2.imshow("img", img)
+
         layer_inds = [find_layer_ind(x) for x in xrange(len(score))]
 
         # concat the heat maps before the detectors
@@ -188,7 +190,7 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
         # find all the targets in advance
         target = [find_target(j) for j in xrange(len(score))]
 
-        total_superposition = np.zeros_like(img, dtype=float)
+        total_superposition = np.zeros(img.shape[0:2], dtype=float)
         for a in attr_list:
             # calc the actual contribution weights
             def w_func(x):
@@ -215,29 +217,9 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
             mean = (superposition.max() + superposition.min()) / 2
             val_range = superposition.max() - superposition.min()
             superposition = (superposition - mean) * 255 / val_range / len(attr_list)
-            for j in xrange(img_height):
-                for k in xrange(img_width):
-                    total_superposition[j][k][2] += superposition[j][k]
-                    total_superposition[j][k][1] -= superposition[j][k]
-                    total_superposition[j][k][0] -= superposition[j][k]
-            cv2.line(total_superposition,
-                     (int(img_width * center_x - cross_len), int(img_height * center_y)),
-                     (int(img_width * center_x + cross_len), int(img_height * center_y)),
-                     (0, 255, 255))
-            cv2.line(total_superposition,
-                     (int(img_width * center_x), int(img_height * center_y - cross_len)),
-                     (int(img_width * center_x), int(img_height * center_y + cross_len)),
-                     (0, 255, 255))
+            total_superposition += superposition
 
             if attr_id != -1:
-                for j in xrange(img_height):
-                    for k in xrange(img_width):
-                        total_superposition[j][k][2] = min(255, max(0, total_superposition[j][k][2]))
-                        total_superposition[j][k][1] = min(255, max(0, total_superposition[j][k][1]))
-                        total_superposition[j][k][0] = min(255, max(0, total_superposition[j][k][0]))
-                cv2.imshow("sup", total_superposition.astype('uint8'))
-                cv2.imshow("img", img)
-
                 for j in [_[0] for _ in sorted(enumerate([w_func(k) for k in xrange(len(score))]),
                                                key=lambda x:x[1],
                                                reverse=1)][0:8]:
@@ -256,17 +238,17 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
                              (int(img_width * _x), int(img_height * _y - cross_len)),
                              (int(img_width * _x), int(img_height * _y + cross_len)),
                              (0, 255, 255))
-                    cv2.imshow("Masked heat map", canvas)
+                    cv2.imshow("heat", canvas)
                     cv2.waitKey(0)
 
                     print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
                     cv2.imwrite(os.path.join(vis_img_dir, 'heat{}.jpg'.format(j)),
                                 canvas)
 
-        canvas = total_superposition + img
+        canvas = np.array(img)
         for j in xrange(img_height):
             for k in xrange(img_width):
-                canvas[j][k][2] = min(255, max(0, canvas[j][k][2]))
+                canvas[j][k][2] = min(255, max(0, canvas[j][k][2] + total_superposition[j][k]))
                 canvas[j][k][1] = min(255, max(0, canvas[j][k][1]))
                 canvas[j][k][0] = min(255, max(0, canvas[j][k][0]))
         canvas = canvas.astype('uint8')
@@ -277,8 +259,7 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, vis=Fal
         print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
         cv2.imwrite(os.path.join(vis_img_dir, 'final.jpg'), canvas)
 
-    cv2.destroyWindow("heat_maps")
-    cv2.destroyWindow("sup")
+    cv2.destroyWindow("heat")
     cv2.destroyWindow("img")
 
 if __name__ == '__main__':

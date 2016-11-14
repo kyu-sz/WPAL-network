@@ -111,5 +111,8 @@ logs/
 # Swap files
 *.swp
 
+# Output files
+output
+
 # Dataset links
 data/dataset
