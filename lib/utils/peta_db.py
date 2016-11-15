@@ -64,6 +64,8 @@ class PETA:
         self.attr_group = [range(0, 4)]
         self.flip_attr_pairs = []  # The PETA database has no symmetric attribute pairs.
 
+        self.expected_loc_centroids = np.ones(self.num_attr) * 2
+
     def evaluate_mA(self, attr, inds):
         return evaluate.mA(attr, self.labels[inds])
 

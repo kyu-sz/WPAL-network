@@ -71,12 +71,14 @@ def cluster_heat(img, k, stepsX, max_round=1000):
     return centroids
 
 
-def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display=True, save_dir=None):
+def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display=True, save_dir=None, max_count=-1):
     """Test localization of a WPAL Network."""
 
     cfg.TEST.MAX_AREA = int(cfg.TEST.MAX_AREA / 2)
 
     num_images = len(db.test_ind)
+    if (max_count == -1):
+        max_count = num_images
 
     all_attrs = [[] for _ in xrange(num_images)]
 
@@ -139,7 +141,6 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display
         # pass the image throught the test net.
         attr, heat3, heat4, heat5, score, img_scale = recognize_attr(net, img, db.attr_group, threshold)
         all_attrs[cnt] = attr
-        cnt += 1
 
         img_height = int(img.shape[0] * img_scale)
         img_width = int(img.shape[1] * img_scale)
@@ -159,6 +160,7 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display
 
         if display:
             cv2.imshow("img", img)
+            #cv2.waitKey(0)
 
         layer_inds = [find_layer_ind(x) for x in xrange(len(score))]
 
@@ -244,13 +246,12 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display
             superposition = (superposition - thresh) * 255 / val_range / len(attr_list)
             total_superposition += superposition
 
-            expected_num_centroids = 2
+            expected_num_centroids = db.expected_loc_centroids[a]
             centroids = cluster_heat(superposition,
                                      expected_num_centroids + 2,
                                      img.shape[1],
-                                     max_round=1000 / len(attr_list))
+                                     max_round=100 / len(attr_list))
 
-            print centroids
             for c in centroids[:expected_num_centroids]:
                 cv2.line(canvas,
                          (int(c[0] - cross_len), int(c[1])),
@@ -267,26 +268,26 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display
                                                reverse=1)][0:8]:
                     print name, j, w_func(j)
                     val_scale = 255.0 / max(max(__) for __ in bin2heat[j])
-                    canvas = np.zeros_like(img)
-                    canvas[..., 2] = cv2.resize((bin2heat[j] * val_scale).astype('uint8'),
-                                                (img.shape[1], img.shape[0]))
+                    heat_vis = np.zeros_like(img)
+                    heat_vis[..., 2] = cv2.resize((bin2heat[j] * val_scale).astype('uint8'),
+                                                  (img.shape[1], img.shape[0]))
                     y = 1.0 * target[j][0] / bin2heat[j].shape[0]
                     x = 1.0 * target[j][1] / bin2heat[j].shape[1]
-                    cv2.line(canvas,
+                    cv2.line(heat_vis,
                              (int(img_width * x - cross_len), int(img_height * y)),
                              (int(img_width * x + cross_len), int(img_height * y)),
                              (0, 255, 255))
-                    cv2.line(canvas,
+                    cv2.line(heat_vis,
                              (int(img_width * x), int(img_height * y - cross_len)),
                              (int(img_width * x), int(img_height * y + cross_len)),
                              (0, 255, 255))
                     if display:
-                        cv2.imshow("heat", canvas)
+                        cv2.imshow("heat", heat_vis)
                         cv2.waitKey(100)
 
-                    print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
+                    print 'Saving to:', os.path.join(vis_img_dir, 'heat{}.jpg'.format(j))
                     cv2.imwrite(os.path.join(vis_img_dir, 'heat{}.jpg'.format(j)),
-                                canvas)
+                                heat_vis)
 
             print 'Localized attribute {}: {}!'.format(a, db.attr_eng[a][0][0])
 
@@ -302,6 +303,11 @@ def localize(net, db, output_dir, pos_ave, neg_ave, dweight, attr_id=-1, display
             cv2.waitKey(0)
         print 'Saving to:', os.path.join(vis_img_dir, 'final.jpg')
         cv2.imwrite(os.path.join(vis_img_dir, 'final.jpg'), canvas)
+
+        cnt += 1
+        print 'Localized {} targets!'.format(cnt)
+        if cnt >= max_count:
+            break
 
     cv2.destroyWindow("heat")
     cv2.destroyWindow("img")

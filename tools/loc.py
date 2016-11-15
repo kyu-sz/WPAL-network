@@ -72,7 +72,10 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--display', dest='display',
                         help='whether to display on screen',
-                        default=1, type=str)
+                        default=1, type=int)
+    parser.add_argument('--max-count', dest='max_count',
+                        help='max number of images to perform localization',
+                        default=-1, type=int)
     parser.add_argument('--attr-id', dest='attr_id',
                         help='the ID of the attribute to be localized and visualized.'
                              ' -1 for whole body outline.'
@@ -134,14 +137,17 @@ if __name__ == '__main__':
         for a in xrange(db.num_attr):
             localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
                      attr_id=a,
-                     vis=args.display,
-                     save_dir=os.path.join(args.output_dir, 'loc'))
+                     display=args.display,
+                     save_dir=os.path.join(args.output_dir, 'loc',),
+                     max_count=args.max_count)
         localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
                  attr_id=-1,
-                 vis=args.display,
-                 save_dir=os.path.join(args.output_dir, 'loc'))
+                 display=args.display,
+                 save_dir=os.path.join(args.output_dir, 'loc'),
+                 max_count=args.max_count)
     else:
         localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
                  attr_id=args.attr_id,
-                 vis=args.display,
-                 save_dir=os.path.join(args.output_dir, 'loc'))
+                 display=args.display,
+                 save_dir=os.path.join(args.output_dir, 'loc'),
+                 max_count=args.max_count)

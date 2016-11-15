@@ -47,6 +47,10 @@ class RAP:
 
         self.flip_attr_pairs = [(54, 55)]
 
+        self.expected_loc_centroids = np.ones(self.num_attr, dtype=int) * 2
+        self.expected_loc_centroids[9:16] = 1
+        self.expected_loc_centroids[35:43] = 1
+
         """In our model, labels should be all between 0 and 1.
         Some labels are set to 2 in the RAP database, usually meaning the label is unknown or unsure.
         We change it to 0.5 as a more reasonable value expression.
