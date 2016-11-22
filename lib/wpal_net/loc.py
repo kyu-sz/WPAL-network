@@ -32,6 +32,15 @@ from recog import recognize_attr, ResizedImageTooLargeException, ResizedSideTooS
 from config import cfg
 from utils.kmeans import weighted_kmeans
 
+colors = [
+    [0, 0, 255],
+    [0, 255, 0],
+    [255, 0, 0],
+    [0, 255, 255],
+    [255, 0, 255],
+    [255, 255, 0],
+]
+
 
 def gaussian_filter(shape, center_y, center_x, var=1):
     filter_map = np.ndarray(shape)
@@ -216,7 +225,7 @@ def locate(scaled_img,
 
     thresh = min(np.median(superposition), np.mean(superposition))
     val_range = superposition.max() - superposition.min()
-    superposition = (superposition - thresh) * 255 / val_range
+    superposition = (superposition - thresh) / val_range
 
     expected_num_centroids = db.expected_loc_centroids[attr_id]
     centroids = cluster_heat(superposition,
@@ -237,9 +246,10 @@ def locate(scaled_img,
                      (0, 255, 255),
                      thickness=4)
 
+        act_map = superposition * 256
         for j in xrange(img_height):
             for k in xrange(img_width):
-                canvas[j][k][2] = min(255, max(0, canvas[j][k][2] + max(0, superposition[j][k])))
+                canvas[j][k][2] = min(255, max(0, canvas[j][k][2] + max(0, act_map[j][k])))
                 canvas[j][k][1] = min(255, max(0, canvas[j][k][1]))
                 canvas[j][k][0] = min(255, max(0, canvas[j][k][0]))
         canvas = canvas.astype('uint8')
@@ -330,16 +340,16 @@ def test_localization(net,
             if not os.path.exists(vis_img_dir):
                 os.makedirs(vis_img_dir)
 
-            superposition, centroids = locate(img,
-                                              pos_ave, neg_ave, dweight,
-                                              a,
-                                              db,
-                                              attr, heat_maps, score,
-                                              display and attr_id != -1,
-                                              vis_img_dir)
+            act_map, centroids = locate(img,
+                                        pos_ave, neg_ave, dweight,
+                                        a,
+                                        db,
+                                        attr, heat_maps, score,
+                                        display and attr_id != -1,
+                                        vis_img_dir)
             if attr_id == -1:
                 all_centroids += centroids
-                total_superposition += superposition / len(attr_list)
+                total_superposition += act_map * 256 / len(attr_list)
             print 'Localized attribute {}: {}!'.format(a, db.attr_eng[a][0][0])
 
         if attr_id == -1:
@@ -388,14 +398,22 @@ def locate_in_video(net,
                     video_path, tracking_res_path,
                     output_dir,
                     pos_ave, neg_ave, dweight,
-                    attr_id):
+                    attr_id_list):
     """Locate attributes of pedestrians in a video using a WPAL-network.
     The tracking results should be provided in a text file.
     """
 
-    cfg.TEST.MAX_AREA = cfg.TEST.MAX_AREA * 5 / 6
+    cfg.TEST.MAX_AREA = cfg.TEST.MAX_AREA * 3 / 4
 
-    vid_path = os.path.join(output_dir, 'display', db.attr_eng[attr_id][0][0], os.path.basename(video_path))
+    attr_ids = [int(s) for s in attr_id_list.split(',')]
+    if len(attr_ids) > len(colors):
+        print 'Cannot locate more than {} attributes in one video!'.format(len(colors))
+        return
+
+    name_comb = db.attr_eng[attr_ids[0]][0][0]
+    for attr_id in attr_ids[1:]:
+        name_comb += db.attr_eng[attr_id][0][0]
+    vid_path = os.path.join(output_dir, 'display', name_comb, os.path.basename(video_path))
     if not os.path.exists(vid_path):
         os.makedirs(vid_path)
 
@@ -426,6 +444,21 @@ def locate_in_video(net,
         if ret is False:
             break
         canvas = np.array(frame)
+
+        for i in xrange(len(attr_ids)):
+            cv2.rectangle(canvas,
+                          (frame.shape[1] - 300, 30 + 60 * i),
+                          (frame.shape[1] - 280, 50 + 60 * i),
+                          colors[i],
+                          thickness=20)
+            cv2.putText(canvas,
+                        db.attr_eng[attr_ids[i]][0][0],
+                        (frame.shape[1] - 260, 50 + 60 * i),
+                        cv2.FONT_HERSHEY_COMPLEX,
+                        1,
+                        colors[i],
+                        thickness=3)
+
         has_pedestrian = False
         for tracklet in tracklets:
             if tracklet['start_frame_ind'] \
@@ -445,16 +478,20 @@ def locate_in_video(net,
                                                                        db.attr_group,
                                                                        threshold,
                                                                        neglect=False)
-                except ResizedImageTooLargeException:
-                    print 'Skipped for too large resized image.'
-                    continue
                 except ResizedSideTooShortException:
                     print 'Skipped for too short side.'
                     continue
 
-                if attr[attr_id] != 1:
-                    print 'Target has not attribute {}!'.format(db.attr_eng[attr_id][0][0])
-                    continue
+                msg = ''
+                for i in xrange(len(attr_ids)):
+                    if attr[attr_ids[i]] == 1:
+                        msg += db.attr_eng[attr_ids[i]][0][0] + ' '
+                print 'Recognized {}from Frame {}'.format(msg, frame_cnt)
+                msg = ''
+                for i in xrange(len(attr)):
+                    if attr[i] == 1 and not attr_ids.__contains__(i):
+                        msg += db.attr_eng[i][0][0] + ' '
+                print 'Unshown attributes: ' + msg
 
                 cv2.imshow("cropped", cropped)
                 cv2.waitKey(1)
@@ -463,30 +500,39 @@ def locate_in_video(net,
                 cropped_width = int(cropped.shape[1] * img_scale)
                 cropped = cv2.resize(cropped, (cropped_width, cropped_height))
 
-                superposition, centroids = locate(cropped, pos_ave, neg_ave, dweight, attr_id, db,
-                                                  attr, heat_maps, score, display=False)
-                superposition = cv2.resize(superposition, (bbox[2], bbox[3]))
-                for x in xrange(bbox[2]):
-                    for y in xrange(bbox[3]):
-                        fx = x + bbox[0]
-                        fy = y + bbox[1]
-                        canvas[fy][fx][2] = np.uint8(min(255, np.float64(frame[fy][fx][2]) + superposition[y][x]))
-                centroids = centroids[:,:2] / img_scale + (bbox[0], bbox[1])
-                cross_len = math.sqrt(frame.shape[0] * frame.shape[1]) * 0.02
+                for i in xrange(len(attr_ids)):
+                    attr_id = attr_ids[i]
+                    if attr[attr_id] != 1:
+                        continue
+                    act_map, centroids = locate(cropped, pos_ave, neg_ave, dweight, attr_id, db,
+                                                      attr, heat_maps, score, display=False)
+                    act_map = cv2.resize(act_map, (bbox[2], bbox[3]))
+                    for x in xrange(bbox[2]):
+                        for y in xrange(bbox[3]):
+                            fx = x + bbox[0]
+                            fy = y + bbox[1]
+                            canvas[fy][fx][0] = np.uint8(min(255, canvas[fy][fx][0]
+                                                             + max(0, act_map[y][x]) * colors[i][0]))
+                            canvas[fy][fx][1] = np.uint8(min(255, canvas[fy][fx][1]
+                                                             + max(0, act_map[y][x]) * colors[i][1]))
+                            canvas[fy][fx][2] = np.uint8(min(255, canvas[fy][fx][2]
+                                                             + max(0, act_map[y][x]) * colors[i][2]))
+                    centroids = centroids[:, :2] / img_scale + (bbox[0], bbox[1])
+                    cross_len = math.sqrt(frame.shape[0] * frame.shape[1]) * 0.02
 
-                thickness = len(centroids) * 2
-                for c in centroids:
-                    cv2.line(canvas,
-                             (int(c[0] - cross_len), int(c[1])),
-                             (int(c[0] + cross_len), int(c[1])),
-                             (0, 255, 255),
-                             thickness=thickness)
-                    cv2.line(canvas,
-                             (int(c[0]), int(c[1] - cross_len)),
-                             (int(c[0]), int(c[1] + cross_len)),
-                             (0, 255, 255),
-                             thickness=thickness)
-                    thickness -= 2
+                    thickness = len(centroids) * 2
+                    for c in centroids:
+                        cv2.line(canvas,
+                                 (int(c[0] - cross_len), int(c[1])),
+                                 (int(c[0] + cross_len), int(c[1])),
+                                 colors[i],
+                                 thickness=thickness)
+                        cv2.line(canvas,
+                                 (int(c[0]), int(c[1] - cross_len)),
+                                 (int(c[0]), int(c[1] + cross_len)),
+                                 colors[i],
+                                 thickness=thickness)
+                        thickness -= 2
 
         if has_pedestrian:
             if writer is None:

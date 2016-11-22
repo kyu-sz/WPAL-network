@@ -76,11 +76,12 @@ def parse_args():
     parser.add_argument('--max-count', dest='max_count',
                         help='max number of images to perform localization',
                         default=-1, type=int)
-    parser.add_argument('--attr-id', dest='attr_id',
-                        help='the ID of the attribute to be located and visualized.'
-                             ' -1 for whole body outline.'
-                             ' -2 for all attributes.',
-                        default=-1, type=int)
+    parser.add_argument('--attr-ids', dest='attr_id_list',
+                        help='the IDs of the attributes to be located and visualized, '
+                             'split by comma. '
+                             '-1 for whole body shape. '
+                             '-2 for all attributes. ',
+                        default=-1, type=str)
     parser.add_argument('--video', dest='video',
                         help='specifying this argument means the program is to perform '
                              'attribute localization on a video but not the database pictures ',
@@ -150,9 +151,9 @@ if __name__ == '__main__':
                         args.video, args.tracking_res,
                         args.output_dir,
                         pack['pos_ave'], pack['neg_ave'], pack['binding'],
-                        args.attr_id)
+                        args.attr_id_list)
     else:
-        if args.attr_id == -2:
+        if args.attr_id_list == '-2':
             for a in xrange(db.num_attr):
                 test_localization(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
                                   attr_id=a,
@@ -163,7 +164,8 @@ if __name__ == '__main__':
                               display=args.display,
                               max_count=args.max_count)
         else:
-            test_localization(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
-                              attr_id=args.attr_id,
-                              display=args.display,
-                              max_count=args.max_count)
+            for attr_id in args.attr_id_list.split(','):
+                test_localization(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                                  attr_id=int(attr_id),
+                                  display=args.display,
+                                  max_count=args.max_count)

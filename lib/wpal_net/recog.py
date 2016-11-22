@@ -78,13 +78,15 @@ def discretize(attr, threshold):
 
 def recognize_attr(net, img, attr_group, threshold=None, neglect=False):
     """Recognize attributes in a pedestrian image.
-
     Arguments:
-        net (caffe.Net): WMA network to use.
-        img (ndarray): color image to test (in BGR order)
-        attr_group(list of ranges): a list of ranges, each contains indexes
-                                    of attributes that mutually exclude each other.
-
+        net (caffe.Net):            WPAL network to use.
+        img (ndarray):              Color image to test (in BGR order)
+        attr_group(list of ranges): A list of ranges, each contains indexes of
+                                    attributes mutually excluding each other.
+        threshold (array):          Threshold for judging labels from scores.
+        neglect (bool):             Whether to neglect the image if when it is
+                                    adjusted to have expected longest side
+                                    length, its size becomes larger than limit.
     Returns:
         attributes (ndarray): K x 1 array of predicted attributes. (K is
             specified by database or the net)
