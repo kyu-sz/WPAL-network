@@ -40,7 +40,7 @@ def estimate_param(net, db, output_dir, res_file, save_res=False):
         cnt = 0
         for i in db.train_ind:
             img = cv2.imread(db.get_img_path(i))
-            attr, _, _, _, score, _ = recognize_attr(net, img, db.attr_group)
+            attr, _, score, _ = recognize_attr(net, img, db.attr_group)
             attrs.append(attr)
             scores.append([x for x in score])
             labels.append(db.labels[i])

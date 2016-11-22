@@ -33,7 +33,7 @@ import numpy as np
 
 import caffe
 from wpal_net.config import cfg, cfg_from_file, cfg_from_list
-from wpal_net.loc import localize
+from wpal_net.loc import test_localization, locate_in_video
 
 
 def parse_args():
@@ -77,10 +77,19 @@ def parse_args():
                         help='max number of images to perform localization',
                         default=-1, type=int)
     parser.add_argument('--attr-id', dest='attr_id',
-                        help='the ID of the attribute to be localized and visualized.'
+                        help='the ID of the attribute to be located and visualized.'
                              ' -1 for whole body outline.'
                              ' -2 for all attributes.',
                         default=-1, type=int)
+    parser.add_argument('--video', dest='video',
+                        help='specifying this argument means the program is to perform '
+                             'attribute localization on a video but not the database pictures ',
+                        default=None, type=str)
+    parser.add_argument('--tracking-res', dest='tracking_res',
+                        help='when conducting attribute localization on a video, '
+                             'pedestrian tracking should be performed in advance, '
+                             'and results are input as an input file.',
+                        default=None, type=str)
 
     args = parser.parse_args()
 
@@ -114,10 +123,12 @@ if __name__ == '__main__':
     if args.db == 'RAP':
         """Load RAP database"""
         from utils.rap_db import RAP
+
         db = RAP(os.path.join('data', 'dataset', args.db), args.par_set_id)
     else:
         """Load PETA dayanse"""
         from utils.peta_db import PETA
+
         db = PETA(os.path.join('data', 'dataset', args.db), args.par_set_id)
 
     f = open(args.dweight, 'rb')
@@ -133,21 +144,26 @@ if __name__ == '__main__':
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
-    if args.attr_id == -2:
-        for a in xrange(db.num_attr):
-            localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
-                     attr_id=a,
-                     display=args.display,
-                     save_dir=os.path.join(args.output_dir, 'loc',),
-                     max_count=args.max_count)
-        localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
-                 attr_id=-1,
-                 display=args.display,
-                 save_dir=os.path.join(args.output_dir, 'loc'),
-                 max_count=args.max_count)
+    if args.video is not None:
+        locate_in_video(net,
+                        db,
+                        args.video, args.tracking_res,
+                        args.output_dir,
+                        pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                        args.attr_id)
     else:
-        localize(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
-                 attr_id=args.attr_id,
-                 display=args.display,
-                 save_dir=os.path.join(args.output_dir, 'loc'),
-                 max_count=args.max_count)
+        if args.attr_id == -2:
+            for a in xrange(db.num_attr):
+                test_localization(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                                  attr_id=a,
+                                  display=args.display,
+                                  max_count=args.max_count)
+            test_localization(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                              attr_id=-1,
+                              display=args.display,
+                              max_count=args.max_count)
+        else:
+            test_localization(net, db, args.output_dir, pack['pos_ave'], pack['neg_ave'], pack['binding'],
+                              attr_id=args.attr_id,
+                              display=args.display,
+                              max_count=args.max_count)
