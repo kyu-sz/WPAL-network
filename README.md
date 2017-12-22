@@ -62,7 +62,7 @@ To train the model, first fetch a pretrained VGG_CNN_S model by:
 Then run experiment script for training:
 
 ```Shell
-./experiments/example/VGG_CNN_S/train_vgg_s_rap_0.sh
+./experiments/examples/VGG_CNN_S/train_vgg_s_rap_0.sh
 ```
 
 Experiment script for testing is also available:
