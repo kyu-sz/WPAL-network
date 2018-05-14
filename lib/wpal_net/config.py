@@ -78,6 +78,9 @@ __C.TRAIN.ASPECT_GROUPING = True
 # Whether to do flipping during training
 __C.TRAIN.DO_FLIP = True
 
+# The number of the attributes used in training
+__C.NUM_ATTR = 92
+
 # Value range of RGB Jittering.
 __C.TRAIN.RGB_JIT = 16
 
